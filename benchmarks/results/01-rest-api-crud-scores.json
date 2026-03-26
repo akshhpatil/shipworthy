@@ -1,0 +1,14 @@
+{
+  "task": "01-rest-api-crud",
+  "timestamp": "2026-03-26T04:37:35Z",
+  "with_plugin": {
+    "score": 22,
+    "score_file": "01-rest-api-crud-with-score.json"
+  },
+  "without_plugin": {
+    "score": 12,
+    "score_file": "01-rest-api-crud-without-score.json"
+  },
+  "difference": 10,
+  "winner": "with-plugin"
+}

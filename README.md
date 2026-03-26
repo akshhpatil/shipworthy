@@ -190,6 +190,29 @@ Specialized AI personas dispatched by skills for focused review:
 - Session 3: Add features. Quality gates catch issues before you see them. Tech debt is tracked, not hidden.
 - Ship: Tested, secure, documented, production-ready.
 
+## Benchmark Results
+
+We tested the plugin with an unbiased benchmark: same prompt, same starter project, scored by 15 automated checks. The only variable is whether the plugin is loaded.
+
+**Task 01 — Build a REST API with CRUD (Express + TypeScript):**
+
+| | With Plugin | Without Plugin |
+|---|---|---|
+| **Score** | **22/25 (A)** | **12/25 (C)** |
+| Tests | 22 tests, all passing | 0 tests |
+| Input validation | Zod schemas | Manual if/else |
+| Error handling | 3 structured error types | 1 basic class |
+| Architecture | 8 files, separated concerns | 5 files, simpler |
+
+**+83% score improvement.** The plugin's TDD skill drove test creation, the security skill enforced Zod validation, and the API design skill produced proper status codes and error formatting.
+
+Full methodology, all 10 task definitions, and reproducible benchmark scripts: [BENCHMARKS.md](BENCHMARKS.md)
+
+```bash
+# Run benchmarks yourself
+cd benchmarks && ./run-benchmark.sh --task 1 --both
+```
+
 ## Contributing
 
 We welcome contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on writing new skills, adding templates, proposing agents, and submitting pull requests.

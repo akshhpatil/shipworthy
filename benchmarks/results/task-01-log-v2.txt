@@ -1,0 +1,110 @@
+Benchmark Runner
+  Mode: both
+  Results: /Users/vimalkumar/engineering-with-vibes/benchmarks/results
+
+==============================================
+Task 01: 01-rest-api-crud
+==============================================
+Prompt: Build a REST API for a todo app with CRUD operations. Use Express and TypeScript. Include proper error handling and input validation.
+This prompt is given identically for both the **with-plugin** and **without-plugin** runs. No additional guidance or follow-up prompts are allowed.
+
+--- Running WITH plugin ---
+Project set up at: /Users/vimalkumar/engineering-with-vibes/benchmarks/results/01-rest-api-crud-with
+  Running Claude Code (plugin=true)...
+
+added 143 packages, and audited 144 packages in 3s
+
+23 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+Zero type errors. Here's what was built:
+
+**Project structure:**
+```
+src/
+├── __tests__/todos.test.ts   — 22 tests covering all CRUD + edge cases
+├── app.ts                    — Express app with global error handler
+├── errors.ts                 — Structured error types (AppError, NotFoundError, ValidationError)
+├── index.ts                  — Server entry point
+├── routes/todos.ts           — CRUD route handlers with error forwarding
+├── store.ts                  — In-memory todo storage
+├── types.ts                  — Todo interface
+└── validation.ts             — Zod schemas for create/update
+```
+
+**API endpoints:**
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/todos` | List all todos (newest first) |
+| GET | `/todos/:id` | Get a single todo |
+| POST | `/todos` | Create a todo (requires `title`) |
+| PUT | `/todos/:id` | Update a todo (partial update) |
+| DELETE | `/todos/:id` | Delete a todo |
+
+**Key features:**
+- **Input validation** with Zod — title length limits, required fields, partial update requires at least one field
+- **Structured errors** — consistent `{ error: { code, message, details? } }` format across all error types (validation, not found, bad JSON, server errors)
+- **Proper status codes** — 201 for create, 204 for delete, 400 for validation, 404 for missing resources
+- **No leaked internals** — unexpected errors return generic message, never stack traces
+- **22 tests passing**, TypeScript compiles with zero errors
+
+Run with `npm run dev` to start the server on port 3000.
+  Scoring...
+  Score: 22/25 (A)
+
+--- Running WITHOUT plugin ---
+Project set up at: /Users/vimalkumar/engineering-with-vibes/benchmarks/results/01-rest-api-crud-without
+  Running Claude Code (plugin=false)...
+
+added 143 packages, and audited 144 packages in 798ms
+
+23 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+All endpoints working correctly. Here's what was built:
+
+**Files created:**
+
+| File | Purpose |
+|---|---|
+| `src/index.ts` | Express server setup, mounts routes and error handler |
+| `src/types.ts` | `Todo` interface, request body types, `AppError` class |
+| `src/validation.ts` | Input validation for create/update with length limits |
+| `src/routes/todos.ts` | CRUD route handlers with in-memory store |
+| `src/middleware/errorHandler.ts` | Centralized error handling middleware |
+
+**Endpoints:**
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/health` | Health check |
+| `GET` | `/todos` | List all todos (newest first) |
+| `GET` | `/todos/:id` | Get a single todo |
+| `POST` | `/todos` | Create a todo (`title` required, `description` optional) |
+| `PATCH` | `/todos/:id` | Update a todo (partial updates) |
+| `DELETE` | `/todos/:id` | Delete a todo |
+
+**Error handling includes:** custom `AppError` class for structured HTTP errors, input validation (required fields, type checks, length limits), 404 for missing todos, malformed JSON detection, and a catch-all 500 handler.
+
+Run with `npm run dev` to start the development server.
+  Scoring...
+  Score: 12/25 (C)
+
+--- Comparison ---
+  With plugin:    22 points
+  Without plugin: 12 points
+  Difference:     10 points
+
+  Combined scores saved to: /Users/vimalkumar/engineering-with-vibes/benchmarks/results/01-rest-api-crud-scores.json
+
+--- Running blind A/B comparison ---
+Blind assignment: A=without-plugin, B=with-plugin
+(This mapping is hidden from the judge.)
+
+Collecting code from Codebase A...
+Collecting code from Codebase B...
+sed: 1: "s|{{TASK_PROMPT}}|Build ...": unescaped newline inside substitute pattern
+

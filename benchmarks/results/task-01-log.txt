@@ -1,0 +1,99 @@
+Benchmark Runner
+  Mode: both
+  Results: /Users/vimalkumar/engineering-with-vibes/benchmarks/results
+
+==============================================
+Task 01: 01-rest-api-crud
+==============================================
+Prompt: Build a REST API for a todo app with CRUD operations. Use Express and TypeScript. Include proper error handling and input validation.
+This prompt is given identically for both the **with-plugin** and **without-plugin** runs. No additional guidance or follow-up prompts are allowed.
+
+--- Running WITH plugin ---
+Project set up at: /Users/vimalkumar/engineering-with-vibes/benchmarks/results/01-rest-api-crud-with
+  Running Claude Code (plugin=true)...
+
+added 143 packages, and audited 144 packages in 4s
+
+23 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+All endpoints work correctly. Here's what was built:
+
+**Files created:**
+
+| File | Purpose |
+|---|---|
+| `src/index.ts` | Express app setup, health check, 404 handler, global error handler |
+| `src/types.ts` | `Todo`, `CreateTodoInput`, `UpdateTodoInput` interfaces + `AppError` class |
+| `src/validation.ts` | Input validation for create/update with type checks, length limits, required fields |
+| `src/routes/todos.ts` | CRUD route handlers using in-memory `Map` store |
+
+**Endpoints:**
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/todos` | List all todos (sorted by newest first) |
+| `GET` | `/todos/:id` | Get a single todo |
+| `POST` | `/todos` | Create a todo (requires `title`, optional `description`) |
+| `PUT` | `/todos/:id` | Update a todo (`title`, `description`, `completed`) |
+| `DELETE` | `/todos/:id` | Delete a todo |
+| `GET` | `/health` | Health check |
+
+**Error handling:** Custom `AppError` class for structured errors, malformed JSON detection, 404 for unknown routes/IDs, validation errors with clear messages, and a catch-all 500 handler.
+
+**Run with:** `npm run dev`
+  Scoring...
+  Score: 14/25 (B)
+
+--- Running WITHOUT plugin ---
+Project set up at: /Users/vimalkumar/engineering-with-vibes/benchmarks/results/01-rest-api-crud-without
+  Running Claude Code (plugin=false)...
+
+added 143 packages, and audited 144 packages in 797ms
+
+23 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+All endpoints working correctly. Here's what was built:
+
+**Files created:**
+
+| File | Purpose |
+|------|---------|
+| `src/index.ts` | Express app setup, JSON parse error handling, 404/500 handlers |
+| `src/types.ts` | TypeScript interfaces for Todo, request bodies, and API errors |
+| `src/validation.ts` | Input validation for create/update with detailed error messages |
+| `src/routes/todos.ts` | CRUD route handlers using in-memory Map storage |
+
+**API Endpoints:**
+
+| Method | Route | Description |
+|--------|-------|-------------|
+| `GET` | `/api/todos` | List all todos (sorted newest first) |
+| `GET` | `/api/todos/:id` | Get a single todo |
+| `POST` | `/api/todos` | Create a todo |
+| `PUT` | `/api/todos/:id` | Update a todo |
+| `DELETE` | `/api/todos/:id` | Delete a todo |
+| `GET` | `/health` | Health check |
+
+**Error handling covers:** invalid JSON bodies, validation failures (empty title, wrong types, length limits), 404 for missing todos and unknown routes, and a global 500 handler. Run with `npm run dev` to start the server.
+  Scoring...
+  Score: 14/25 (B)
+
+--- Comparison ---
+  With plugin:    14 points
+  Without plugin: 14 points
+  Difference:     0 points
+
+  Combined scores saved to: /Users/vimalkumar/engineering-with-vibes/benchmarks/results/01-rest-api-crud-scores.json
+
+--- Running blind A/B comparison ---
+Blind assignment: A=without-plugin, B=with-plugin
+(This mapping is hidden from the judge.)
+
+Collecting code from Codebase A...
+Collecting code from Codebase B...
+sed: 1: "/^## Prompt$/,/^## /{/^ ...": extra characters at the end of p command
+
