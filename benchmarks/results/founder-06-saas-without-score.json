@@ -1,0 +1,25 @@
+{
+  "project": "/Users/vimalkumar/engineering-with-vibes/benchmarks/results/founder-06-saas-without",
+  "timestamp": "2026-03-26T06:03:11Z",
+  "language": "node",
+  "checks": {
+    "tests_exist": { "pass": true, "points": 3, "max_points": 3, "details": "Found 1 test file(s)" },
+    "tests_pass": { "pass": true, "points": 3, "max_points": 3, "details": "npm test exit code: 0" },
+    "build_passes": { "pass": true, "points": 2, "max_points": 2, "details": "tsc --noEmit exit code: 0" },
+    "no_hardcoded_secrets": { "pass": false, "points": 0, "max_points": 2, "details": "Found 1 potential secret(s) in source" },
+    "no_console_log": { "pass": false, "points": 0, "max_points": 1, "details": "Found 5 console.log statement(s) in non-test files" },
+    "input_validation": { "pass": false, "points": 0, "max_points": 2, "details": "No validation library detected" },
+    "error_handling": { "pass": true, "points": 2, "max_points": 2, "details": "Error middleware pattern found" },
+    "typescript_strict": { "pass": true, "points": 2, "max_points": 2, "details": "tsconfig.json has strict: true" },
+    "no_any_types": { "pass": false, "points": 0, "max_points": 1, "details": "Found 34 occurrence(s) of : any in .ts files" },
+    "http_status_codes": { "pass": false, "points": 0, "max_points": 2, "details": "No HTTP status code patterns found" },
+    "env_variables": { "pass": true, "points": 1, "max_points": 1, "details": "Found 20 process.env reference(s)" },
+    "test_coverage": { "pass": false, "points": 0, "max_points": 1, "details": "Coverage tooling not configured or not available" },
+    "lint_passes": { "pass": false, "points": 0, "max_points": 1, "details": "No linter configured" },
+    "no_circular_imports": { "pass": true, "points": 1, "max_points": 1, "details": "No obvious circular imports detected" },
+    "lock_file_present": { "pass": true, "points": 1, "max_points": 1, "details": "package-lock.json present" }
+  },
+  "total_points": 15,
+  "max_points": 25,
+  "grade": "B"
+}

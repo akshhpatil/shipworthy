@@ -1,0 +1,29 @@
+{
+  "task": "founder-06-full-saas-app",
+  "persona": "Non-technical startup founder building InvoiceFlow",
+  "prompt_length": "Long detailed brief describing auth, clients, invoices, dashboard, filters, authorization",
+  "with_plugin": { "score": 19, "grade": "A", "tests": 30, "files": 17 },
+  "without_plugin": { "score": 15, "grade": "B", "tests": 23, "files": 15 },
+  "difference": 4,
+  "winner": "with-plugin",
+  "deep_comparison": {
+    "database": { "with": "SQLite with FK constraints, indexes, CHECK constraints, WAL mode", "without": "SQLite with FK constraints, transactions" },
+    "validation": { "with": "Zod schemas for all inputs", "without": "Manual if/else checks" },
+    "tests": { "with": "30 tests (auth, IDOR prevention, CRUD, status machine, dashboard aggregation)", "without": "23 tests (auth, CRUD, status, dashboard)" },
+    "authorization_tests": { "with": "Explicit cross-user isolation tests", "without": "Query scoped by user_id but no explicit IDOR tests" },
+    "error_handling": { "with": "Structured AppError with codes and status mapping", "without": "Raw error responses" },
+    "secrets": { "with": "Clean — no hardcoded secrets detected", "without": "Potential secret patterns detected in error messages" },
+    "status_machine": { "with": "Enforced transitions (draft→sent→paid, overdue→paid)", "without": "Enforced transitions (draft→sent→paid, overdue→paid)" },
+    "invoice_totals": { "with": "Computed from line items", "without": "Computed from line items" }
+  },
+  "key_findings": [
+    "Both produced a working SaaS backend with SQLite, auth, CRUD, and dashboard",
+    "Both enforced invoice status transitions correctly",
+    "Both computed invoice totals from line items (not stored separately)",
+    "Plugin version had Zod validation vs manual checks",
+    "Plugin version had 30 tests vs 23 — the 7 extra tests were specifically for IDOR prevention and edge cases",
+    "Plugin version had structured error codes vs raw error strings",
+    "Plugin version had no any types; without-plugin version may have some",
+    "The founder got a production-ready backend either way — the plugin version was more robust"
+  ]
+}
