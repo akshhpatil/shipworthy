@@ -1,0 +1,19 @@
+{
+  "task": "founder-01-signup-login",
+  "persona": "Non-technical startup founder",
+  "prompt": "I need users to be able to create an account and log in to my app. They should sign up with their email and password, and once they're logged in they should stay logged in. If someone tries to access the app without logging in, they should be sent to the login page.",
+  "with_plugin": { "score": 18, "grade": "A" },
+  "without_plugin": { "score": 17, "grade": "B" },
+  "difference": 1,
+  "security_analysis": {
+    "password_hashing": { "with": "PASS (bcrypt)", "without": "PASS (bcrypt)" },
+    "session_expiry": { "with": "PASS (30 days JWT)", "without": "PASS (7 days session)" },
+    "safe_error_messages": { "with": "PASS (generic 'Invalid email or password')", "without": "PASS (generic 'Invalid email or password')" },
+    "secrets_from_env": { "with": "PASS (JWT_SECRET from process.env)", "without": "PASS (SESSION_SECRET from process.env)" },
+    "no_any_types": { "with": "PASS (0 any)", "without": "FAIL (2 any types)" },
+    "tests": { "with": "PASS (14 tests)", "without": "PASS (14 tests)" },
+    "database": { "with": "SQLite (persistent)", "without": "In-memory (resets on restart)" }
+  },
+  "winner": "with-plugin",
+  "notes": "Both produced secure auth with bcrypt, safe error messages, and tests. Key differences: with-plugin used SQLite (persistent data), no any types, structured error codes. Without-plugin used in-memory storage (data lost on restart) and 2 any types."
+}

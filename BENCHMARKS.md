@@ -146,6 +146,53 @@ src/
 
 ---
 
+---
+
+## Founder Test Results
+
+These tests use **non-technical language** — the prompts describe business outcomes, not technical implementations. The founder doesn't know what REST, JWT, bcrypt, or middleware means. They just describe what they want.
+
+The question: **does Shipworthy produce production-grade code even when the user can't ask for it?**
+
+### Founder Test 01: "I need users to sign up and log in"
+
+**Prompt (identical for both runs):**
+> I need users to be able to create an account and log in to my app. They should sign up with their email and password, and once they're logged in they should stay logged in. If someone tries to access the app without logging in, they should be sent to the login page.
+
+Note: This prompt does NOT mention bcrypt, JWT, hashing, middleware, rate limiting, or any security concept. A non-technical founder wouldn't know to ask for these.
+
+#### Scores
+
+| | With Plugin | Without Plugin |
+|---|---|---|
+| **Automated Score** | **18/25 (A)** | **17/25 (B)** |
+
+#### Security Deep-Dive (The Stuff Founders Can't Ask For)
+
+| Security Check | With Plugin | Without Plugin |
+|----------------|------------|----------------|
+| Passwords hashed (bcrypt) | PASS | PASS |
+| Session/token expiry | PASS (30-day JWT) | PASS (7-day session) |
+| Safe error messages | PASS ("Invalid email or password") | PASS ("Invalid email or password") |
+| Secrets from env vars | PASS (JWT_SECRET) | PASS (SESSION_SECRET) |
+| No `any` types | PASS (0 any) | FAIL (2 any types) |
+| Tests | PASS (14 tests) | PASS (14 tests) |
+| **Data persistence** | **SQLite (survives restart)** | **In-memory (lost on restart)** |
+
+#### Key Finding
+
+Both runs produced secure auth — bcrypt hashing, safe error messages, env-based secrets, 14 tests. The founder would get a working, secure login system either way.
+
+However, the **with-plugin** output was more production-ready:
+- **SQLite database** instead of in-memory storage (data survives server restarts)
+- **Zero `any` types** (stricter TypeScript)
+- **Structured error codes** (`INVALID_CREDENTIALS`, `VALIDATION_ERROR`) vs raw error strings
+- **JWT with HTTP-only cookies** vs express-session (more scalable for APIs)
+
+The **without-plugin** output had a critical production bug: **in-memory storage means all user accounts are lost when the server restarts.** A founder would discover this the hard way in production. The plugin's architecture skills guided Claude to use a proper database.
+
+---
+
 ## How to Run Benchmarks Yourself
 
 ### Prerequisites
