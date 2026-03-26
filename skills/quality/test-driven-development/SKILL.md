@@ -152,6 +152,43 @@ No matter who the user is or how small the task seems, these ALWAYS get tested:
 6. **Testing trivial getters/setters** — this adds maintenance, not confidence
 7. **Ceremonial tests** — writing tests to hit a coverage number rather than to verify behavior
 
+## Test Infrastructure Setup (Do This First)
+
+Before writing any test, ensure the test infrastructure exists:
+
+### TypeScript/JavaScript
+1. Install vitest if not present: `npm install -D vitest @vitest/coverage-v8`
+2. Add scripts to package.json:
+   ```json
+   "test": "vitest run",
+   "test:watch": "vitest",
+   "test:coverage": "vitest run --coverage"
+   ```
+3. If supertest is needed for API tests: `npm install -D supertest @types/supertest`
+
+### Python
+1. Install pytest if not present: `pip install pytest pytest-cov`
+2. Add pytest.ini or pyproject.toml config with coverage settings
+
+### Go
+1. Use stdlib `testing` — no install needed
+2. Run with: `go test -cover ./...`
+
+This is a one-time setup. Do it on the FIRST test, not every test.
+
+## TypeScript-Specific Rules
+
+- **NEVER use `catch (err: any)`** — use `catch (err: unknown)` and narrow:
+  ```typescript
+  catch (err: unknown) {
+    if (err instanceof Error) {
+      // handle Error
+    }
+    throw err;
+  }
+  ```
+- **NEVER use `: any` in test files either** — tests should be as strictly typed as production code
+
 ## Integration with Architecture Spec
 
 Read `architecture.md` to determine:
@@ -160,4 +197,4 @@ Read `architecture.md` to determine:
 - Naming conventions for test files
 - Coverage thresholds (if specified)
 
-Follow whatever the architecture spec says. If it doesn't specify, ask the user.
+Follow whatever the architecture spec says. If it doesn't specify, default to Vitest for TypeScript, pytest for Python, stdlib testing for Go.

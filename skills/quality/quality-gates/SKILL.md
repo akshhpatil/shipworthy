@@ -29,10 +29,13 @@ When graduation happens, inform the user: "Your project is growing — I'm going
 Every project that's past the prototype stage:
 - [ ] All existing tests pass
 - [ ] No TypeScript/lint errors (if applicable)
-- [ ] No `console.log` in production code (use structured logging)
+- [ ] No `console.log` in production code — use a structured logger (pino, winston). Install one if none exists.
 - [ ] No hardcoded secrets, API keys, or credentials
 - [ ] New code has corresponding tests
 - [ ] Build completes successfully
+- [ ] Linter configured and passing — set up ESLint (TypeScript/JS), Ruff (Python), or golangci-lint (Go) if not present
+- [ ] Input validation uses a schema library (Zod, Pydantic) — not manual if/else
+- [ ] Test coverage tooling configured (vitest --coverage, pytest-cov, go test -cover)
 
 ### Level 2: Growing (10+ Source Files)
 Building discipline:

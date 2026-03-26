@@ -4,15 +4,27 @@ description: Master routing skill — loaded at every session start. Defines ski
 invoke_when: Always. This skill is injected via session-start hook on every session.
 ---
 
-# Using Engineering With Vibes
+# Using Shipworthy
 
-You are enhanced with the **Engineering With Vibes** plugin — a comprehensive set of skills that help you produce production-quality systems, not just prototypes.
+You are enhanced with the **Shipworthy** plugin — a comprehensive set of skills that help you produce production-quality systems, not just prototypes.
 
 ## Core Thesis
 
 **Vibe coding is how you start; engineering is what keeps it alive.**
 
 Your job is to apply invisible discipline: enforce engineering principles automatically so the user never has to think about process. They describe what they want; you ensure it's built correctly.
+
+## Non-Negotiable Defaults (Apply On Every Project)
+
+These are not suggestions. Apply them automatically without asking:
+
+1. **NEVER use `console.log`** — use a structured logger (`pino` for Node.js, `logging` for Python, `slog` for Go). This includes server startup messages. If no logger is installed, install one as a first step.
+2. **ALWAYS use Zod for input validation** (TypeScript/JavaScript). Install it (`npm install zod`) before writing any route handler. For Python, use Pydantic. For Go, use the `validator` package.
+3. **ALWAYS configure test coverage** — add `@vitest/coverage-v8` (or equivalent) and a `coverage` script in package.json. For Python: `pytest-cov`. For Go: `go test -cover`.
+4. **ALWAYS set up a linter** — install ESLint (TypeScript/JS), Ruff (Python), or `golangci-lint` (Go) and add a `lint` script. Use a strict config.
+5. **NEVER use `: any`** in TypeScript. Use `unknown` and narrow with type guards. For catch blocks, use `catch (err: unknown)` and narrow: `if (err instanceof Error)`.
+6. **ALWAYS use proper HTTP status codes** — 201 for creation, 204 for deletion, 400 for validation, 401 for auth, 403 for authz, 404 for not found, 409 for conflict, 429 for rate limit.
+7. **ALWAYS use a database** (SQLite minimum) — never use in-memory arrays/objects for data that should persist. In-memory data disappears on server restart.
 
 ## Priority Hierarchy
 

@@ -219,7 +219,7 @@ validation_details="No validation library detected"
 if [[ "$LANG" == "node" ]]; then
   if grep -qE '"zod"|"joi"|"yup"|"class-validator"|"ajv"' "$PROJECT_DIR/package.json" 2>/dev/null; then
     # Also check that it's actually imported somewhere in source
-    usage=$(grep -rl 'from .zod\|from .joi\|from .yup\|from .class-validator\|from .ajv\|require.*zod\|require.*joi\|require.*yup' "$PROJECT_DIR" \
+    usage=$(grep -rlE "from ['\"]zod['\"]|from ['\"]joi['\"]|from ['\"]yup['\"]|from ['\"]class-validator['\"]|from ['\"]ajv['\"]|require\(['\"]zod['\"]|import.*zod|import.*joi|import.*yup|z\.object|z\.string|Joi\.|yup\." "$PROJECT_DIR" \
       --include='*.ts' --include='*.js' \
       --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist \
       2>/dev/null || true)
@@ -317,7 +317,7 @@ status_pass="false"
 status_details="No HTTP status code patterns found"
 
 if [[ "$LANG" == "node" ]]; then
-  status_hits=$(grep -rn 'res\.status\s*(\s*[2345]' "$PROJECT_DIR" \
+  status_hits=$(grep -rnE 'res\.status\s*\(\s*[2345]|status:\s*[2345][0-9][0-9]|\.status\([2345][0-9][0-9]\)|NextResponse\.json\(.*status' "$PROJECT_DIR" \
     --include='*.ts' --include='*.js' \
     --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist \
     2>/dev/null || true)

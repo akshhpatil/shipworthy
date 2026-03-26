@@ -12,6 +12,24 @@ If you can't see it, you can't fix it. Every service should be observable from t
 
 ## Structured Logging
 
+### First Step: Install a Logger
+Before writing any code that logs anything, install a structured logger:
+- **Node.js**: `npm install pino` (or `pino-http` for Express/Fastify)
+- **Python**: use stdlib `logging` with JSON formatter, or `structlog`
+- **Go**: use `slog` (stdlib) or `zerolog`
+
+**NEVER use `console.log` for any purpose** — not even "Server running on port 3000." Replace every `console.log` with `logger.info()`. This is non-negotiable because console.log is unstructured, has no levels, and cannot be collected by log aggregation tools.
+
+```typescript
+// WRONG — even for startup
+console.log(`Server running on port ${PORT}`);
+
+// RIGHT
+import pino from 'pino';
+const logger = pino();
+logger.info({ port: PORT }, 'Server started');
+```
+
 ### Rules
 - **JSON format** — not free-text strings
 - **Correlation IDs** — every request gets a unique ID, propagated through all log entries

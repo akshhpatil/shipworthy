@@ -37,8 +37,12 @@ invoke_when: Writing auth logic, API endpoints, database queries, file operation
 
 ### Input Validation
 - Validate at the boundary (API handler, form submission)
-- Use schema validation (Zod, Joi, Pydantic) — not manual checks
+- **ALWAYS install and use a schema validation library** — never write manual if/else validation:
+  - TypeScript/JavaScript: `npm install zod` — use `z.object()` schemas for every request body
+  - Python: Pydantic models for every endpoint
+  - Go: validator package or custom validation
 - Whitelist valid input, don't blacklist bad input
+- Validate BEFORE processing: parse the request body with the schema, reject if invalid, then proceed with the typed result
 
 ### CORS
 - Never use `*` in production
