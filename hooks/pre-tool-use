@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Engineering With Vibes — Pre-Tool-Use Hook
+# Fires before Write/Edit operations. Lightweight architecture enforcement.
+# String-level checks only (no AST) — must be FAST.
+
+set -euo pipefail
+
+PROJECT_ROOT="$(pwd)"
+ARCH_SPEC_PATH="$PROJECT_ROOT/.engineering-with-vibes/architecture.md"
+
+# Read tool input from stdin
+INPUT=$(cat)
+
+# If no architecture spec exists, approve everything
+if [ ! -f "$ARCH_SPEC_PATH" ]; then
+  echo '{"hookSpecificOutput":{"decision":"approve"}}'
+  exit 0
+fi
+
+# Extract file path from tool input
+FILE_PATH=$(echo "$INPUT" | grep -o '"file_path"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"file_path"[[:space:]]*:[[:space:]]*"//' | sed 's/"$//' || true)
+
+if [ -z "$FILE_PATH" ]; then
+  echo '{"hookSpecificOutput":{"decision":"approve"}}'
+  exit 0
+fi
+
+# Lightweight checks based on architecture.md content
+WARNINGS=""
+
+# Check 1: Detect secrets/credentials in content
+CONTENT=$(echo "$INPUT" | grep -o '"content"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 || true)
+if echo "$CONTENT" | grep -qiE '(password|secret|api_key|apikey|private_key|access_token)[[:space:]]*[:=][[:space:]]*"[^"]{8,}"'; then
+  WARNINGS="${WARNINGS}Potential hardcoded secret detected. Use environment variables instead. "
+fi
+
+# Check 2: console.log in non-test production files
+if [[ "$FILE_PATH" != *test* ]] && [[ "$FILE_PATH" != *spec* ]] && [[ "$FILE_PATH" != *.test.* ]]; then
+  if echo "$CONTENT" | grep -q 'console\.log'; then
+    WARNINGS="${WARNINGS}console.log detected in production code — use structured logging. "
+  fi
+fi
+
+# If warnings found, advise but don't block (advisory mode)
+if [ -n "$WARNINGS" ]; then
+  ESCAPED_WARNINGS=$(echo "$WARNINGS" | sed 's/"/\\"/g')
+  echo "{\"hookSpecificOutput\":{\"decision\":\"approve\",\"message\":\"[engineering-with-vibes] Advisory: ${ESCAPED_WARNINGS}\"}}"
+else
+  echo '{"hookSpecificOutput":{"decision":"approve"}}'
+fi

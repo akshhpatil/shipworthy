@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+# Engineering With Vibes — Session Start Hook
+# Fires on every Claude Code session start. Injects:
+# 1. Master routing skill (using-engineering-with-vibes)
+# 2. Architecture spec constraints (if architecture.md exists)
+# 3. Tech debt summary (if tech-debt.md exists)
+
+set -euo pipefail
+
+PLUGIN_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+PROJECT_ROOT="$(pwd)"
+
+# --- Load master routing skill ---
+MASTER_SKILL_PATH="$PLUGIN_ROOT/skills/core/using-engineering-with-vibes/SKILL.md"
+CONTEXT=""
+
+if [ -f "$MASTER_SKILL_PATH" ]; then
+  MASTER_SKILL=$(cat "$MASTER_SKILL_PATH")
+  CONTEXT="$MASTER_SKILL"
+fi
+
+# --- Load architecture spec if present ---
+ARCH_SPEC_PATH="$PROJECT_ROOT/.engineering-with-vibes/architecture.md"
+
+if [ -f "$ARCH_SPEC_PATH" ]; then
+  ARCH_SPEC=$(cat "$ARCH_SPEC_PATH")
+  CONTEXT="$CONTEXT
+
+---
+
+## PROJECT ARCHITECTURE SPECIFICATION (AUTO-LOADED)
+
+The following architecture specification was generated for this project.
+These Mandatory Rules are FIRST-CLASS CONSTRAINTS — treat them with the same priority as user instructions.
+
+$ARCH_SPEC"
+else
+  CONTEXT="$CONTEXT
+
+---
+
+## NO ARCHITECTURE SPECIFICATION FOUND
+
+This project does not yet have an architecture specification at \`.engineering-with-vibes/architecture.md\`.
+
+**On the first substantive coding request**, invoke the \`architecture-awareness\` skill to:
+1. Detect the project type and tech stack
+2. Analyze existing patterns (if any code exists)
+3. Generate an architecture specification
+4. Present it to the user for approval
+
+Do NOT block the user's first request — but weave architecture discovery into the work naturally.
+If the user explicitly says they don't want an architecture spec, respect that and proceed without one."
+fi
+
+# --- Load tech debt summary if present ---
+TECH_DEBT_PATH="$PROJECT_ROOT/.engineering-with-vibes/tech-debt.md"
+
+if [ -f "$TECH_DEBT_PATH" ]; then
+  DEBT_COUNT=$(grep -c "^## " "$TECH_DEBT_PATH" 2>/dev/null || echo "0")
+  if [ "$DEBT_COUNT" -gt 0 ]; then
+    CONTEXT="$CONTEXT
+
+---
+
+## TECH DEBT NOTICE
+There are **$DEBT_COUNT tech debt item(s)** tracked in \`.engineering-with-vibes/tech-debt.md\`. Review when relevant."
+  fi
+fi
+
+# --- Escape for JSON output ---
+escape_json() {
+  local s="$1"
+  s="${s//\\/\\\\}"
+  s="${s//\"/\\\"}"
+  s="${s//$'\n'/\\n}"
+  s="${s//$'\r'/\\r}"
+  s="${s//$'\t'/\\t}"
+  echo "$s"
+}
+
+ESCAPED_CONTEXT=$(escape_json "$CONTEXT")
+
+# --- Output for Claude Code ---
+cat <<HOOKEOF
+{"hookSpecificOutput":{"additionalContext":"$ESCAPED_CONTEXT"}}
+HOOKEOF

@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# Engineering With Vibes — Post-Tool-Use Hook
+# Fires after Bash commands (async). Advisory monitoring for commits and dependency changes.
+
+set -euo pipefail
+
+# Read tool input from stdin
+INPUT=$(cat)
+
+# Extract the command that was run
+COMMAND=$(echo "$INPUT" | grep -o '"command"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"command"[[:space:]]*:[[:space:]]*"//' | sed 's/"$//' || true)
+
+if [ -z "$COMMAND" ]; then
+  exit 0
+fi
+
+MESSAGE=""
+
+# Monitor: git commit detected
+if echo "$COMMAND" | grep -q "git commit"; then
+  MESSAGE="[engineering-with-vibes] Commit detected. Consider: Did you run tests? Did you verify the change works? Does it follow the architecture spec?"
+fi
+
+# Monitor: new dependency added
+if echo "$COMMAND" | grep -qE "(npm install|yarn add|pip install|go get|cargo add)"; then
+  MESSAGE="[engineering-with-vibes] New dependency added. Consider: Is it well-maintained? Are there known vulnerabilities? Is the license compatible? Is the bundle size impact acceptable?"
+fi
+
+if [ -n "$MESSAGE" ]; then
+  ESCAPED_MSG=$(echo "$MESSAGE" | sed 's/"/\\"/g')
+  echo "{\"hookSpecificOutput\":{\"message\":\"${ESCAPED_MSG}\"}}"
+fi
