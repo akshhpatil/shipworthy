@@ -190,11 +190,6 @@ Specialized AI personas dispatched by skills for focused review:
 - Session 3: Add features. Quality gates catch issues before you see them. Tech debt is tracked, not hidden.
 - Ship: Tested, secure, documented, production-ready.
 
-## Inspired By
-
-- [Superpowers](https://github.com/obra/superpowers) -- battle-tested Claude Code skills for TDD, planning, verification, and debugging
-- [FleetShield AI](https://github.com/Vimalk0703/geotab-hackathon) -- architecture-aware development using CLAUDE.md as an architectural contract
-
 ## Contributing
 
 We welcome contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on writing new skills, adding templates, proposing agents, and submitting pull requests.
