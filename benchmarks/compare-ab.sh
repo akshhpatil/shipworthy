@@ -149,7 +149,7 @@ task_name="${task_name%-without}"
 
 for task_file in "${SCRIPT_DIR}/tasks"/*.md; do
   if [[ "$(basename "$task_file" .md)" == "$task_name" ]]; then
-    TASK_PROMPT=$(sed -n '/^## Prompt$/,/^## /{/^## Prompt$/d;/^## /d;p}' "$task_file" | \
+    TASK_PROMPT=$(awk '/^## Prompt$/{found=1; next} /^## /{if(found) exit} found{print}' "$task_file" | \
       sed 's/^> //' | sed '/^$/d' | head -20)
     break
   fi

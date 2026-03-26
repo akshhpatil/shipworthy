@@ -132,8 +132,8 @@ check_prerequisites
 # ---------------------------------------------------------------------------
 extract_prompt() {
   local task_file="$1"
-  # Extract everything between ## Prompt and the next ## heading
-  sed -n '/^## Prompt$/,/^## /{/^## Prompt$/d;/^## /d;p}' "$task_file" | \
+  # Extract everything between ## Prompt and the next ## heading (macOS-compatible)
+  awk '/^## Prompt$/{found=1; next} /^## /{if(found) exit} found{print}' "$task_file" | \
     sed 's/^> //' | \
     sed '/^$/d' | \
     head -20
@@ -225,8 +225,8 @@ run_claude() {
   fi
 
   if [[ "$use_plugin" == "true" ]]; then
-    # Run with the plugin installed by pointing CLAUDE_CONFIG to include it
-    # The plugin is installed by adding it to the project's .claude/settings.json
+    # Inject plugin skills as CLAUDE.md — this is what the session-start hook does
+    # in real usage: it loads the master routing skill + architecture rules into context
     mkdir -p "$project_dir/.claude"
     cat > "$project_dir/.claude/settings.json" <<SETTINGS
 {
@@ -236,15 +236,34 @@ run_claude() {
   }
 }
 SETTINGS
-    # Copy the plugin's CLAUDE.md (the main instructions file) so Claude picks it up
-    if [[ -f "${PLUGIN_DIR}/CLAUDE.md" ]]; then
-      cp "${PLUGIN_DIR}/CLAUDE.md" "$project_dir/CLAUDE.md"
-    fi
 
-    # Also make the skills available by symlinking the skills directory
-    if [[ -d "${PLUGIN_DIR}/skills" ]]; then
-      ln -sf "${PLUGIN_DIR}/skills" "$project_dir/.skills-ref"
-    fi
+    # Build a CLAUDE.md from the master routing skill + key skills
+    # This simulates the session-start hook injecting context
+    {
+      cat "${PLUGIN_DIR}/skills/core/using-engineering-with-vibes/SKILL.md"
+      echo ""
+      echo "---"
+      echo ""
+      echo "# Key Skills Reference"
+      echo ""
+      echo "## Test-Driven Development"
+      cat "${PLUGIN_DIR}/skills/quality/test-driven-development/SKILL.md"
+      echo ""
+      echo "## Security-First Development"
+      cat "${PLUGIN_DIR}/skills/security/security-first-development/SKILL.md"
+      echo ""
+      echo "## API Design Standards"
+      cat "${PLUGIN_DIR}/skills/architecture/api-design-standards/SKILL.md"
+      echo ""
+      echo "## Error Handling Patterns"
+      cat "${PLUGIN_DIR}/skills/quality/error-handling-patterns/SKILL.md"
+      echo ""
+      echo "## Verification Before Completion"
+      cat "${PLUGIN_DIR}/skills/quality/verification-before-completion/SKILL.md"
+      echo ""
+      echo "## Quality Gates"
+      cat "${PLUGIN_DIR}/skills/quality/quality-gates/SKILL.md"
+    } > "$project_dir/CLAUDE.md"
 
     claude --print "$prompt" 2>&1 || true
   else
