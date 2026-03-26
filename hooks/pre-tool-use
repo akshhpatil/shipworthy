@@ -24,12 +24,11 @@ ARCH_SPEC_PATH="$PROJECT_ROOT/.engineering-with-vibes/architecture.md"
 # --- Extract file path from tool input ---
 FILE_PATH=$(echo "$INPUT" | grep -o '"file_path"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"file_path"[[:space:]]*:[[:space:]]*"//' | sed 's/"$//' 2>/dev/null || true)
 
-# --- Extract content from tool input ---
-CONTENT=$(echo "$INPUT" | grep -o '"content"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 2>/dev/null || true)
-# Also check new_string for Edit tool
-if [ -z "$CONTENT" ]; then
-  CONTENT=$(echo "$INPUT" | grep -o '"new_string"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 2>/dev/null || true)
-fi
+# --- Use full input as content for pattern matching ---
+# Extracting just the "content" field is fragile with escaped quotes in JSON.
+# Instead, search the entire input for dangerous patterns — this is more robust
+# and catches secrets in any field (content, new_string, command, etc.)
+CONTENT="$INPUT"
 
 # --- Extract command for Bash tool ---
 COMMAND=$(echo "$INPUT" | grep -o '"command"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"command"[[:space:]]*:[[:space:]]*"//' | sed 's/"$//' 2>/dev/null || true)
@@ -45,8 +44,8 @@ if [ -n "$CONTENT" ]; then
     WARNINGS="${WARNINGS}AWS Access Key ID detected (AKIA...). Use environment variables or AWS credentials file. "
   fi
 
-  # Generic secret/password/token/key patterns with values
-  if echo "$CONTENT" | grep -qiE '(password|secret|api_key|apikey|api-key|private_key|access_token|auth_token|secret_key|client_secret)[[:space:]]*[:=][[:space:]]*["\x27][^"\x27]{8,}["\x27]'; then
+  # Generic secret/password/token/key patterns with values (handles JSON-escaped quotes too)
+  if echo "$CONTENT" | grep -qiE '(password|secret|api_key|apikey|api-key|private_key|access_token|auth_token|secret_key|client_secret)[[:space:]]*[:=][[:space:]]*(\\?["\x27])[^"\\]{8,}'; then
     WARNINGS="${WARNINGS}Potential hardcoded secret detected. Use environment variables instead. "
   fi
 
@@ -98,7 +97,9 @@ fi
 # Check 4: console.log in production code
 # ============================================================
 if [ -n "$FILE_PATH" ] && [ -n "$CONTENT" ]; then
-  if [[ "$FILE_PATH" != *test* ]] && [[ "$FILE_PATH" != *spec* ]] && [[ "$FILE_PATH" != *.test.* ]] && [[ "$FILE_PATH" != *.spec.* ]] && [[ "$FILE_PATH" != *__tests__* ]] && [[ "$FILE_PATH" != *__mocks__* ]]; then
+  FILE_BASENAME=$(basename "$FILE_PATH" 2>/dev/null || true)
+  FILE_DIRNAME=$(dirname "$FILE_PATH" 2>/dev/null || true)
+  if [[ "$FILE_BASENAME" != *test* ]] && [[ "$FILE_BASENAME" != *spec* ]] && [[ "$FILE_BASENAME" != *.test.* ]] && [[ "$FILE_BASENAME" != *.spec.* ]] && [[ "$FILE_DIRNAME" != *__tests__* ]] && [[ "$FILE_DIRNAME" != *__mocks__* ]]; then
     if echo "$CONTENT" | grep -q 'console\.log'; then
       WARNINGS="${WARNINGS}console.log detected in production code — use structured logging instead. "
     fi
