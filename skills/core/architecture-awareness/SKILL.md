@@ -1,7 +1,7 @@
 ---
 name: architecture-awareness
 description: Detects project type, analyzes existing patterns, generates architecture specifications, and maintains architectural consistency across sessions. The key innovation that turns CLAUDE.md-style contracts into automatic, evolving project specifications.
-invoke_when: Project has no .engineering-with-vibes/architecture.md, user runs /scaffold command, new technology is added to the project, or a significant architectural decision is made during brainstorming.
+invoke_when: Project has no .shipworthy/architecture.md, user runs /scaffold command, new technology is added to the project, or a significant architectural decision is made during brainstorming.
 ---
 
 # Architecture Awareness
@@ -28,7 +28,7 @@ The session-start hook detects a project's maturity tier based on these signals.
 | Has code | `package.json`, `requirements.txt`, `go.mod`, `Cargo.toml`, `pom.xml`, `setup.py`, `pyproject.toml` exist | Project has been initialized with a language/framework |
 | Has tests | `tests/`, `__tests__/`, `test/`, `spec/` directories exist, or files matching `*.test.*`, `*.spec.*`, `test_*.py`, `*_test.go` | Project has some test coverage |
 | Has CI | `.github/workflows/`, `.gitlab-ci.yml`, `.circleci/`, `Jenkinsfile`, `.travis.yml`, `.buildkite/` exist | Project has automated quality checks |
-| Has architecture | `.engineering-with-vibes/architecture.md` exists | Project has documented constraints |
+| Has architecture | `.shipworthy/architecture.md` exists | Project has documented constraints |
 
 ### Tier Definitions
 
@@ -95,7 +95,7 @@ This section is used for context injection when the full spec is too large.]
 ### Best Practices for Budget-Friendly Specs
 - Keep Mandatory Rules to 5-15 items, each on one line
 - Use the Summary section for the essential identity and top 3 rules
-- Move detailed examples and rationale into separate ADR files in `.engineering-with-vibes/decisions/`
+- Move detailed examples and rationale into separate ADR files in `.shipworthy/decisions/`
 - Prefer terse, actionable rules over verbose explanations
 
 ## Polyglot Projects
@@ -204,7 +204,7 @@ Critical rule: Do NOT impose alien patterns on existing codebases. If the projec
 
 ### Specification Structure
 
-Generate `.engineering-with-vibes/architecture.md` with these sections:
+Generate `.shipworthy/architecture.md` with these sections:
 
 ```markdown
 # Architecture Specification: [Project Name]
@@ -277,7 +277,7 @@ When the architecture needs to change:
 3. Show the diff (old -> new)
 4. Get user approval before updating
 
-Track significant decisions as Architecture Decision Records in `.engineering-with-vibes/decisions/`:
+Track significant decisions as Architecture Decision Records in `.shipworthy/decisions/`:
 ```markdown
 # ADR-NNN: [Decision Title]
 

@@ -240,7 +240,7 @@ SETTINGS
     # Build a CLAUDE.md from the master routing skill + key skills
     # This simulates the session-start hook injecting context
     {
-      cat "${PLUGIN_DIR}/skills/core/using-engineering-with-vibes/SKILL.md"
+      cat "${PLUGIN_DIR}/skills/core/using-shipworthy/SKILL.md"
       echo ""
       echo "---"
       echo ""

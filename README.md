@@ -1,9 +1,10 @@
-# Engineering With Vibes
+# Shipworthy
 
 > Vibe coding is how you start; engineering is what keeps it alive.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-blue)]()
+[![Benchmark: +83%](https://img.shields.io/badge/Benchmark-+83%25%20Quality-brightgreen)](BENCHMARKS.md)
 
 ---
 
@@ -21,19 +22,19 @@ You end up building the same feature three times: once to get it working, once t
 
 ## The Solution
 
-**Engineering With Vibes** is a Claude Code plugin that auto-activates every session and silently enforces production engineering practices. It detects your project type, generates an architecture spec, and maintains it across sessions. You vibe code at full speed -- the plugin handles TDD, security, quality gates, and 29 engineering skills invisibly. No configuration, no ceremony, no workflow changes.
+**Shipworthy** is a Claude Code plugin that auto-activates every session and silently enforces production engineering practices. It detects your project type, generates an architecture spec, and maintains it across sessions. You vibe code at full speed -- the plugin handles TDD, security, quality gates, and 29 engineering skills invisibly. No configuration, no ceremony, no workflow changes.
 
 ## What Happens In Your First Session
 
 ```
-/plugin install engineering-with-vibes
+/plugin install shipworthy
 ```
 
 That is the only setup. Here is what happens next:
 
 1. **You open Claude Code on your project.** The plugin fires its session-start hook automatically.
 2. **It detects your tech stack.** Next.js? Express? FastAPI? Go? React? Python? It knows.
-3. **It generates an architecture spec.** A file at `.engineering-with-vibes/architecture.md` captures your project's conventions, mandatory rules, and structure.
+3. **It generates an architecture spec.** A file at `.shipworthy/architecture.md` captures your project's conventions, mandatory rules, and structure.
 4. **From now on, every session enforces those rules.** Claude remembers your architecture, your naming conventions, your patterns -- permanently.
 5. **You build features normally.** Say "add a payment endpoint" and Claude automatically applies API design standards, security-first development, TDD, and quality gates. You never asked it to. It just does.
 6. **Before completing, it verifies.** Tests pass, no secrets leaked, no regressions, build is clean. Evidence, not claims.
@@ -62,7 +63,7 @@ A weekend prototype should not face the same ceremony as an enterprise platform.
 ### Core
 | Skill | What It Does |
 |-------|-------------|
-| **using-engineering-with-vibes** | Master router -- loaded every session, dispatches to relevant skills |
+| **using-shipworthy** | Master router -- loaded every session, dispatches to relevant skills |
 | **architecture-awareness** | Auto-detects project type, generates and enforces architecture spec |
 
 ### Planning

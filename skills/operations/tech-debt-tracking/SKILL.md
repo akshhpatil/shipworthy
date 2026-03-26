@@ -22,7 +22,7 @@ Every shortcut has a cost. This skill ensures shortcuts are conscious decisions 
 
 ## How to Track
 
-Add an entry to `.engineering-with-vibes/tech-debt.md`:
+Add an entry to `.shipworthy/tech-debt.md`:
 
 ```markdown
 ## [Short Description]

@@ -1,10 +1,10 @@
 {
-  "name": "engineering-with-vibes",
-  "title": "Engineering With Vibes",
+  "name": "shipworthy",
+  "title": "Shipworthy",
   "description": "Vibe coding is how you start; engineering is what keeps it alive. Auto-activating Claude Code plugin that silently installs production engineering guardrails — architecture awareness, TDD, quality gates, security-first development, and 25+ skills so vibe coders build real systems without thinking about process.",
   "version": "1.0.0",
   "author": "Vimal Kumar",
-  "repository": "https://github.com/Vimalk0703/engineering-with-vibes",
+  "repository": "https://github.com/Vimalk0703/shipworthy",
   "categories": ["development", "architecture", "quality", "security"],
   "platforms": ["claude-code", "cursor", "codex", "opencode"]
 }

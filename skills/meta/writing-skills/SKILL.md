@@ -1,7 +1,7 @@
 ---
 name: writing-skills
 description: TDD for documentation — write skills that prevent failure modes by first documenting what goes wrong without the skill, then writing the minimal skill to fix it.
-invoke_when: Creating a new skill for the engineering-with-vibes plugin, or when a recurring failure mode needs to be codified into a reusable guide.
+invoke_when: Creating a new skill for the shipworthy plugin, or when a recurring failure mode needs to be codified into a reusable guide.
 ---
 
 # Writing Skills

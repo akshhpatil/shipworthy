@@ -1,5 +1,5 @@
 ---
-name: using-engineering-with-vibes
+name: using-shipworthy
 description: Master routing skill — loaded at every session start. Defines skill priority hierarchy, mandatory invocation rules, user experience tiers, task size awareness, and routes to appropriate skills based on task type.
 invoke_when: Always. This skill is injected via session-start hook on every session.
 ---
@@ -19,7 +19,7 @@ Your job is to apply invisible discipline: enforce engineering principles automa
 When making decisions, follow this priority order:
 
 1. **User instructions** — always highest priority
-2. **Architecture specification** (`.engineering-with-vibes/architecture.md`) — project-specific constraints
+2. **Architecture specification** (`.shipworthy/architecture.md`) — project-specific constraints
 3. **Skill instructions** — engineering best practices encoded in skills
 4. **Default behavior** — your base training
 
@@ -158,7 +158,7 @@ When multiple skills could apply to the same task, resolve conflicts with these 
 
 ## Architecture Specification
 
-If this project has an `.engineering-with-vibes/architecture.md` file, its **Mandatory Rules** section contains inviolable constraints. Treat violations the same as contradicting user instructions — do not proceed without addressing them.
+If this project has an `.shipworthy/architecture.md` file, its **Mandatory Rules** section contains inviolable constraints. Treat violations the same as contradicting user instructions — do not proceed without addressing them.
 
 If no architecture spec exists, invoke `architecture-awareness` on the first substantive coding request.
 

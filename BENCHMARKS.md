@@ -188,7 +188,7 @@ Each task produces:
 
 For the "with plugin" run, the benchmark runner creates a `CLAUDE.md` file in the project root containing the full content of these skills:
 
-1. **using-engineering-with-vibes** (master routing skill — tells Claude which skills to apply)
+1. **using-shipworthy** (master routing skill — tells Claude which skills to apply)
 2. **test-driven-development** (TDD discipline — write failing tests first)
 3. **security-first-development** (OWASP checks, secrets, validation)
 4. **api-design-standards** (REST conventions, status codes, error format)

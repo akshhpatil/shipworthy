@@ -31,7 +31,7 @@ You are an architecture analysis specialist. Your job is to analyze a project's 
 - How is the project deployed?
 
 ### Output
-Produce a complete `.engineering-with-vibes/architecture.md` following the template structure with:
+Produce a complete `.shipworthy/architecture.md` following the template structure with:
 - Project Identity
 - Mandatory Rules (5-15 inviolable constraints)
 - Directory Structure

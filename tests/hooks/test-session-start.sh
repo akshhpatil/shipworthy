@@ -57,8 +57,8 @@ cleanup "$TMPDIR"
 # ---------------------------------------------------------------
 echo "Test 2: Architecture.md present -> rules injected"
 TMPDIR=$(setup_temp_project)
-mkdir -p "$TMPDIR/.engineering-with-vibes"
-cat > "$TMPDIR/.engineering-with-vibes/architecture.md" << 'ARCHEOF'
+mkdir -p "$TMPDIR/.shipworthy"
+cat > "$TMPDIR/.shipworthy/architecture.md" << 'ARCHEOF'
 # Architecture Specification
 
 ## Mandatory Rules
@@ -100,8 +100,8 @@ cleanup "$TMPDIR"
 # ---------------------------------------------------------------
 echo "Test 4: tech-debt.md present -> debt count surfaced"
 TMPDIR=$(setup_temp_project)
-mkdir -p "$TMPDIR/.engineering-with-vibes"
-cat > "$TMPDIR/.engineering-with-vibes/tech-debt.md" << 'DEBTEOF'
+mkdir -p "$TMPDIR/.shipworthy"
+cat > "$TMPDIR/.shipworthy/tech-debt.md" << 'DEBTEOF'
 ## Item 1: Fix auth token refresh
 Needs refactoring.
 
@@ -128,8 +128,8 @@ cleanup "$TMPDIR"
 # ---------------------------------------------------------------
 echo "Test 5: JSON escaping handles special characters"
 TMPDIR=$(setup_temp_project)
-mkdir -p "$TMPDIR/.engineering-with-vibes"
-cat > "$TMPDIR/.engineering-with-vibes/architecture.md" << 'SPECEOF'
+mkdir -p "$TMPDIR/.shipworthy"
+cat > "$TMPDIR/.shipworthy/architecture.md" << 'SPECEOF'
 # Architecture
 
 ## Mandatory Rules
@@ -153,9 +153,9 @@ cleanup "$TMPDIR"
 # ---------------------------------------------------------------
 echo "Test 6: Subdirectory execution finds architecture.md"
 TMPDIR=$(setup_temp_project)
-mkdir -p "$TMPDIR/.engineering-with-vibes"
+mkdir -p "$TMPDIR/.shipworthy"
 mkdir -p "$TMPDIR/src/components"
-cat > "$TMPDIR/.engineering-with-vibes/architecture.md" << 'SUBEOF'
+cat > "$TMPDIR/.shipworthy/architecture.md" << 'SUBEOF'
 # Architecture
 
 ## Mandatory Rules

@@ -100,7 +100,7 @@ When this skill activates:
 
 ## Configuration
 
-Quality gate thresholds can be customized in `.engineering-with-vibes/architecture.md`:
+Quality gate thresholds can be customized in `.shipworthy/architecture.md`:
 ```markdown
 ## Quality Gate Levels
 Level 0 (builder, <5 files): [build, no secrets]

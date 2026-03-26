@@ -62,11 +62,11 @@ The best improvements come from real failure cases. If you hit a scenario where 
 
 ```bash
 # Clone the repository
-git clone https://github.com/Vimalk0703/engineering-with-vibes.git
-cd engineering-with-vibes
+git clone https://github.com/Vimalk0703/shipworthy.git
+cd shipworthy
 
 # Install the plugin locally in Claude Code
-/plugin install /path/to/engineering-with-vibes
+/plugin install /path/to/shipworthy
 
 # Test that session-start hooks fire
 # Open a new Claude Code session and verify the plugin loads

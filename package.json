@@ -1,5 +1,5 @@
 {
-  "name": "engineering-with-vibes",
+  "name": "shipworthy",
   "version": "1.0.0",
   "description": "Production engineering guardrails for vibe coders. Auto-activating Claude Code plugin with architecture awareness, TDD, quality gates, security, and 25+ skills.",
   "type": "module",
@@ -7,7 +7,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Vimalk0703/engineering-with-vibes.git"
+    "url": "https://github.com/Vimalk0703/shipworthy.git"
   },
   "keywords": [
     "claude-code",

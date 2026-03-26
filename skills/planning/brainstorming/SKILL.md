@@ -94,7 +94,7 @@ This is the complete design discovery process. It exists because big decisions m
 - Identify risks and mitigations
 
 ### Step 6: Write a Design Spec
-- Save to `.engineering-with-vibes/specs/[feature-name].md`
+- Save to `.shipworthy/specs/[feature-name].md`
 - Include: problem, approach, data model changes, API changes, UI changes, testing approach
 - Keep it concise — a spec is not a novel
 

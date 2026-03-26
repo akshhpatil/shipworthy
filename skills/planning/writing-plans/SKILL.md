@@ -12,7 +12,7 @@ Transform an approved design into a sequence of small, verifiable tasks that fol
 
 ## Plan Structure
 
-Save plans to `.engineering-with-vibes/plans/[feature-name].md`.
+Save plans to `.shipworthy/plans/[feature-name].md`.
 
 ### Header
 ```markdown

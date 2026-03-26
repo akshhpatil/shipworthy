@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Engineering With Vibes — Pre-Tool-Use Hook
+# Shipworthy — Pre-Tool-Use Hook
 # Fires before Write/Edit operations. Lightweight architecture enforcement.
 # String-level checks only (no AST) — must be FAST.
 # Advisory only: never blocks, only warns.
@@ -19,7 +19,7 @@ fi
 
 # --- Resolve project root ---
 PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-ARCH_SPEC_PATH="$PROJECT_ROOT/.engineering-with-vibes/architecture.md"
+ARCH_SPEC_PATH="$PROJECT_ROOT/.shipworthy/architecture.md"
 
 # --- Extract file path from tool input ---
 FILE_PATH=$(echo "$INPUT" | grep -o '"file_path"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"file_path"[[:space:]]*:[[:space:]]*"//' | sed 's/"$//' 2>/dev/null || true)
@@ -112,7 +112,7 @@ fi
 if [ -n "$WARNINGS" ]; then
   # Escape warnings for JSON
   ESCAPED_WARNINGS=$(printf '%s' "$WARNINGS" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g' | tr -d '\n\r')
-  echo "{\"hookSpecificOutput\":{\"decision\":\"approve\",\"message\":\"[engineering-with-vibes] Advisory: ${ESCAPED_WARNINGS}\"}}"
+  echo "{\"hookSpecificOutput\":{\"decision\":\"approve\",\"message\":\"[shipworthy] Advisory: ${ESCAPED_WARNINGS}\"}}"
 else
   echo '{"hookSpecificOutput":{"decision":"approve"}}'
 fi

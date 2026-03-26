@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Engineering With Vibes — Post-Tool-Use Hook
+# Shipworthy — Post-Tool-Use Hook
 # Fires after Bash commands (async). Advisory monitoring for commits and dependency changes.
 
 set -euo pipefail
@@ -30,9 +30,9 @@ MESSAGE=""
 # ============================================================
 if echo "$COMMAND" | grep -q "git commit" 2>/dev/null; then
   if echo "$COMMAND" | grep -q "\-\-amend" 2>/dev/null; then
-    MESSAGE="[engineering-with-vibes] Commit amend detected. Verify: Was this intentional? Amending rewrites history — avoid on shared/pushed branches. Did you run tests after the amend?"
+    MESSAGE="[shipworthy] Commit amend detected. Verify: Was this intentional? Amending rewrites history — avoid on shared/pushed branches. Did you run tests after the amend?"
   else
-    MESSAGE="[engineering-with-vibes] Commit detected. Verify: Did you run tests? Did you verify the change works? Does it follow the architecture spec?"
+    MESSAGE="[shipworthy] Commit detected. Verify: Did you run tests? Did you verify the change works? Does it follow the architecture spec?"
   fi
 fi
 
@@ -67,7 +67,7 @@ elif echo "$COMMAND" | grep -qE "(npm install [a-zA-Z@]|yarn add |pnpm add |pip 
 
   # Skip flags (things starting with -)
   if [ -n "$DEP_NAME" ] && [[ "$DEP_NAME" != -* ]]; then
-    MESSAGE="[engineering-with-vibes] New dependency added: ${DEP_NAME}. Consider: Is it well-maintained? Are there known vulnerabilities? Is the license compatible? Is the bundle size impact acceptable? Update architecture spec if this changes the tech stack."
+    MESSAGE="[shipworthy] New dependency added: ${DEP_NAME}. Consider: Is it well-maintained? Are there known vulnerabilities? Is the license compatible? Is the bundle size impact acceptable? Update architecture spec if this changes the tech stack."
   fi
 fi
 
@@ -75,7 +75,7 @@ fi
 # Monitor: force push detected
 # ============================================================
 if echo "$COMMAND" | grep -qE "git push.*(--force|-f)" 2>/dev/null; then
-  MESSAGE="[engineering-with-vibes] Force push detected. This rewrites remote history. Verify: Is this a shared branch? Have other contributors pulled? Consider --force-with-lease instead."
+  MESSAGE="[shipworthy] Force push detected. This rewrites remote history. Verify: Is this a shared branch? Have other contributors pulled? Consider --force-with-lease instead."
 fi
 
 # ============================================================
@@ -83,7 +83,7 @@ fi
 # ============================================================
 if echo "$COMMAND" | grep -qE "(migrate|migration|db:migrate|prisma migrate|alembic|knex migrate|typeorm migration)" 2>/dev/null; then
   if [ -z "$MESSAGE" ]; then
-    MESSAGE="[engineering-with-vibes] Database migration detected. Verify: Is the migration reversible? Have you tested rollback? Is the migration safe for zero-downtime deployment?"
+    MESSAGE="[shipworthy] Database migration detected. Verify: Is the migration reversible? Have you tested rollback? Is the migration safe for zero-downtime deployment?"
   fi
 fi
 

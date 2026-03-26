@@ -16,7 +16,7 @@ Documentation that lives outside the codebase rots. Keep documentation as close 
 - Public API functions (JSDoc/docstrings with params, returns, throws)
 - Module purpose (brief comment at top of file explaining what this module does)
 - Non-obvious business logic (why, not what)
-- Architecture decisions (ADRs in `.engineering-with-vibes/decisions/`)
+- Architecture decisions (ADRs in `.shipworthy/decisions/`)
 - API endpoints (request/response types serve as documentation)
 - Environment variables (what each one does, valid values)
 
@@ -48,7 +48,7 @@ Every project README should have:
 
 ## Architecture Decision Records
 
-For significant decisions, create `.engineering-with-vibes/decisions/NNN-title.md`:
+For significant decisions, create `.shipworthy/decisions/NNN-title.md`:
 ```markdown
 # ADR-NNN: [Decision Title]
 ## Status: Accepted | Superseded | Deprecated
