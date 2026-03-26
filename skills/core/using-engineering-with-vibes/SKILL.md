@@ -1,6 +1,6 @@
 ---
 name: using-engineering-with-vibes
-description: Master routing skill — loaded at every session start. Defines skill priority hierarchy, mandatory invocation rules, and routes to appropriate skills based on task type.
+description: Master routing skill — loaded at every session start. Defines skill priority hierarchy, mandatory invocation rules, user experience tiers, task size awareness, and routes to appropriate skills based on task type.
 invoke_when: Always. This skill is injected via session-start hook on every session.
 ---
 
@@ -23,36 +23,123 @@ When making decisions, follow this priority order:
 3. **Skill instructions** — engineering best practices encoded in skills
 4. **Default behavior** — your base training
 
+## User Experience Tiers
+
+The session-start hook detects the project's maturity and assigns a tier. Adapt your behavior accordingly.
+
+### Builder Tier
+**Signals**: No code yet, or code exists but no test files/directories.
+**Behavior**:
+- Focus on scaffolding and generating working code quickly
+- Introduce testing gradually — suggest but do not block on missing tests for the first few interactions
+- Use streamlined 3-step brainstorming (Problem, Solution, Action) instead of full 5-step
+- Skip advanced planning for small tasks
+- Suggest architecture-awareness on the first substantive request
+- Quality gates: relaxed (run what exists, do not demand full coverage)
+
+### Maker Tier
+**Signals**: Project has code and test files, but lacks CI configuration or architecture spec.
+**Behavior**:
+- Use standard workflows with all skills
+- Brainstorming uses streamlined 3-step (Problem, Solution, Action) unless task is complex
+- Encourage adding CI and architecture documentation
+- Quality gates: standard (tests must pass, lint must pass if configured)
+- Recommend but do not require architecture spec updates for every change
+
+### Engineer Tier
+**Signals**: Project has code, tests, and CI configuration and/or architecture.md.
+**Behavior**:
+- Use full engineering workflows with all skills at maximum rigor
+- Brainstorming uses full 5-step process (Context, Problem, Options, Decision, Plan)
+- All quality gates enforced strictly
+- Architecture spec updates required when patterns change
+- Test coverage expectations enforced
+- CI must pass before declaring work complete
+
+## Task Size Awareness
+
+Classify every incoming task by estimated effort, then select the appropriate workflow depth.
+
+### Quick Fix (< 5 minutes estimated)
+Examples: typo fix, simple config change, one-line bug fix, rename a variable.
+**Workflow**: Skip brainstorming and planning. Go directly to:
+1. Apply TDD if testable (write/update test, make the fix, verify test passes)
+2. Run verification (test, lint, build)
+3. Done
+
+Do NOT spin up brainstorming or planning for trivially small changes. The overhead is not justified.
+
+### Feature (5-60 minutes estimated)
+Examples: new API endpoint, new component, refactor a module, add a new test suite.
+**Workflow**:
+1. **Brainstorming** (streamlined for Builder/Maker, full for Engineer)
+2. **Planning** via `writing-plans` (skip for Maker/Builder if task is well-understood)
+3. **Execution** via `executing-plans` + `test-driven-development`
+4. **Verification** via `verification-before-completion`
+
+### Project (> 60 minutes estimated)
+Examples: new service, major refactor, multi-component feature, migration.
+**Workflow** (all tiers):
+1. **Brainstorming** via `brainstorming` (full process)
+2. **Planning** via `writing-plans` (detailed plan with milestones)
+3. **Execution** via `executing-plans` + `test-driven-development`
+4. **Quality Gates** via `quality-gates` (at each milestone)
+5. **Verification** via `verification-before-completion`
+6. Consider `subagent-driven-development` or `dispatching-parallel-agents` for parallelizable work
+
 ## Mandatory Skill Invocation Rule
 
 **Before responding to ANY coding request, check if a skill applies. If there is even a 1% chance a skill is relevant, invoke it.**
 
 ### Skill Selection Guide
 
-| Task Type | Invoke These Skills |
-|-----------|-------------------|
-| Starting something new | `brainstorming` → `writing-plans` |
-| Implementing code | `executing-plans`, `test-driven-development` |
-| No architecture spec exists | `architecture-awareness` |
-| Writing API endpoints | `api-design-standards`, `security-first-development` |
-| Database work | `database-design` |
-| Debugging a problem | `systematic-debugging` |
-| Adding dependencies | `dependency-management` |
-| Writing tests | `test-driven-development` |
-| Creating UI components | `accessibility`, `frontend-standards` |
-| Finishing work | `verification-before-completion`, `quality-gates` |
-| Preparing a commit | `quality-gates` |
-| Code review needed | `requesting-code-review` |
-| Received review feedback | `receiving-code-review` |
-| Complex multi-part task | `subagent-driven-development` or `dispatching-parallel-agents` |
-| Working on a branch | `using-git-worktrees`, `finishing-a-development-branch` |
-| Writing error handling | `error-handling-patterns` |
-| Setting up logging/monitoring | `observability-by-default` |
-| Performance concerns | `performance-budgets` |
-| CI/CD or deployment | `ci-cd-awareness` |
-| Taking a shortcut | `tech-debt-tracking` |
-| Writing documentation | `documentation-as-code` |
-| Creating a new skill | `writing-skills` |
+| Task Type | Invoke These Skills | Tier Notes |
+|-----------|-------------------|------------|
+| Starting something new | `brainstorming` then `writing-plans` | Builder/Maker: 3-step brainstorm. Engineer: full 5-step |
+| Implementing code | `executing-plans`, `test-driven-development` | Builder: suggest tests. Maker/Engineer: require tests |
+| No architecture spec exists | `architecture-awareness` | Builder: suggest. Maker: recommend. Engineer: require |
+| Writing API endpoints | `api-design-standards`, `security-first-development` | All tiers |
+| Database work | `database-design` | All tiers |
+| Debugging a problem | `systematic-debugging` | All tiers — debugging always wins priority |
+| Adding dependencies | `dependency-management` | All tiers |
+| Writing tests | `test-driven-development` | All tiers |
+| Creating UI components | `accessibility`, `frontend-standards` | All tiers |
+| Finishing work | `verification-before-completion`, `quality-gates` | Builder: relaxed gates. Engineer: strict gates |
+| Preparing a commit | `quality-gates` | All tiers |
+| Code review needed | `requesting-code-review` | Maker/Engineer |
+| Received review feedback | `receiving-code-review` | Maker/Engineer |
+| Complex multi-part task | `subagent-driven-development` or `dispatching-parallel-agents` | All tiers for Project-size tasks |
+| Working on a branch | `using-git-worktrees`, `finishing-a-development-branch` | All tiers |
+| Writing error handling | `error-handling-patterns` | All tiers |
+| Setting up logging/monitoring | `observability-by-default` | Maker/Engineer |
+| Performance concerns | `performance-budgets` | Maker/Engineer |
+| CI/CD or deployment | `ci-cd-awareness` | Maker/Engineer |
+| Taking a shortcut | `tech-debt-tracking` | All tiers |
+| Writing documentation | `documentation-as-code` | All tiers |
+| Creating a new skill | `writing-skills` | All tiers |
+
+## Conflict Resolution Rules
+
+When multiple skills could apply to the same task, resolve conflicts with these rules:
+
+1. **Debugging wins for bugs**: If the task involves fixing a broken behavior, `systematic-debugging` takes priority over `brainstorming` or `test-driven-development`. Debug first, then write a regression test.
+
+2. **TDD wins for new code**: If the task involves writing new functionality (new function, new module, new endpoint), `test-driven-development` takes priority over `brainstorming`. Write the test first, then implement.
+
+3. **Brainstorming wins for new features**: If the task involves a new user-facing feature or a significant design decision, `brainstorming` takes priority. Think before coding.
+
+4. **Architecture wins for structural changes**: If the task changes project structure, dependency graph, or data flow, `architecture-awareness` takes priority.
+
+5. **Security wins when security is involved**: If the task touches authentication, authorization, user data, or external APIs, `security-first-development` takes priority alongside whatever other skill applies.
+
+6. **Verification always runs last**: No matter which skills were used during implementation, `verification-before-completion` is always the final step.
+
+### Resolution Examples
+- "Fix the login bug" -> `systematic-debugging` first, then `test-driven-development` for regression test
+- "Add a search feature" -> `brainstorming` first, then `test-driven-development` for implementation
+- "Write a function to parse CSV" -> `test-driven-development` directly (no brainstorming needed for well-defined tasks)
+- "Refactor the database layer" -> `architecture-awareness` first, then `test-driven-development`
+- "Add OAuth login" -> `security-first-development` + `brainstorming`, then `test-driven-development`
 
 ### Red Flag Rationalizations — DO NOT SKIP SKILLS BECAUSE:
 

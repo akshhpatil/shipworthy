@@ -73,8 +73,23 @@ src/
 - Database queries per request: <10
 - Payload size: <1MB per response
 
+## Type System
+- `strict: true` in tsconfig.json
+- No `any` -- use `unknown` and type guards
+- Request/response types defined for every endpoint
+- Zod schemas for runtime validation, infer TypeScript types from schemas
+
 ## Quality Gate Levels
 - Level 1 (always): Tests pass, build succeeds, no lint errors
 - Level 2 (10+ files): Coverage >80%, no hardcoded secrets
 - Level 3 (50+ files): No circular imports, API docs synchronized
-- Level 4 (100+ files): Load testing, security scan clean
+- Level 4 (100+ files): Load testing, security scan clean, dependency audit passes
+
+## Common Mistakes
+1. Not using centralized error handling -- catching errors in individual routes
+2. Sending raw error objects to clients (leaking stack traces and internals)
+3. Missing input validation on endpoints (trusting client data)
+4. Not using async error handling middleware (unhandled promise rejections crash the server)
+5. Hardcoding CORS origins instead of using environment configuration
+6. Missing rate limiting on public endpoints
+7. Not closing database connections properly on shutdown

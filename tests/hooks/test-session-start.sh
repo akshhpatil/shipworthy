@@ -1,0 +1,286 @@
+#!/usr/bin/env bash
+# Tests for the session-start hook
+# Validates JSON output, architecture injection, tech debt, tier detection, JSON escaping
+
+set -euo pipefail
+
+HOOK_PATH="$(cd "$(dirname "$0")/../../hooks" && pwd)/session-start"
+PASSED=0
+FAILED=0
+
+pass() {
+  PASSED=$((PASSED + 1))
+  echo "  PASS: $1"
+}
+
+fail() {
+  FAILED=$((FAILED + 1))
+  echo "  FAIL: $1"
+  if [ -n "${2:-}" ]; then
+    echo "        $2"
+  fi
+}
+
+setup_temp_project() {
+  local dir
+  dir=$(mktemp -d)
+  git -C "$dir" init --quiet 2>/dev/null
+  echo "$dir"
+}
+
+cleanup() {
+  rm -rf "$1" 2>/dev/null || true
+}
+
+validate_json() {
+  python3 -c "import json,sys; json.loads(sys.stdin.read())" 2>/dev/null
+}
+
+echo "=== session-start hook tests ==="
+echo ""
+
+# ---------------------------------------------------------------
+# Test 1: Output is valid JSON
+# ---------------------------------------------------------------
+echo "Test 1: Output is valid JSON"
+TMPDIR=$(setup_temp_project)
+OUTPUT=$(cd "$TMPDIR" && "$HOOK_PATH" 2>/dev/null || true)
+if echo "$OUTPUT" | validate_json; then
+  pass "Output is valid JSON"
+else
+  fail "Output is not valid JSON" "Got: $OUTPUT"
+fi
+cleanup "$TMPDIR"
+
+# ---------------------------------------------------------------
+# Test 2: With architecture.md present, rules are injected
+# ---------------------------------------------------------------
+echo "Test 2: Architecture.md present -> rules injected"
+TMPDIR=$(setup_temp_project)
+mkdir -p "$TMPDIR/.engineering-with-vibes"
+cat > "$TMPDIR/.engineering-with-vibes/architecture.md" << 'ARCHEOF'
+# Architecture Specification
+
+## Mandatory Rules
+
+1. **No any types** -- strict mode required.
+2. **Tests required** -- every module must have tests.
+ARCHEOF
+OUTPUT=$(cd "$TMPDIR" && "$HOOK_PATH" 2>/dev/null || true)
+if echo "$OUTPUT" | validate_json; then
+  if echo "$OUTPUT" | grep -q "Mandatory Rules"; then
+    pass "Architecture rules are injected in output"
+  else
+    fail "Architecture rules not found in output"
+  fi
+else
+  fail "Output is not valid JSON with architecture.md"
+fi
+cleanup "$TMPDIR"
+
+# ---------------------------------------------------------------
+# Test 3: Without architecture.md, shows NOT FOUND message
+# ---------------------------------------------------------------
+echo "Test 3: No architecture.md -> NOT FOUND message"
+TMPDIR=$(setup_temp_project)
+OUTPUT=$(cd "$TMPDIR" && "$HOOK_PATH" 2>/dev/null || true)
+if echo "$OUTPUT" | validate_json; then
+  if echo "$OUTPUT" | grep -q "NO ARCHITECTURE SPECIFICATION FOUND"; then
+    pass "NOT FOUND message displayed"
+  else
+    fail "NOT FOUND message missing"
+  fi
+else
+  fail "Output is not valid JSON without architecture.md"
+fi
+cleanup "$TMPDIR"
+
+# ---------------------------------------------------------------
+# Test 4: With tech-debt.md, debt count surfaced
+# ---------------------------------------------------------------
+echo "Test 4: tech-debt.md present -> debt count surfaced"
+TMPDIR=$(setup_temp_project)
+mkdir -p "$TMPDIR/.engineering-with-vibes"
+cat > "$TMPDIR/.engineering-with-vibes/tech-debt.md" << 'DEBTEOF'
+## Item 1: Fix auth token refresh
+Needs refactoring.
+
+## Item 2: Remove legacy API v1
+Deprecated endpoint still active.
+
+## Item 3: Update dependencies
+Several outdated packages.
+DEBTEOF
+OUTPUT=$(cd "$TMPDIR" && "$HOOK_PATH" 2>/dev/null || true)
+if echo "$OUTPUT" | validate_json; then
+  if echo "$OUTPUT" | grep -q "3 tech debt item"; then
+    pass "Tech debt count (3) surfaced"
+  else
+    fail "Tech debt count not found or incorrect" "Output: $OUTPUT"
+  fi
+else
+  fail "Output is not valid JSON with tech-debt.md"
+fi
+cleanup "$TMPDIR"
+
+# ---------------------------------------------------------------
+# Test 5: JSON escaping - newlines, quotes, backslashes
+# ---------------------------------------------------------------
+echo "Test 5: JSON escaping handles special characters"
+TMPDIR=$(setup_temp_project)
+mkdir -p "$TMPDIR/.engineering-with-vibes"
+cat > "$TMPDIR/.engineering-with-vibes/architecture.md" << 'SPECEOF'
+# Architecture
+
+## Mandatory Rules
+
+1. Use "double quotes" in strings.
+2. Escape \ backslashes properly.
+3. Handle	tabs and
+newlines gracefully.
+4. Special chars: <, >, &, $, !, @, #
+SPECEOF
+OUTPUT=$(cd "$TMPDIR" && "$HOOK_PATH" 2>/dev/null || true)
+if echo "$OUTPUT" | validate_json; then
+  pass "JSON escaping handles special characters"
+else
+  fail "JSON escaping broke with special characters" "Output: $OUTPUT"
+fi
+cleanup "$TMPDIR"
+
+# ---------------------------------------------------------------
+# Test 6: Running from subdirectory still finds architecture.md
+# ---------------------------------------------------------------
+echo "Test 6: Subdirectory execution finds architecture.md"
+TMPDIR=$(setup_temp_project)
+mkdir -p "$TMPDIR/.engineering-with-vibes"
+mkdir -p "$TMPDIR/src/components"
+cat > "$TMPDIR/.engineering-with-vibes/architecture.md" << 'SUBEOF'
+# Architecture
+
+## Mandatory Rules
+
+1. **Rule from root** -- should be found from subdirectory.
+SUBEOF
+OUTPUT=$(cd "$TMPDIR/src/components" && "$HOOK_PATH" 2>/dev/null || true)
+if echo "$OUTPUT" | validate_json; then
+  if echo "$OUTPUT" | grep -q "Mandatory Rules"; then
+    pass "Architecture found from subdirectory"
+  else
+    fail "Architecture not found from subdirectory"
+  fi
+else
+  fail "Output not valid JSON from subdirectory"
+fi
+cleanup "$TMPDIR"
+
+# ---------------------------------------------------------------
+# Test 7: Empty/missing SKILL.md -> graceful fallback, valid JSON
+# ---------------------------------------------------------------
+echo "Test 7: Missing SKILL.md -> graceful fallback"
+TMPDIR=$(setup_temp_project)
+# The hook reads SKILL.md from the plugin root. We test with a project
+# that has no plugin structure - should still produce valid JSON.
+OUTPUT=$(cd "$TMPDIR" && "$HOOK_PATH" 2>/dev/null || true)
+if echo "$OUTPUT" | validate_json; then
+  pass "Graceful fallback with missing SKILL.md"
+else
+  fail "Invalid JSON on missing SKILL.md" "Output: $OUTPUT"
+fi
+cleanup "$TMPDIR"
+
+# ---------------------------------------------------------------
+# Test 8: Tier detection - no package.json = builder
+# ---------------------------------------------------------------
+echo "Test 8: Tier detection - no package.json = builder"
+TMPDIR=$(setup_temp_project)
+OUTPUT=$(cd "$TMPDIR" && "$HOOK_PATH" 2>/dev/null || true)
+if echo "$OUTPUT" | validate_json; then
+  if echo "$OUTPUT" | grep -qi "BUILDER"; then
+    pass "No package.json detected as builder tier"
+  else
+    fail "Expected builder tier for empty project" "Output snippet: $(echo "$OUTPUT" | head -c 300)"
+  fi
+else
+  fail "Output not valid JSON for tier detection"
+fi
+cleanup "$TMPDIR"
+
+# ---------------------------------------------------------------
+# Test 9: Tier detection - package.json but no tests = builder
+# ---------------------------------------------------------------
+echo "Test 9: Tier detection - package.json, no tests = builder"
+TMPDIR=$(setup_temp_project)
+echo '{"name":"test","version":"1.0.0"}' > "$TMPDIR/package.json"
+OUTPUT=$(cd "$TMPDIR" && "$HOOK_PATH" 2>/dev/null || true)
+if echo "$OUTPUT" | validate_json; then
+  if echo "$OUTPUT" | grep -qi "BUILDER"; then
+    pass "Package.json without tests detected as builder"
+  else
+    fail "Expected builder tier for project without tests" "Output snippet: $(echo "$OUTPUT" | head -c 300)"
+  fi
+else
+  fail "Output not valid JSON for builder detection"
+fi
+cleanup "$TMPDIR"
+
+# ---------------------------------------------------------------
+# Test 10: Tier detection - package.json + tests = maker
+# ---------------------------------------------------------------
+echo "Test 10: Tier detection - package.json + tests = maker"
+TMPDIR=$(setup_temp_project)
+echo '{"name":"test","version":"1.0.0"}' > "$TMPDIR/package.json"
+mkdir -p "$TMPDIR/tests"
+echo "test('hello', () => {});" > "$TMPDIR/tests/sample.test.js"
+OUTPUT=$(cd "$TMPDIR" && "$HOOK_PATH" 2>/dev/null || true)
+if echo "$OUTPUT" | validate_json; then
+  if echo "$OUTPUT" | grep -qi "MAKER"; then
+    pass "Package.json with tests (no CI) detected as maker"
+  else
+    fail "Expected maker tier for project with tests but no CI" "Output snippet: $(echo "$OUTPUT" | head -c 300)"
+  fi
+else
+  fail "Output not valid JSON for maker detection"
+fi
+cleanup "$TMPDIR"
+
+# ---------------------------------------------------------------
+# Test 11: Tier detection - package.json + tests + CI = engineer
+# ---------------------------------------------------------------
+echo "Test 11: Tier detection - package.json + tests + CI = engineer"
+TMPDIR=$(setup_temp_project)
+echo '{"name":"test","version":"1.0.0"}' > "$TMPDIR/package.json"
+mkdir -p "$TMPDIR/tests"
+echo "test('hello', () => {});" > "$TMPDIR/tests/sample.test.js"
+mkdir -p "$TMPDIR/.github/workflows"
+echo "name: CI" > "$TMPDIR/.github/workflows/ci.yml"
+OUTPUT=$(cd "$TMPDIR" && "$HOOK_PATH" 2>/dev/null || true)
+if echo "$OUTPUT" | validate_json; then
+  if echo "$OUTPUT" | grep -qi "ENGINEER"; then
+    pass "Full project detected as engineer tier"
+  else
+    fail "Expected engineer tier for project with tests and CI" "Output snippet: $(echo "$OUTPUT" | head -c 300)"
+  fi
+else
+  fail "Output not valid JSON for engineer detection"
+fi
+cleanup "$TMPDIR"
+
+# ---------------------------------------------------------------
+# Summary
+# ---------------------------------------------------------------
+echo ""
+echo "=== Results ==="
+echo "Passed: $PASSED"
+echo "Failed: $FAILED"
+TOTAL=$((PASSED + FAILED))
+echo "Total:  $TOTAL"
+echo ""
+
+if [ "$FAILED" -gt 0 ]; then
+  echo "SOME TESTS FAILED"
+  exit 1
+else
+  echo "ALL TESTS PASSED"
+  exit 0
+fi

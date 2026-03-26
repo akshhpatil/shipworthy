@@ -2,48 +2,115 @@
 # Engineering With Vibes — Pre-Tool-Use Hook
 # Fires before Write/Edit operations. Lightweight architecture enforcement.
 # String-level checks only (no AST) — must be FAST.
+# Advisory only: never blocks, only warns.
 
 set -euo pipefail
 
-PROJECT_ROOT="$(pwd)"
+# --- Error recovery: always output valid JSON ---
+trap 'echo "{\"hookSpecificOutput\":{\"decision\":\"approve\"}}"' ERR
+
+# --- Read tool input from stdin (handle empty input) ---
+INPUT=$(cat 2>/dev/null || true)
+
+if [ -z "$INPUT" ]; then
+  echo '{"hookSpecificOutput":{"decision":"approve"}}'
+  exit 0
+fi
+
+# --- Resolve project root ---
+PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 ARCH_SPEC_PATH="$PROJECT_ROOT/.engineering-with-vibes/architecture.md"
 
-# Read tool input from stdin
-INPUT=$(cat)
+# --- Extract file path from tool input ---
+FILE_PATH=$(echo "$INPUT" | grep -o '"file_path"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"file_path"[[:space:]]*:[[:space:]]*"//' | sed 's/"$//' 2>/dev/null || true)
 
-# If no architecture spec exists, approve everything
-if [ ! -f "$ARCH_SPEC_PATH" ]; then
-  echo '{"hookSpecificOutput":{"decision":"approve"}}'
-  exit 0
+# --- Extract content from tool input ---
+CONTENT=$(echo "$INPUT" | grep -o '"content"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 2>/dev/null || true)
+# Also check new_string for Edit tool
+if [ -z "$CONTENT" ]; then
+  CONTENT=$(echo "$INPUT" | grep -o '"new_string"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 2>/dev/null || true)
 fi
 
-# Extract file path from tool input
-FILE_PATH=$(echo "$INPUT" | grep -o '"file_path"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"file_path"[[:space:]]*:[[:space:]]*"//' | sed 's/"$//' || true)
+# --- Extract command for Bash tool ---
+COMMAND=$(echo "$INPUT" | grep -o '"command"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"command"[[:space:]]*:[[:space:]]*"//' | sed 's/"$//' 2>/dev/null || true)
 
-if [ -z "$FILE_PATH" ]; then
-  echo '{"hookSpecificOutput":{"decision":"approve"}}'
-  exit 0
-fi
-
-# Lightweight checks based on architecture.md content
 WARNINGS=""
 
-# Check 1: Detect secrets/credentials in content
-CONTENT=$(echo "$INPUT" | grep -o '"content"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 || true)
-if echo "$CONTENT" | grep -qiE '(password|secret|api_key|apikey|private_key|access_token)[[:space:]]*[:=][[:space:]]*"[^"]{8,}"'; then
-  WARNINGS="${WARNINGS}Potential hardcoded secret detected. Use environment variables instead. "
-fi
+# ============================================================
+# Check 1: Detect secrets and credentials in content
+# ============================================================
+if [ -n "$CONTENT" ]; then
+  # AWS Access Key IDs (start with AKIA)
+  if echo "$CONTENT" | grep -qE 'AKIA[0-9A-Z]{16}'; then
+    WARNINGS="${WARNINGS}AWS Access Key ID detected (AKIA...). Use environment variables or AWS credentials file. "
+  fi
 
-# Check 2: console.log in non-test production files
-if [[ "$FILE_PATH" != *test* ]] && [[ "$FILE_PATH" != *spec* ]] && [[ "$FILE_PATH" != *.test.* ]]; then
-  if echo "$CONTENT" | grep -q 'console\.log'; then
-    WARNINGS="${WARNINGS}console.log detected in production code — use structured logging. "
+  # Generic secret/password/token/key patterns with values
+  if echo "$CONTENT" | grep -qiE '(password|secret|api_key|apikey|api-key|private_key|access_token|auth_token|secret_key|client_secret)[[:space:]]*[:=][[:space:]]*["\x27][^"\x27]{8,}["\x27]'; then
+    WARNINGS="${WARNINGS}Potential hardcoded secret detected. Use environment variables instead. "
+  fi
+
+  # Long hex strings (potential tokens/hashes being hardcoded — 32+ hex chars)
+  if echo "$CONTENT" | grep -qE '[0-9a-fA-F]{40,}'; then
+    WARNINGS="${WARNINGS}Long hex string detected — could be a hardcoded token or key. Verify this is not a secret. "
+  fi
+
+  # Base64-encoded strings that look like secrets (long base64 after a key-like variable)
+  if echo "$CONTENT" | grep -qiE '(key|token|secret|password|credential)[[:space:]]*[:=][[:space:]]*["\x27][A-Za-z0-9+/]{40,}={0,2}["\x27]'; then
+    WARNINGS="${WARNINGS}Potential base64-encoded secret detected. Use environment variables instead. "
+  fi
+
+  # Common API key patterns (sk-..., pk-..., rk_live_, sk_live_, etc.)
+  if echo "$CONTENT" | grep -qE '(sk-[a-zA-Z0-9]{20,}|pk-[a-zA-Z0-9]{20,}|sk_live_[a-zA-Z0-9]{20,}|rk_live_[a-zA-Z0-9]{20,}|pk_live_[a-zA-Z0-9]{20,})'; then
+    WARNINGS="${WARNINGS}API key pattern detected (sk-/pk-/live key). Use environment variables instead. "
   fi
 fi
 
-# If warnings found, advise but don't block (advisory mode)
+# ============================================================
+# Check 2: Detect eval() and Function() constructor calls
+# ============================================================
+if [ -n "$CONTENT" ]; then
+  if echo "$CONTENT" | grep -qE 'eval\s*\('; then
+    WARNINGS="${WARNINGS}eval() detected — this is a security risk. Consider safer alternatives. "
+  fi
+  if echo "$CONTENT" | grep -qE 'new\s+Function\s*\('; then
+    WARNINGS="${WARNINGS}new Function() constructor detected — equivalent to eval(). Consider safer alternatives. "
+  fi
+fi
+
+# ============================================================
+# Check 3: Detect writing to .env files
+# ============================================================
+if [ -n "$FILE_PATH" ]; then
+  BASENAME=$(basename "$FILE_PATH" 2>/dev/null || true)
+  if [[ "$BASENAME" == .env* ]]; then
+    # Check if .gitignore exists and includes .env
+    GITIGNORE_PATH="$PROJECT_ROOT/.gitignore"
+    if [ -f "$GITIGNORE_PATH" ] && grep -q '\.env' "$GITIGNORE_PATH" 2>/dev/null; then
+      : # .env is gitignored, no warning needed
+    else
+      WARNINGS="${WARNINGS}Writing to $BASENAME — ensure this file is in .gitignore to prevent committing secrets. "
+    fi
+  fi
+fi
+
+# ============================================================
+# Check 4: console.log in production code
+# ============================================================
+if [ -n "$FILE_PATH" ] && [ -n "$CONTENT" ]; then
+  if [[ "$FILE_PATH" != *test* ]] && [[ "$FILE_PATH" != *spec* ]] && [[ "$FILE_PATH" != *.test.* ]] && [[ "$FILE_PATH" != *.spec.* ]] && [[ "$FILE_PATH" != *__tests__* ]] && [[ "$FILE_PATH" != *__mocks__* ]]; then
+    if echo "$CONTENT" | grep -q 'console\.log'; then
+      WARNINGS="${WARNINGS}console.log detected in production code — use structured logging instead. "
+    fi
+  fi
+fi
+
+# ============================================================
+# Output result
+# ============================================================
 if [ -n "$WARNINGS" ]; then
-  ESCAPED_WARNINGS=$(echo "$WARNINGS" | sed 's/"/\\"/g')
+  # Escape warnings for JSON
+  ESCAPED_WARNINGS=$(printf '%s' "$WARNINGS" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g' | tr -d '\n\r')
   echo "{\"hookSpecificOutput\":{\"decision\":\"approve\",\"message\":\"[engineering-with-vibes] Advisory: ${ESCAPED_WARNINGS}\"}}"
 else
   echo '{"hookSpecificOutput":{"decision":"approve"}}'

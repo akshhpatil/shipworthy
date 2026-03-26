@@ -4,29 +4,95 @@
 
 set -euo pipefail
 
-# Read tool input from stdin
-INPUT=$(cat)
+# --- Error recovery: always output valid JSON ---
+trap 'echo "{}"' ERR
 
-# Extract the command that was run
-COMMAND=$(echo "$INPUT" | grep -o '"command"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"command"[[:space:]]*:[[:space:]]*"//' | sed 's/"$//' || true)
+# --- Read tool input from stdin (handle empty input) ---
+INPUT=$(cat 2>/dev/null || true)
+
+if [ -z "$INPUT" ]; then
+  echo '{}'
+  exit 0
+fi
+
+# --- Extract the command that was run ---
+COMMAND=$(echo "$INPUT" | grep -o '"command"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"command"[[:space:]]*:[[:space:]]*"//' | sed 's/"$//' 2>/dev/null || true)
 
 if [ -z "$COMMAND" ]; then
+  echo '{}'
   exit 0
 fi
 
 MESSAGE=""
 
+# ============================================================
 # Monitor: git commit detected
-if echo "$COMMAND" | grep -q "git commit"; then
-  MESSAGE="[engineering-with-vibes] Commit detected. Consider: Did you run tests? Did you verify the change works? Does it follow the architecture spec?"
+# ============================================================
+if echo "$COMMAND" | grep -q "git commit" 2>/dev/null; then
+  if echo "$COMMAND" | grep -q "\-\-amend" 2>/dev/null; then
+    MESSAGE="[engineering-with-vibes] Commit amend detected. Verify: Was this intentional? Amending rewrites history — avoid on shared/pushed branches. Did you run tests after the amend?"
+  else
+    MESSAGE="[engineering-with-vibes] Commit detected. Verify: Did you run tests? Did you verify the change works? Does it follow the architecture spec?"
+  fi
 fi
 
-# Monitor: new dependency added
-if echo "$COMMAND" | grep -qE "(npm install|yarn add|pip install|go get|cargo add)"; then
-  MESSAGE="[engineering-with-vibes] New dependency added. Consider: Is it well-maintained? Are there known vulnerabilities? Is the license compatible? Is the bundle size impact acceptable?"
+# ============================================================
+# Monitor: dependency changes
+# ============================================================
+
+# --- Installing existing dependencies (from lockfile/manifest) ---
+if echo "$COMMAND" | grep -qE "^(npm ci|yarn install --frozen-lockfile|pnpm install --frozen-lockfile|pip install -r |go mod download|bundle install --deployment|cargo build)" 2>/dev/null; then
+  # These are installing existing dependencies, not adding new ones. No warning needed.
+  :
+elif echo "$COMMAND" | grep -qE "^(npm install|yarn install|pnpm install|pip install -r|go mod download|bundle install)$" 2>/dev/null; then
+  # Plain install commands without flags — installing from existing manifest
+  :
+# --- Adding a NEW dependency ---
+elif echo "$COMMAND" | grep -qE "(npm install [a-zA-Z@]|yarn add |pnpm add |pip install [a-zA-Z]|go get |cargo add |gem install )" 2>/dev/null; then
+  # Extract what's being installed
+  DEP_NAME=""
+  if echo "$COMMAND" | grep -qE "npm install " 2>/dev/null; then
+    DEP_NAME=$(echo "$COMMAND" | sed 's/.*npm install //' | awk '{print $1}')
+  elif echo "$COMMAND" | grep -qE "yarn add " 2>/dev/null; then
+    DEP_NAME=$(echo "$COMMAND" | sed 's/.*yarn add //' | awk '{print $1}')
+  elif echo "$COMMAND" | grep -qE "pnpm add " 2>/dev/null; then
+    DEP_NAME=$(echo "$COMMAND" | sed 's/.*pnpm add //' | awk '{print $1}')
+  elif echo "$COMMAND" | grep -qE "pip install " 2>/dev/null; then
+    DEP_NAME=$(echo "$COMMAND" | sed 's/.*pip install //' | awk '{print $1}')
+  elif echo "$COMMAND" | grep -qE "go get " 2>/dev/null; then
+    DEP_NAME=$(echo "$COMMAND" | sed 's/.*go get //' | awk '{print $1}')
+  elif echo "$COMMAND" | grep -qE "cargo add " 2>/dev/null; then
+    DEP_NAME=$(echo "$COMMAND" | sed 's/.*cargo add //' | awk '{print $1}')
+  fi
+
+  # Skip flags (things starting with -)
+  if [ -n "$DEP_NAME" ] && [[ "$DEP_NAME" != -* ]]; then
+    MESSAGE="[engineering-with-vibes] New dependency added: ${DEP_NAME}. Consider: Is it well-maintained? Are there known vulnerabilities? Is the license compatible? Is the bundle size impact acceptable? Update architecture spec if this changes the tech stack."
+  fi
 fi
 
+# ============================================================
+# Monitor: force push detected
+# ============================================================
+if echo "$COMMAND" | grep -qE "git push.*(--force|-f)" 2>/dev/null; then
+  MESSAGE="[engineering-with-vibes] Force push detected. This rewrites remote history. Verify: Is this a shared branch? Have other contributors pulled? Consider --force-with-lease instead."
+fi
+
+# ============================================================
+# Monitor: database migration
+# ============================================================
+if echo "$COMMAND" | grep -qE "(migrate|migration|db:migrate|prisma migrate|alembic|knex migrate|typeorm migration)" 2>/dev/null; then
+  if [ -z "$MESSAGE" ]; then
+    MESSAGE="[engineering-with-vibes] Database migration detected. Verify: Is the migration reversible? Have you tested rollback? Is the migration safe for zero-downtime deployment?"
+  fi
+fi
+
+# ============================================================
+# Output result
+# ============================================================
 if [ -n "$MESSAGE" ]; then
-  ESCAPED_MSG=$(echo "$MESSAGE" | sed 's/"/\\"/g')
+  ESCAPED_MSG=$(printf '%s' "$MESSAGE" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g' | tr -d '\n\r')
   echo "{\"hookSpecificOutput\":{\"message\":\"${ESCAPED_MSG}\"}}"
+else
+  echo '{}'
 fi

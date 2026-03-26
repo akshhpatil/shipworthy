@@ -1,16 +1,71 @@
 ---
 name: brainstorming
-description: 9-step design discovery process that prevents wasted work on wrong assumptions. Enforces design-before-code discipline with architecture-aware constraints.
-invoke_when: User wants to build something new, add a significant feature, or redesign existing functionality. Do NOT implement until design is approved.
+description: Design discovery process that scales with task size and user tier. Prevents wasted work on wrong assumptions while staying out of the way for small tasks. Enforces design-before-code discipline with architecture-aware constraints.
+invoke_when: User wants to build something new, add a significant feature, or redesign existing functionality. First determine task size and user tier, then follow the appropriate mode.
 ---
 
 # Brainstorming
 
-## Hard Gate
+## Task Size Classification
 
-**Do NOT implement until design is approved.** Writing code before understanding the problem wastes hours of work when assumptions are wrong.
+Before doing anything, classify the task:
 
-## The 9 Steps
+| Size | Examples | Signal Words |
+|------|----------|-------------|
+| **Quick Fix** | Add a health endpoint, fix a typo, change button color, update copy, add an env var, tweak spacing | "add", "fix", "change", "update", "tweak", "rename" on a single small concern |
+| **Feature** | Build user authentication, add Stripe payments, create a dashboard page, implement file upload | "build", "create", "implement", "add" for a user-facing capability |
+| **Project** | Design a microservice architecture, rebuild the data layer, migrate databases, redesign the app | "design", "architect", "rebuild", "migrate", "redesign" spanning multiple systems |
+
+When in doubt, start small. You can always escalate if complexity reveals itself.
+
+## User Tier Detection
+
+- **Builder tier**: Non-technical or semi-technical user. Wants things built. Dislikes process talk. Cares about outcomes, not methodology. Signs: asks "can you build X", doesn't mention tech stack specifics, uses product language not engineering language.
+- **Engineer tier**: Technical user. Appreciates rigor. Wants to understand tradeoffs. Signs: mentions specific technologies, asks about architecture, uses engineering terminology, requests design docs.
+
+If uncertain, default to Builder tier. Nobody ever complained that you moved too fast; plenty have complained about being lectured on process.
+
+---
+
+## Lite Mode
+
+**Use when:** Quick Fix tasks (any tier) OR Feature tasks with Builder-tier users.
+
+Collapses the full process into 3 steps. Fast, focused, no ceremony.
+
+### Step 1: Understand
+- What needs to happen?
+- Who is this for?
+- Any constraints? (existing code patterns, architecture.md rules, performance needs)
+- Read relevant existing code quickly to avoid breaking things
+
+### Step 2: Recommend
+- Propose ONE approach. Not three. One.
+- Briefly explain why this is the right call
+- For Builder-tier: "Here's what I'll do" not "Here are your options"
+- For Quick Fixes: this step can be a single sentence
+
+### Step 3: Confirm and Build
+- Let me make sure I understand what you want before I start building
+- For Quick Fixes with obvious intent: proceed immediately, confirm as you deliver
+- For Features: brief confirmation, then build
+- Transition directly to implementation (invoke `writing-plans` only if the feature has 3+ moving parts)
+
+**Example — Quick Fix (Lite Mode):**
+> User: "Add a health endpoint"
+> AI: "I'll add a GET /health endpoint that returns 200 with a JSON status. It'll follow the existing route pattern in your app." [proceeds to build]
+
+**Example — Feature, Builder tier (Lite Mode):**
+> User: "I need user authentication"
+> AI: "I'll set up NextAuth with email/password and Google sign-in, using your Supabase database for user storage. This gives you login, signup, and session management. Let me make sure I understand what you want — do you need social logins beyond Google, or is email + Google enough?"
+
+---
+
+## Full Mode (9 Steps)
+
+**Use when:** Feature tasks with Engineer-tier users OR Project tasks with any user.
+
+This is the complete design discovery process. It exists because big decisions made on wrong assumptions waste days, not minutes.
 
 ### Step 1: Explore Context
 - Read relevant existing code, configs, and architecture.md
@@ -39,7 +94,7 @@ invoke_when: User wants to build something new, add a significant feature, or re
 - Identify risks and mitigations
 
 ### Step 6: Write a Design Spec
-- Save to `docs/engineering-with-vibes/specs/[feature-name].md`
+- Save to `.engineering-with-vibes/specs/[feature-name].md`
 - Include: problem, approach, data model changes, API changes, UI changes, testing approach
 - Keep it concise — a spec is not a novel
 
@@ -58,6 +113,20 @@ invoke_when: User wants to build something new, add a significant feature, or re
 - Once approved, invoke the `writing-plans` skill
 - Pass the approved design spec as context
 
-## Anti-Pattern: Skipping Brainstorming
+---
 
-If you catch yourself writing implementation code before completing at least steps 1-5, STOP. Delete the code. Go back to step 1. The 10 minutes you spend brainstorming saves hours of rework.
+## Anti-Pattern Warnings
+
+These apply at every size, but proportionally:
+
+**For Quick Fixes:** If you're writing a design doc for adding a health endpoint, you've lost the plot. Ship it.
+
+**For Features:** If you catch yourself writing implementation code before understanding what the user actually wants, pause. A 2-minute conversation saves 2 hours of rework. But don't turn that 2-minute conversation into a 20-minute interrogation.
+
+**For Projects:** If you catch yourself writing implementation code before completing at least steps 1-5, STOP. Go back to step 1. The 30 minutes you spend brainstorming saves days of rework on the wrong architecture.
+
+**For all sizes:**
+- Don't ask questions you can answer by reading the code
+- Don't propose alternatives when there's one obviously correct answer
+- Don't write a spec when a comment would do
+- Don't block progress with process — process serves progress, not the other way around

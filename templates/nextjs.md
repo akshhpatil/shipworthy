@@ -9,16 +9,16 @@
 
 ## Mandatory Rules
 
-1. **Never break existing features** — read entire files before modifying. Verify all callers when changing function signatures.
-2. **Server components by default** — only add `'use client'` when the component needs useState, useEffect, event handlers, or browser APIs.
-3. **TypeScript strict mode** — no `any` types. All function parameters and return types must be typed.
-4. **Co-located types** — shared types in `src/types/`. Component-specific types in the component file.
-5. **API routes validate input** — use Zod schemas for all request body and query parameter validation.
-6. **Error boundaries on every route** — each route segment should have an `error.tsx`.
-7. **No `console.log` in production code** — use structured logging utilities.
-8. **Tests required for business logic** — pure functions, API routes, and data transformations must have tests.
-9. **No circular imports** — unidirectional dependency flow. Lower modules don't import from higher modules.
-10. **Environment variables validated at startup** — fail fast if required variables are missing.
+1. **Never break existing features** -- read entire files before modifying. Verify all callers when changing function signatures.
+2. **Server components by default** -- only add `'use client'` when the component needs useState, useEffect, event handlers, or browser APIs.
+3. **TypeScript strict mode** -- no `any` types. All function parameters and return types must be typed.
+4. **Co-located types** -- shared types in `src/types/`. Component-specific types in the component file.
+5. **API routes validate input** -- use Zod schemas for all request body and query parameter validation.
+6. **Error boundaries on every route** -- each route segment should have an `error.tsx`.
+7. **No `console.log` in production code** -- use structured logging utilities.
+8. **Tests required for business logic** -- pure functions, API routes, and data transformations must have tests.
+9. **No circular imports** -- unidirectional dependency flow. Lower modules don't import from higher modules.
+10. **Environment variables validated at startup** -- fail fast if required variables are missing.
 
 ## Directory Structure
 
@@ -51,10 +51,16 @@ src/
 - **Constants**: UPPER_SNAKE_CASE
 - **Test files**: `[name].test.ts` or `[name].test.tsx`
 
+## Type System
+- `strict: true` in tsconfig.json
+- No `any` -- use `unknown` and type guards
+- Zod schemas for runtime validation, infer TypeScript types from schemas
+- Shared types in `src/types/`, component-specific types co-located
+
 ## Testing Strategy
 - **Framework**: Vitest + React Testing Library
 - **Location**: Co-located (`src/lib/utils.test.ts`) or `__tests__/`
-- **Coverage**: 70% for business logic, API routes tested E2E
+- **Coverage**: 80% for business logic, API routes tested E2E
 - **Pattern**: Test behavior, not implementation
 
 ## Error Handling
@@ -77,9 +83,9 @@ src/
 
 ## Quality Gate Levels
 - Level 1 (always): Tests pass, build succeeds, no lint errors
-- Level 2 (10+ files): Coverage >70%, no TODOs without tickets
+- Level 2 (10+ files): Coverage >80%, no TODOs without tickets
 - Level 3 (50+ files): Bundle size within budget, no circular imports
-- Level 4 (100+ files): Accessibility audit, performance benchmarks
+- Level 4 (100+ files): Accessibility audit passes, Lighthouse score >90, performance benchmarks met
 
 ## Common Mistakes
 1. Forgetting `'use client'` on components that use hooks

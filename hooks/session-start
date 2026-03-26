@@ -4,11 +4,108 @@
 # 1. Master routing skill (using-engineering-with-vibes)
 # 2. Architecture spec constraints (if architecture.md exists)
 # 3. Tech debt summary (if tech-debt.md exists)
+# 4. User experience tier detection
 
 set -euo pipefail
 
+# --- Error recovery: always output valid JSON ---
+trap 'echo "{\"hookSpecificOutput\":{\"additionalContext\":\"[engineering-with-vibes] Session hook encountered an error. Skills are still available — invoke them manually.\"}}"' ERR
+
+# --- Resolve paths robustly ---
 PLUGIN_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-PROJECT_ROOT="$(pwd)"
+PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+
+# --- Idempotency: skip if context was already injected this session ---
+MARKER_FILE="/tmp/ewv-session-$(echo "$PROJECT_ROOT" | tr '/' '_')-$$"
+if [ -f "$MARKER_FILE" ]; then
+  echo '{"hookSpecificOutput":{"additionalContext":"[engineering-with-vibes] Context already loaded for this session."}}'
+  exit 0
+fi
+
+# --- Robust JSON escaping ---
+escape_json() {
+  local s="$1"
+  # Use python if available for bulletproof escaping, fall back to sed
+  if command -v python3 &>/dev/null; then
+    printf '%s' "$s" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read())[1:-1], end="")'
+  elif command -v python &>/dev/null; then
+    printf '%s' "$s" | python -c 'import json,sys; print(json.dumps(sys.stdin.read())[1:-1]),'
+  else
+    # Manual escaping as fallback — handles backslash, quotes, newlines, tabs, carriage returns
+    s="${s//\\/\\\\}"
+    s="${s//\"/\\\"}"
+    s="${s//	/\\t}"
+    s="$(printf '%s' "$s" | sed ':a;N;$!ba;s/\r/\\r/g;s/\n/\\n/g')"
+    # Strip any null bytes
+    s="$(printf '%s' "$s" | tr -d '\000')"
+    printf '%s' "$s"
+    return
+  fi
+}
+
+# --- User Experience Tier Detection ---
+detect_tier() {
+  local has_code="false"
+  local has_tests="false"
+  local has_ci="false"
+  local has_arch="false"
+
+  # Check for code indicators
+  if [ -f "$PROJECT_ROOT/package.json" ] || \
+     [ -f "$PROJECT_ROOT/requirements.txt" ] || \
+     [ -f "$PROJECT_ROOT/pyproject.toml" ] || \
+     [ -f "$PROJECT_ROOT/go.mod" ] || \
+     [ -f "$PROJECT_ROOT/Cargo.toml" ] || \
+     [ -f "$PROJECT_ROOT/pom.xml" ] || \
+     [ -f "$PROJECT_ROOT/build.gradle" ] || \
+     [ -f "$PROJECT_ROOT/Makefile" ] || \
+     [ -f "$PROJECT_ROOT/setup.py" ]; then
+    has_code="true"
+  fi
+
+  # Check for test files
+  if [ -d "$PROJECT_ROOT/tests" ] || \
+     [ -d "$PROJECT_ROOT/__tests__" ] || \
+     [ -d "$PROJECT_ROOT/test" ] || \
+     [ -d "$PROJECT_ROOT/spec" ]; then
+    has_tests="true"
+  fi
+  # Also check for test file patterns if no test directory found
+  if [ "$has_tests" = "false" ]; then
+    local test_count
+    test_count=$(find "$PROJECT_ROOT" -maxdepth 4 -type f \( -name "*.test.*" -o -name "*.spec.*" -o -name "test_*.py" -o -name "*_test.go" -o -name "*_test.rs" \) 2>/dev/null | head -5 | wc -l | tr -d ' ')
+    if [ "$test_count" -gt 0 ]; then
+      has_tests="true"
+    fi
+  fi
+
+  # Check for CI configuration
+  if [ -d "$PROJECT_ROOT/.github/workflows" ] || \
+     [ -f "$PROJECT_ROOT/.gitlab-ci.yml" ] || \
+     [ -f "$PROJECT_ROOT/.circleci/config.yml" ] || \
+     [ -f "$PROJECT_ROOT/Jenkinsfile" ] || \
+     [ -f "$PROJECT_ROOT/.travis.yml" ] || \
+     [ -f "$PROJECT_ROOT/azure-pipelines.yml" ] || \
+     [ -d "$PROJECT_ROOT/.buildkite" ]; then
+    has_ci="true"
+  fi
+
+  # Check for architecture spec
+  if [ -f "$PROJECT_ROOT/.engineering-with-vibes/architecture.md" ]; then
+    has_arch="true"
+  fi
+
+  # Determine tier
+  if [ "$has_code" = "false" ] || [ "$has_tests" = "false" ]; then
+    echo "builder"
+  elif [ "$has_code" = "true" ] && [ "$has_tests" = "true" ] && { [ "$has_ci" = "true" ] || [ "$has_arch" = "true" ]; }; then
+    echo "engineer"
+  else
+    echo "maker"
+  fi
+}
+
+TIER=$(detect_tier)
 
 # --- Load master routing skill ---
 MASTER_SKILL_PATH="$PLUGIN_ROOT/skills/core/using-engineering-with-vibes/SKILL.md"
@@ -19,12 +116,32 @@ if [ -f "$MASTER_SKILL_PATH" ]; then
   CONTEXT="$MASTER_SKILL"
 fi
 
+# --- Inject tier information ---
+CONTEXT="$CONTEXT
+
+---
+
+## USER EXPERIENCE TIER: $(echo "$TIER" | tr '[:lower:]' '[:upper:]')
+
+Detected tier: **$TIER**
+- **builder**: Project has no code or no tests. Focus on scaffolding, generating code, and introducing testing gradually. Use streamlined workflows. Skip advanced planning unless the user asks for it.
+- **maker**: Project has code and some tests but lacks CI or architecture spec. Use standard workflows. Encourage adding CI and architecture documentation.
+- **engineer**: Project has code, tests, CI, and/or architecture spec. Use full engineering workflows. Enforce all quality gates and verification standards.
+
+Adapt skill behavior to this tier. For example:
+- Brainstorming: 3-step for builder/maker, full 5-step for engineer
+- Quality gates: relaxed for builder, standard for maker, strict for engineer
+- Architecture awareness: suggest for builder, recommend for maker, require for engineer"
+
+# --- Context budget: 4000 character limit ---
+CONTEXT_BUDGET=4000
+
 # --- Load architecture spec if present ---
 ARCH_SPEC_PATH="$PROJECT_ROOT/.engineering-with-vibes/architecture.md"
 
 if [ -f "$ARCH_SPEC_PATH" ]; then
   ARCH_SPEC=$(cat "$ARCH_SPEC_PATH")
-  CONTEXT="$CONTEXT
+  ARCH_SECTION="
 
 ---
 
@@ -34,6 +151,40 @@ The following architecture specification was generated for this project.
 These Mandatory Rules are FIRST-CLASS CONSTRAINTS — treat them with the same priority as user instructions.
 
 $ARCH_SPEC"
+
+  # Check context budget
+  COMBINED_LENGTH=$(( ${#CONTEXT} + ${#ARCH_SECTION} ))
+  if [ "$COMBINED_LENGTH" -gt "$CONTEXT_BUDGET" ]; then
+    # Extract Mandatory Rules section only for budget compliance
+    MANDATORY_RULES=$(sed -n '/^## Mandatory Rules/,/^## [^M]/p' "$ARCH_SPEC_PATH" | sed '$d' 2>/dev/null || true)
+    if [ -z "$MANDATORY_RULES" ]; then
+      # Try alternate heading formats
+      MANDATORY_RULES=$(sed -n '/^## Mandatory/,/^## /p' "$ARCH_SPEC_PATH" | sed '$d' 2>/dev/null || true)
+    fi
+    if [ -n "$MANDATORY_RULES" ]; then
+      CONTEXT="$CONTEXT
+
+---
+
+## PROJECT ARCHITECTURE SPECIFICATION (SUMMARIZED — full spec at .engineering-with-vibes/architecture.md)
+
+$MANDATORY_RULES
+
+(Architecture spec was summarized to fit context budget. Read the full file for complete details.)"
+    else
+      # No Mandatory Rules section found; include a pointer
+      CONTEXT="$CONTEXT
+
+---
+
+## PROJECT ARCHITECTURE SPECIFICATION (TRUNCATED)
+
+Architecture spec exists at \`.engineering-with-vibes/architecture.md\` but is too large for context injection.
+Read the file directly when making architectural decisions."
+    fi
+  else
+    CONTEXT="$CONTEXT$ARCH_SECTION"
+  fi
 else
   CONTEXT="$CONTEXT
 
@@ -68,18 +219,13 @@ There are **$DEBT_COUNT tech debt item(s)** tracked in \`.engineering-with-vibes
   fi
 fi
 
-# --- Escape for JSON output ---
-escape_json() {
-  local s="$1"
-  s="${s//\\/\\\\}"
-  s="${s//\"/\\\"}"
-  s="${s//$'\n'/\\n}"
-  s="${s//$'\r'/\\r}"
-  s="${s//$'\t'/\\t}"
-  echo "$s"
-}
-
+# --- Escape and output for Claude Code ---
 ESCAPED_CONTEXT=$(escape_json "$CONTEXT")
+
+# --- Mark session as initialized ---
+touch "$MARKER_FILE"
+# Clean up marker file after 24 hours (background, non-blocking)
+(sleep 86400 && rm -f "$MARKER_FILE" 2>/dev/null) &>/dev/null &
 
 # --- Output for Claude Code ---
 cat <<HOOKEOF
