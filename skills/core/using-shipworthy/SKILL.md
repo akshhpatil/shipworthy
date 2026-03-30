@@ -126,11 +126,22 @@ Examples: new service, major refactor, multi-component feature, migration.
 | Working on a branch | `using-git-worktrees`, `finishing-a-development-branch` | All tiers |
 | Writing error handling | `error-handling-patterns` | All tiers |
 | Setting up logging/monitoring | `observability-by-default` | Maker/Engineer |
-| Performance concerns | `performance-budgets` | Maker/Engineer |
-| CI/CD or deployment | `ci-cd-awareness` | Maker/Engineer |
+| Performance concerns | `performance-budgets`, `resilience-patterns` | Maker/Engineer |
+| CI/CD or deployment | `ci-cd-awareness`, `production-readiness` | Maker/Engineer |
 | Taking a shortcut | `tech-debt-tracking` | All tiers |
 | Writing documentation | `documentation-as-code` | All tiers |
 | Creating a new skill | `writing-skills` | All tiers |
+| Architecture decisions | `decision-frameworks`, `design-documents` | Maker/Engineer |
+| Compliance/regulatory | `compliance-awareness`, `threat-modeling`, `pii-detection` | Maker/Engineer |
+| Container/Docker work | `container-security` | All tiers |
+| API breaking changes | `api-versioning` | Maker/Engineer |
+| Code smells/complexity | `code-complexity` | Maker/Engineer |
+| Multi-service systems | `distributed-systems`, `twelve-factor-app`, `api-backward-compatibility` | Engineer |
+| Incident or outage | `incident-response`, `slo-sli-definition` | Maker/Engineer |
+| Database migration | `migration-strategies`, `zero-downtime-migrations` | All tiers |
+| Feature rollout | `feature-flag-discipline` | Maker/Engineer |
+| Environment or setup | `environment-setup` | All tiers |
+| MCP server opportunity | `mcp-integration` | All tiers (advisory) |
 
 ## Conflict Resolution Rules
 

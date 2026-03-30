@@ -11,37 +11,23 @@ set -euo pipefail
 # --- Error recovery: always output valid JSON ---
 trap 'echo "{\"hookSpecificOutput\":{\"additionalContext\":\"[shipworthy] Session hook encountered an error. Skills are still available — invoke them manually.\"}}"' ERR
 
-# --- Resolve paths robustly ---
+# --- Source shared library ---
 PLUGIN_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+# shellcheck source=hooks/lib.sh
+source "$PLUGIN_ROOT/hooks/lib.sh" 2>/dev/null || true
 
-# --- Idempotency: skip if context was already injected this session ---
-MARKER_FILE="/tmp/ewv-session-$(echo "$PROJECT_ROOT" | tr '/' '_')-$$"
-if [ -f "$MARKER_FILE" ]; then
+# --- Resolve paths robustly (with timeout for corporate proxies) ---
+PROJECT_ROOT="$(timeout 3 git rev-parse --show-toplevel 2>/dev/null || pwd)"
+
+debug_log "session-start" "Starting. PROJECT_ROOT=$PROJECT_ROOT"
+
+# --- Idempotency: use PPID (Claude Code process) not $$ (hook process) ---
+MARKER_FILE="/tmp/shipworthy-session-$(echo "$PROJECT_ROOT" | tr '/' '_')-${PPID:-$$}"
+# Allow force reload via env var
+if [ -f "$MARKER_FILE" ] && [ "${SHIPWORTHY_FORCE_RELOAD:-0}" != "1" ]; then
   echo '{"hookSpecificOutput":{"additionalContext":"[shipworthy] Context already loaded for this session."}}'
   exit 0
 fi
-
-# --- Robust JSON escaping ---
-escape_json() {
-  local s="$1"
-  # Use python if available for bulletproof escaping, fall back to sed
-  if command -v python3 &>/dev/null; then
-    printf '%s' "$s" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read())[1:-1], end="")'
-  elif command -v python &>/dev/null; then
-    printf '%s' "$s" | python -c 'import json,sys; print(json.dumps(sys.stdin.read())[1:-1]),'
-  else
-    # Manual escaping as fallback — handles backslash, quotes, newlines, tabs, carriage returns
-    s="${s//\\/\\\\}"
-    s="${s//\"/\\\"}"
-    s="${s//	/\\t}"
-    s="$(printf '%s' "$s" | sed ':a;N;$!ba;s/\r/\\r/g;s/\n/\\n/g')"
-    # Strip any null bytes
-    s="$(printf '%s' "$s" | tr -d '\000')"
-    printf '%s' "$s"
-    return
-  fi
-}
 
 # --- User Experience Tier Detection ---
 detect_tier() {
@@ -71,9 +57,16 @@ detect_tier() {
     has_tests="true"
   fi
   # Also check for test file patterns if no test directory found
+  # Fast path: check package.json for test script (avoids slow find on large repos)
+  if [ "$has_tests" = "false" ] && [ -f "$PROJECT_ROOT/package.json" ]; then
+    if grep -q '"test"' "$PROJECT_ROOT/package.json" 2>/dev/null; then
+      has_tests="true"
+    fi
+  fi
+  # Slow path: filesystem scan with 2-second timeout to prevent hanging on monorepos
   if [ "$has_tests" = "false" ]; then
     local test_count
-    test_count=$(find "$PROJECT_ROOT" -maxdepth 4 -type f \( -name "*.test.*" -o -name "*.spec.*" -o -name "test_*.py" -o -name "*_test.go" -o -name "*_test.rs" \) 2>/dev/null | head -5 | wc -l | tr -d ' ')
+    test_count=$(timeout 2 find "$PROJECT_ROOT" -maxdepth 3 -type f \( -name "*.test.*" -o -name "*.spec.*" -o -name "test_*.py" -o -name "*_test.go" -o -name "*_test.rs" \) -not -path "*/node_modules/*" -not -path "*/.venv/*" 2>/dev/null | head -3 | wc -l | tr -d ' ')
     if [ "$test_count" -gt 0 ]; then
       has_tests="true"
     fi
@@ -109,7 +102,7 @@ detect_tier() {
 PRESET_NAME=""
 SHIPWORTHY_CONFIG="$PROJECT_ROOT/.shipworthy/config.json"
 if [ -f "$SHIPWORTHY_CONFIG" ]; then
-  PRESET_NAME=$(python3 -c "import json; d=json.load(open('$SHIPWORTHY_CONFIG')); print(d.get('preset',''))" 2>/dev/null || true)
+  PRESET_NAME=$(read_config "preset" "$PROJECT_ROOT" 2>/dev/null || true)
 fi
 
 TIER=$(detect_tier)
@@ -154,7 +147,7 @@ diagnose_gaps() {
   if [ ! -d "$PROJECT_ROOT/tests" ] && [ ! -d "$PROJECT_ROOT/__tests__" ] && \
      [ ! -d "$PROJECT_ROOT/test" ] && [ ! -d "$PROJECT_ROOT/spec" ]; then
     local test_count
-    test_count=$(find "$PROJECT_ROOT" -maxdepth 3 -type f \( -name "*.test.*" -o -name "*.spec.*" -o -name "test_*.py" -o -name "*_test.go" \) 2>/dev/null | head -3 | wc -l | tr -d ' ')
+    test_count=$(timeout 2 find "$PROJECT_ROOT" -maxdepth 3 -type f \( -name "*.test.*" -o -name "*.spec.*" -o -name "test_*.py" -o -name "*_test.go" \) -not -path "*/node_modules/*" -not -path "*/.venv/*" 2>/dev/null | head -3 | wc -l | tr -d ' ')
     if [ "$test_count" -eq 0 ] && [ "$TIER" != "builder" ]; then
       gaps="${gaps}no tests, "
       gap_count=$((gap_count + 1))
@@ -261,8 +254,9 @@ When routing to skills, respect these filters — skip the listed skills and pri
   fi
 fi
 
-# --- Context budget: 4000 character limit ---
-CONTEXT_BUDGET=4000
+# --- Context budget: 8000 character limit ---
+# Priority: Mandatory Rules > Tier > Project Health > Tech Debt > Plans > Session
+CONTEXT_BUDGET=8000
 
 # --- Load architecture spec if present ---
 ARCH_SPEC_PATH="$PROJECT_ROOT/.shipworthy/architecture.md"

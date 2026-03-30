@@ -25,6 +25,38 @@ npx shipworthy init --preset enterprise
 - **skip_skills** — Specific skills to disable
 - **overrides** — Fine-grained behavior settings
 
+## Per-Project Configuration
+
+Create `.shipworthy/config.json` in your project root for per-project overrides:
+
+```json
+{
+  "preset": "enterprise",
+  "overrides": {
+    "allow_console_log": false,
+    "allow_any_types": false,
+    "project_type": "api"
+  },
+  "ignore_paths": ["legacy/", "vendor/", "generated/", "migrations/"]
+}
+```
+
+### Override Reference
+
+| Override | Type | Default | Purpose |
+|----------|------|---------|---------|
+| `allow_console_log` | boolean | false | Skip console.log warnings (for CLI tools) |
+| `allow_any_types` | boolean | false | Skip TypeScript `:any` warnings (for legacy code) |
+| `project_type` | string | auto | Override auto-detection: `api`, `cli`, `frontend`, `library`, `monorepo` |
+
+### Ignore Paths
+
+Files in `ignore_paths` skip all pre-tool-use and post-tool-use checks. Use for:
+- Legacy code you can't change
+- Vendored dependencies
+- Generated/auto-generated files
+- Third-party code
+
 ## Creating a Custom Preset
 
 Create a JSON file in `presets/`:

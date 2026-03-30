@@ -8,6 +8,10 @@ set -euo pipefail
 # --- Error recovery: always output valid JSON ---
 trap 'echo "{\"hookSpecificOutput\":{\"decision\":\"approve\"}}"' ERR
 
+# --- Source shared library ---
+PLUGIN_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+source "$PLUGIN_ROOT/hooks/lib.sh" 2>/dev/null || true
+
 # --- Read tool input from stdin ---
 INPUT=$(cat 2>/dev/null || true)
 
@@ -16,11 +20,9 @@ if [ -z "$INPUT" ]; then
   exit 0
 fi
 
-# --- Extract command (use full input as fallback for escaped quotes) ---
-COMMAND=$(echo "$INPUT" | grep -o '"command"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"command"[[:space:]]*:[[:space:]]*"//' | sed 's/"$//' 2>/dev/null || true)
-
-# Use full input as search target to handle JSON-escaped quotes in commands
-SEARCH_TARGET="$INPUT"
+# --- Extract command using robust parser, with full input as search fallback ---
+COMMAND=$(parse_json_field "$INPUT" "command" 2>/dev/null || true)
+SEARCH_TARGET="${COMMAND:-$INPUT}"
 
 if [ -z "$COMMAND" ] && [ -z "$SEARCH_TARGET" ]; then
   echo '{"hookSpecificOutput":{"decision":"approve"}}'

@@ -8,6 +8,10 @@ set -euo pipefail
 # --- Error recovery: always output valid JSON ---
 trap 'echo "{}"' ERR
 
+# --- Source shared library ---
+PLUGIN_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+source "$PLUGIN_ROOT/hooks/lib.sh" 2>/dev/null || true
+
 # --- Read tool input from stdin ---
 INPUT=$(cat 2>/dev/null || true)
 
@@ -17,11 +21,17 @@ if [ -z "$INPUT" ]; then
 fi
 
 # --- Resolve project root ---
-PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+PROJECT_ROOT="$(timeout 2 git rev-parse --show-toplevel 2>/dev/null || pwd)"
 ARCH_SPEC_PATH="$PROJECT_ROOT/.shipworthy/architecture.md"
 
-# --- Extract file path from tool input ---
-FILE_PATH=$(echo "$INPUT" | grep -o '"file_path"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"file_path"[[:space:]]*:[[:space:]]*"//' | sed 's/"$//' 2>/dev/null || true)
+# --- Extract file path using robust parser ---
+FILE_PATH=$(parse_json_field "$INPUT" "file_path" 2>/dev/null || true)
+
+# --- Check if path should be ignored ---
+if [ -n "$FILE_PATH" ] && is_ignored_path "$FILE_PATH" "$PROJECT_ROOT" 2>/dev/null; then
+  echo '{}'
+  exit 0
+fi
 
 if [ -z "$FILE_PATH" ]; then
   echo '{}'
@@ -56,9 +66,13 @@ if [[ "$FILE_PATH" == *.ts ]] || [[ "$FILE_PATH" == *.tsx ]]; then
   if [ -f "$FILE_PATH" ]; then
     BASENAME_CHECK=$(basename "$FILE_PATH" 2>/dev/null || true)
     if [[ "$BASENAME_CHECK" != *.d.ts ]]; then
-      ANY_COUNT=$(grep -c ': any' "$FILE_PATH" 2>/dev/null || echo "0")
-      if [ "$ANY_COUNT" -gt 0 ]; then
-        MESSAGE="${MESSAGE}TypeScript file contains ${ANY_COUNT} instance(s) of ': any'. Use 'unknown' with type guards instead. "
+      # Check config override
+      if [ "$(read_config 'overrides.allow_any_types' "$PROJECT_ROOT" 2>/dev/null)" != "true" ]; then
+        # Use word boundary and skip comments (lines starting with // or *)
+        ANY_COUNT=$(grep -v '^\s*//' "$FILE_PATH" 2>/dev/null | grep -v '^\s*\*' | grep -cE ':\s*any\b' 2>/dev/null || echo "0")
+        if [ "$ANY_COUNT" -gt 0 ]; then
+          MESSAGE="${MESSAGE}TypeScript file contains ${ANY_COUNT} instance(s) of ': any'. Use 'unknown' with type guards instead. "
+        fi
       fi
     fi
   fi

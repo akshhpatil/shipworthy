@@ -9,6 +9,10 @@ set -euo pipefail
 # --- Error recovery: always output valid JSON ---
 trap 'echo "{\"hookSpecificOutput\":{\"decision\":\"approve\"}}"' ERR
 
+# --- Source shared library ---
+PLUGIN_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+source "$PLUGIN_ROOT/hooks/lib.sh" 2>/dev/null || true
+
 # --- Read tool input from stdin (handle empty input) ---
 INPUT=$(cat 2>/dev/null || true)
 
@@ -18,20 +22,19 @@ if [ -z "$INPUT" ]; then
 fi
 
 # --- Resolve project root ---
-PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-ARCH_SPEC_PATH="$PROJECT_ROOT/.shipworthy/architecture.md"
+PROJECT_ROOT="$(timeout 2 git rev-parse --show-toplevel 2>/dev/null || pwd)"
 
-# --- Extract file path from tool input ---
-FILE_PATH=$(echo "$INPUT" | grep -o '"file_path"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"file_path"[[:space:]]*:[[:space:]]*"//' | sed 's/"$//' 2>/dev/null || true)
+# --- Extract file path using robust parser ---
+FILE_PATH=$(parse_json_field "$INPUT" "file_path" 2>/dev/null || true)
 
 # --- Use full input as content for pattern matching ---
-# Extracting just the "content" field is fragile with escaped quotes in JSON.
-# Instead, search the entire input for dangerous patterns — this is more robust
-# and catches secrets in any field (content, new_string, command, etc.)
 CONTENT="$INPUT"
 
-# --- Extract command for Bash tool ---
-COMMAND=$(echo "$INPUT" | grep -o '"command"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"command"[[:space:]]*:[[:space:]]*"//' | sed 's/"$//' 2>/dev/null || true)
+# --- Check if path should be ignored per project config ---
+if [ -n "$FILE_PATH" ] && is_ignored_path "$FILE_PATH" "$PROJECT_ROOT" 2>/dev/null; then
+  echo '{"hookSpecificOutput":{"decision":"approve"}}'
+  exit 0
+fi
 
 WARNINGS=""
 
@@ -49,9 +52,15 @@ if [ -n "$CONTENT" ]; then
     WARNINGS="${WARNINGS}Potential hardcoded secret detected. Use environment variables instead. "
   fi
 
-  # Long hex strings (potential tokens/hashes being hardcoded — 32+ hex chars)
+  # Long hex strings (potential tokens/hashes — 40+ hex chars)
+  # Exclude: git commit SHAs (preceded by commit/sha/hash/ref), UUIDs, and test files
   if echo "$CONTENT" | grep -qE '[0-9a-fA-F]{40,}'; then
-    WARNINGS="${WARNINGS}Long hex string detected — could be a hardcoded token or key. Verify this is not a secret. "
+    # Check it's not a known safe pattern
+    if ! echo "$CONTENT" | grep -qiE '(commit|sha|hash|ref|digest|checksum)[[:space:]]*[:=]?[[:space:]]*["\x27]?[0-9a-fA-F]{40,}'; then
+      if [ -z "$FILE_PATH" ] || { [[ "$FILE_PATH" != *test* ]] && [[ "$FILE_PATH" != *spec* ]] && [[ "$FILE_PATH" != *fixture* ]]; }; then
+        WARNINGS="${WARNINGS}Long hex string detected — could be a hardcoded token or key. Verify this is not a secret. "
+      fi
+    fi
   fi
 
   # Base64-encoded strings that look like secrets (long base64 after a key-like variable)
@@ -99,8 +108,25 @@ fi
 if [ -n "$FILE_PATH" ] && [ -n "$CONTENT" ]; then
   FILE_BASENAME=$(basename "$FILE_PATH" 2>/dev/null || true)
   FILE_DIRNAME=$(dirname "$FILE_PATH" 2>/dev/null || true)
-  if [[ "$FILE_BASENAME" != *test* ]] && [[ "$FILE_BASENAME" != *spec* ]] && [[ "$FILE_BASENAME" != *.test.* ]] && [[ "$FILE_BASENAME" != *.spec.* ]] && [[ "$FILE_DIRNAME" != *__tests__* ]] && [[ "$FILE_DIRNAME" != *__mocks__* ]]; then
-    if echo "$CONTENT" | grep -q 'console\.log'; then
+
+  # Skip test files, CLI tools, scripts, and bin directories
+  SKIP_CONSOLE_CHECK="false"
+  [[ "$FILE_BASENAME" == *test* ]] && SKIP_CONSOLE_CHECK="true"
+  [[ "$FILE_BASENAME" == *spec* ]] && SKIP_CONSOLE_CHECK="true"
+  [[ "$FILE_DIRNAME" == *__tests__* ]] && SKIP_CONSOLE_CHECK="true"
+  [[ "$FILE_DIRNAME" == *__mocks__* ]] && SKIP_CONSOLE_CHECK="true"
+  [[ "$FILE_DIRNAME" == */cli/* ]] && SKIP_CONSOLE_CHECK="true"
+  [[ "$FILE_DIRNAME" == */bin/* ]] && SKIP_CONSOLE_CHECK="true"
+  [[ "$FILE_DIRNAME" == */scripts/* ]] && SKIP_CONSOLE_CHECK="true"
+
+  # Check project config override
+  if [ "$(read_config 'overrides.allow_console_log' "$PROJECT_ROOT" 2>/dev/null)" = "true" ]; then
+    SKIP_CONSOLE_CHECK="true"
+  fi
+
+  if [ "$SKIP_CONSOLE_CHECK" = "false" ]; then
+    # Only match actual console.log calls, not strings or comments mentioning it
+    if echo "$CONTENT" | grep -qE '[^/]console\.log\s*\(|^console\.log\s*\('; then
       WARNINGS="${WARNINGS}console.log detected in production code — use structured logging instead. "
     fi
   fi

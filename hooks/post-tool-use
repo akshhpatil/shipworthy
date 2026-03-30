@@ -7,6 +7,10 @@ set -euo pipefail
 # --- Error recovery: always output valid JSON ---
 trap 'echo "{}"' ERR
 
+# --- Source shared library ---
+PLUGIN_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+source "$PLUGIN_ROOT/hooks/lib.sh" 2>/dev/null || true
+
 # --- Read tool input from stdin (handle empty input) ---
 INPUT=$(cat 2>/dev/null || true)
 
@@ -15,8 +19,8 @@ if [ -z "$INPUT" ]; then
   exit 0
 fi
 
-# --- Extract the command that was run ---
-COMMAND=$(echo "$INPUT" | grep -o '"command"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"command"[[:space:]]*:[[:space:]]*"//' | sed 's/"$//' 2>/dev/null || true)
+# --- Extract the command that was run using robust parser ---
+COMMAND=$(parse_json_field "$INPUT" "command" 2>/dev/null || true)
 
 if [ -z "$COMMAND" ]; then
   echo '{}'
