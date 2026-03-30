@@ -19,13 +19,25 @@ You are enhanced with Shipworthy engineering guardrails. Apply these principles 
 9. Hash passwords with bcrypt/argon2 — never MD5/SHA/plaintext.
 10. Never expose stack traces or internal details in error responses.
 
+### Intent-to-Spec (Before Coding)
+
+For non-trivial features, generate a lightweight spec before writing code:
+- What the user wants, deliverables, 3-7 acceptance criteria
+- Save to `.shipworthy/specs/[feature-name].md`
+- Skip for quick fixes. Do it silently for non-technical users.
+
+### Project Diagnosis
+
+At session start, check for critical gaps: .gitignore with .env, tests exist, linter configured, CI present, architecture spec exists. Flag critical issues before proceeding.
+
 ### Workflow
 
-1. Understand the task — read existing code, understand patterns
-2. Write a failing test for the expected behavior
-3. Write minimal code to pass the test
-4. Refactor while keeping tests green
-5. Verify: run tests, build, lint. Provide evidence.
+1. Generate spec (for features) — capture intent, deliverables, acceptance criteria
+2. Understand the task — read existing code, understand patterns
+3. Write a failing test for the expected behavior
+4. Write minimal code to pass the test
+5. Refactor while keeping tests green
+6. Verify: run tests, build, lint. Provide evidence.
 
 ### Architecture
 

@@ -182,6 +182,78 @@ else
 fi
 cleanup "$TMPDIR"
 
+# ===============================================================
+# Tests for post-tool-use-write (Write/Edit compliance)
+# ===============================================================
+WRITE_HOOK_PATH="$(cd "$(dirname "$0")/../../hooks" && pwd)/post-tool-use-write"
+
+echo ""
+echo "--- post-tool-use-write tests ---"
+echo ""
+
+# ---------------------------------------------------------------
+# Test 9: TypeScript file with `: any` -> advisory
+# ---------------------------------------------------------------
+echo "Test 9: TypeScript file with : any -> advisory"
+TMPDIR=$(setup_temp_project)
+TSFILE="$TMPDIR/src/service.ts"
+mkdir -p "$TMPDIR/src"
+echo 'export function fetch(data: any) { return data; }' > "$TSFILE"
+INPUT="{\"tool_name\":\"Write\",\"tool_input\":{\"file_path\":\"$TSFILE\"}}"
+OUTPUT=$(cd "$TMPDIR" && echo "$INPUT" | "$WRITE_HOOK_PATH" 2>/dev/null || true)
+if echo "$OUTPUT" | validate_json; then
+  if echo "$OUTPUT" | grep -qi 'any\|unknown'; then
+    pass "TypeScript : any triggers advisory"
+  else
+    fail "Expected : any advisory" "Got: $OUTPUT"
+  fi
+else
+  fail "Output is not valid JSON" "Got: $OUTPUT"
+fi
+cleanup "$TMPDIR"
+
+# ---------------------------------------------------------------
+# Test 10: Route handler without validation import -> advisory
+# ---------------------------------------------------------------
+echo "Test 10: Route without validation -> advisory"
+TMPDIR=$(setup_temp_project)
+ROUTEFILE="$TMPDIR/src/routes.ts"
+mkdir -p "$TMPDIR/src"
+echo 'app.post("/users", (req, res) => { res.json({}); });' > "$ROUTEFILE"
+INPUT="{\"tool_name\":\"Write\",\"tool_input\":{\"file_path\":\"$ROUTEFILE\"}}"
+OUTPUT=$(cd "$TMPDIR" && echo "$INPUT" | "$WRITE_HOOK_PATH" 2>/dev/null || true)
+if echo "$OUTPUT" | validate_json; then
+  if echo "$OUTPUT" | grep -qi 'validation\|Zod\|Pydantic'; then
+    pass "Route without validation triggers advisory"
+  else
+    fail "Expected validation advisory" "Got: $OUTPUT"
+  fi
+else
+  fail "Output is not valid JSON" "Got: $OUTPUT"
+fi
+cleanup "$TMPDIR"
+
+# ---------------------------------------------------------------
+# Test 11: Normal file write -> no advisory
+# ---------------------------------------------------------------
+echo "Test 11: Normal file write -> no advisory"
+TMPDIR=$(setup_temp_project)
+NORMALFILE="$TMPDIR/src/utils.ts"
+mkdir -p "$TMPDIR/src"
+echo 'export const add = (a: number, b: number): number => a + b;' > "$NORMALFILE"
+INPUT="{\"tool_name\":\"Write\",\"tool_input\":{\"file_path\":\"$NORMALFILE\"}}"
+OUTPUT=$(cd "$TMPDIR" && echo "$INPUT" | "$WRITE_HOOK_PATH" 2>/dev/null || true)
+if echo "$OUTPUT" | validate_json; then
+  if echo "$OUTPUT" | grep -qi 'Advisory'; then
+    fail "Normal write should not trigger advisory" "Got: $OUTPUT"
+  else
+    pass "Normal file write produces no advisory"
+  fi
+else
+  fail "Output is not valid JSON" "Got: $OUTPUT"
+fi
+cleanup "$TMPDIR"
+
 # ---------------------------------------------------------------
 # Summary
 # ---------------------------------------------------------------

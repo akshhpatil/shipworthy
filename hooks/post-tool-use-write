@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# Shipworthy — Post-Tool-Use Hook (Write/Edit)
+# Fires after Write/Edit operations. Advisory architecture compliance check.
+# Checks if written file path aligns with project structure conventions.
+
+set -euo pipefail
+
+# --- Error recovery: always output valid JSON ---
+trap 'echo "{}"' ERR
+
+# --- Read tool input from stdin ---
+INPUT=$(cat 2>/dev/null || true)
+
+if [ -z "$INPUT" ]; then
+  echo '{}'
+  exit 0
+fi
+
+# --- Resolve project root ---
+PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+ARCH_SPEC_PATH="$PROJECT_ROOT/.shipworthy/architecture.md"
+
+# --- Extract file path from tool input ---
+FILE_PATH=$(echo "$INPUT" | grep -o '"file_path"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"file_path"[[:space:]]*:[[:space:]]*"//' | sed 's/"$//' 2>/dev/null || true)
+
+if [ -z "$FILE_PATH" ]; then
+  echo '{}'
+  exit 0
+fi
+
+MESSAGE=""
+
+# ============================================================
+# Check 1: Test file written outside test directories
+# ============================================================
+BASENAME=$(basename "$FILE_PATH" 2>/dev/null || true)
+if [[ "$BASENAME" == *test* ]] || [[ "$BASENAME" == *spec* ]] || [[ "$BASENAME" == test_* ]]; then
+  RELATIVE_PATH="${FILE_PATH#$PROJECT_ROOT/}"
+  if [[ "$RELATIVE_PATH" != tests/* ]] && [[ "$RELATIVE_PATH" != __tests__/* ]] && \
+     [[ "$RELATIVE_PATH" != test/* ]] && [[ "$RELATIVE_PATH" != spec/* ]] && \
+     [[ "$RELATIVE_PATH" != */tests/* ]] && [[ "$RELATIVE_PATH" != */__tests__/* ]] && \
+     [[ "$RELATIVE_PATH" != */test/* ]]; then
+    # Check if colocated tests are the convention (test files next to source)
+    if [ -f "$ARCH_SPEC_PATH" ] && grep -qi "colocat" "$ARCH_SPEC_PATH" 2>/dev/null; then
+      : # Colocated tests are the convention, no warning
+    else
+      MESSAGE="${MESSAGE}Test file written outside standard test directory. If this is intentional (colocated tests), update architecture spec. "
+    fi
+  fi
+fi
+
+# ============================================================
+# Check 2: TypeScript `: any` usage (post-write verification)
+# ============================================================
+if [[ "$FILE_PATH" == *.ts ]] || [[ "$FILE_PATH" == *.tsx ]]; then
+  if [ -f "$FILE_PATH" ]; then
+    BASENAME_CHECK=$(basename "$FILE_PATH" 2>/dev/null || true)
+    if [[ "$BASENAME_CHECK" != *.d.ts ]]; then
+      ANY_COUNT=$(grep -c ': any' "$FILE_PATH" 2>/dev/null || echo "0")
+      if [ "$ANY_COUNT" -gt 0 ]; then
+        MESSAGE="${MESSAGE}TypeScript file contains ${ANY_COUNT} instance(s) of ': any'. Use 'unknown' with type guards instead. "
+      fi
+    fi
+  fi
+fi
+
+# ============================================================
+# Check 3: New route handler without validation import
+# ============================================================
+if [ -f "$FILE_PATH" ]; then
+  if grep -qE '(app\.(get|post|put|patch|delete)|router\.(get|post|put|patch|delete)|@(Get|Post|Put|Patch|Delete))' "$FILE_PATH" 2>/dev/null; then
+    if ! grep -qE '(zod|Zod|z\.|Pydantic|pydantic|validator)' "$FILE_PATH" 2>/dev/null; then
+      MESSAGE="${MESSAGE}Route handler detected without input validation import. Consider adding Zod (JS/TS) or Pydantic (Python). "
+    fi
+  fi
+fi
+
+# ============================================================
+# Output result
+# ============================================================
+if [ -n "$MESSAGE" ]; then
+  ESCAPED_MSG=$(printf '%s' "$MESSAGE" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g' | tr -d '\n\r')
+  echo "{\"hookSpecificOutput\":{\"message\":\"[shipworthy] Advisory: ${ESCAPED_MSG}\"}}"
+else
+  echo '{}'
+fi

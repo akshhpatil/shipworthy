@@ -66,6 +66,16 @@ Each task follows TDD flow and takes 2-5 minutes:
 - [API response time expectations?]
 ```
 
+## Task Tracking Integration
+
+After writing the plan, use Claude Code's Task system to make progress visible:
+
+1. **Create a Task for each plan task** using `TaskCreate` — the subject should match the task name from the plan (e.g., "Task 1: Create user service with validation")
+2. **Set dependencies** if tasks must run in order — use `addBlockedBy` so the task list reflects the execution sequence
+3. Tasks appear in the Claude Code UI, giving the user real-time progress visibility
+
+This is especially valuable for Builder-tier users who want to see momentum without reading implementation details.
+
 ## Presenting the Plan
 
 After writing the plan:

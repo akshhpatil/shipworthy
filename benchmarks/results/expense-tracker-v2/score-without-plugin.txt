@@ -1,0 +1,47 @@
+============================================
+ SHIPWORTHY BENCHMARK SCORE
+============================================
+
+ Project: expense-tracker-no-plugin
+ Language: node
+
+--------------------------------------------
+ CHECKS
+--------------------------------------------
+  PASS (+1): Project manifest exists — node
+  PASS (+1): Dependencies installed
+  PASS (+2): Build/parse succeeds
+  PASS (+2): Test files exist — 6 test file(s)
+  PASS (+3): Tests pass
+  FAIL (+0/2): Passing test count — 5 tests
+  FAIL (+0/1): Coverage configured
+  FAIL (+0/1): Linter configured
+  FAIL (+0/1): Linter passes
+  FAIL (+0/1): No console.log in production code — 1 instances
+  FAIL (+0/1): Structured logging
+  FAIL (+0/1): No TypeScript : any — 5 instances
+  FAIL (+0/2): Input validation library
+  FAIL (+0/2): Validation used in handlers
+  FAIL (+0/2): Error handling on routes
+  PASS (+1): Varied HTTP status codes
+  FAIL (+0/2): Uses real database
+  FAIL (+0/1): Database schema defined
+  PASS (+1): Organized directory structure
+  FAIL (+0/1): .gitignore exists
+  FAIL (+0/1): .env in .gitignore
+  PASS (+2): No hardcoded secrets
+  PASS (+2): 5+ API endpoints — 34 endpoints
+  FAIL (+0/1): Architecture/design spec exists
+  FAIL (+0/1): README with content
+
+--------------------------------------------
+ SUMMARY
+--------------------------------------------
+  Score:      15 / 36
+  Percentage: 41%
+  Grade:      F
+  Tests:      5 passing
+  Endpoints:  34
+  Console.log: 1 instances
+  : any count: 5 instances
+============================================

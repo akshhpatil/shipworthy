@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+# Shipworthy — Pre-Tool-Use Hook (Bash)
+# Fires before Bash commands. Catches destructive operations BEFORE execution.
+# Fast-path: only pattern-matches against known dangerous commands.
+
+set -euo pipefail
+
+# --- Error recovery: always output valid JSON ---
+trap 'echo "{\"hookSpecificOutput\":{\"decision\":\"approve\"}}"' ERR
+
+# --- Read tool input from stdin ---
+INPUT=$(cat 2>/dev/null || true)
+
+if [ -z "$INPUT" ]; then
+  echo '{"hookSpecificOutput":{"decision":"approve"}}'
+  exit 0
+fi
+
+# --- Extract command (use full input as fallback for escaped quotes) ---
+COMMAND=$(echo "$INPUT" | grep -o '"command"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"command"[[:space:]]*:[[:space:]]*"//' | sed 's/"$//' 2>/dev/null || true)
+
+# Use full input as search target to handle JSON-escaped quotes in commands
+SEARCH_TARGET="$INPUT"
+
+if [ -z "$COMMAND" ] && [ -z "$SEARCH_TARGET" ]; then
+  echo '{"hookSpecificOutput":{"decision":"approve"}}'
+  exit 0
+fi
+
+WARNINGS=""
+
+# ============================================================
+# Check 1: Destructive file operations
+# ============================================================
+if echo "$SEARCH_TARGET" | grep -qE 'rm\s+(-[a-zA-Z]*r[a-zA-Z]*f|--recursive|--force)' 2>/dev/null; then
+  WARNINGS="${WARNINGS}Destructive rm command detected (recursive/force). Verify target paths carefully. "
+fi
+
+# ============================================================
+# Check 2: Destructive git operations
+# ============================================================
+if echo "$SEARCH_TARGET" | grep -qE 'git\s+push\s+.*(--force\b|-f\b)' 2>/dev/null; then
+  if ! echo "$SEARCH_TARGET" | grep -q 'force-with-lease' 2>/dev/null; then
+    WARNINGS="${WARNINGS}git push --force detected. This rewrites remote history. Consider --force-with-lease instead. "
+  fi
+fi
+
+if echo "$SEARCH_TARGET" | grep -qE 'git\s+reset\s+--hard' 2>/dev/null; then
+  WARNINGS="${WARNINGS}git reset --hard detected. This discards uncommitted changes permanently. "
+fi
+
+if echo "$SEARCH_TARGET" | grep -qE 'git\s+clean\s+-[a-zA-Z]*f' 2>/dev/null; then
+  WARNINGS="${WARNINGS}git clean -f detected. This permanently removes untracked files. "
+fi
+
+if echo "$SEARCH_TARGET" | grep -qE 'git\s+checkout\s+--\s+\.' 2>/dev/null; then
+  WARNINGS="${WARNINGS}git checkout -- . detected. This discards all unstaged changes. "
+fi
+
+if echo "$SEARCH_TARGET" | grep -qE 'git\s+branch\s+-D' 2>/dev/null; then
+  WARNINGS="${WARNINGS}git branch -D detected. This force-deletes a branch regardless of merge status. "
+fi
+
+# ============================================================
+# Check 3: Destructive database operations
+# ============================================================
+if echo "$SEARCH_TARGET" | grep -qiE '(DROP\s+(TABLE|DATABASE|SCHEMA|INDEX)|TRUNCATE\s+TABLE|DELETE\s+FROM\s+[a-zA-Z]+\s*;)' 2>/dev/null; then
+  WARNINGS="${WARNINGS}Destructive database operation detected (DROP/TRUNCATE/DELETE without WHERE). Verify this is intentional. "
+fi
+
+# ============================================================
+# Check 4: Docker/container destructive operations
+# ============================================================
+if echo "$SEARCH_TARGET" | grep -qE 'docker\s+(system\s+prune|container\s+prune|image\s+prune|volume\s+prune)' 2>/dev/null; then
+  WARNINGS="${WARNINGS}Docker prune command detected. This permanently removes stopped containers/unused images/volumes. "
+fi
+
+# ============================================================
+# Check 5: Process killing
+# ============================================================
+if echo "$SEARCH_TARGET" | grep -qE 'kill\s+-9|killall|pkill' 2>/dev/null; then
+  WARNINGS="${WARNINGS}Process kill command detected. Verify the target process is correct. "
+fi
+
+# ============================================================
+# Output result
+# ============================================================
+if [ -n "$WARNINGS" ]; then
+  ESCAPED_WARNINGS=$(printf '%s' "$WARNINGS" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g' | tr -d '\n\r')
+  echo "{\"hookSpecificOutput\":{\"decision\":\"approve\",\"message\":\"[shipworthy] Warning: ${ESCAPED_WARNINGS}\"}}"
+else
+  echo '{"hookSpecificOutput":{"decision":"approve"}}'
+fi

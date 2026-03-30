@@ -49,6 +49,7 @@ Collapses the full process into 3 steps. Fast, focused, no ceremony.
 - Let me make sure I understand what you want before I start building
 - For Quick Fixes with obvious intent: proceed immediately, confirm as you deliver
 - For Features: brief confirmation, then build
+- Ensure a spec exists in `.shipworthy/specs/` — if `intent-to-spec` already created one, reference it. If not (e.g., came here directly), save a lightweight spec now with intent, deliverables, and acceptance criteria
 - Transition directly to implementation (invoke `writing-plans` only if the feature has 3+ moving parts)
 
 **Example — Quick Fix (Lite Mode):**

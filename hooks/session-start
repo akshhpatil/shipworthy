@@ -105,7 +105,113 @@ detect_tier() {
   fi
 }
 
+# --- Load preset configuration if present ---
+PRESET_NAME=""
+SHIPWORTHY_CONFIG="$PROJECT_ROOT/.shipworthy/config.json"
+if [ -f "$SHIPWORTHY_CONFIG" ]; then
+  PRESET_NAME=$(python3 -c "import json; d=json.load(open('$SHIPWORTHY_CONFIG')); print(d.get('preset',''))" 2>/dev/null || true)
+fi
+
 TIER=$(detect_tier)
+
+# Override tier if preset specifies one
+if [ -n "$PRESET_NAME" ]; then
+  PRESET_FILE="$PLUGIN_ROOT/presets/${PRESET_NAME}.json"
+  if [ -f "$PRESET_FILE" ]; then
+    PRESET_TIER=$(python3 -c "import json; d=json.load(open('$PRESET_FILE')); print(d.get('tier',''))" 2>/dev/null || true)
+    if [ -n "$PRESET_TIER" ]; then
+      TIER="$PRESET_TIER"
+    fi
+  fi
+fi
+
+# --- Fast Project Diagnosis (lightweight gap detection) ---
+diagnose_gaps() {
+  local gaps=""
+  local gap_count=0
+  local max_severity="none"
+
+  # Check: .gitignore exists
+  if [ ! -f "$PROJECT_ROOT/.gitignore" ]; then
+    gaps="${gaps}no .gitignore, "
+    gap_count=$((gap_count + 1))
+    max_severity="medium"
+  fi
+
+  # Check: .env in .gitignore (critical)
+  if [ -f "$PROJECT_ROOT/.gitignore" ]; then
+    if ! grep -q '\.env' "$PROJECT_ROOT/.gitignore" 2>/dev/null; then
+      # Only flag if .env files exist or the project has code
+      if [ -f "$PROJECT_ROOT/.env" ] || [ "$TIER" != "builder" ]; then
+        gaps="${gaps}.env not in .gitignore, "
+        gap_count=$((gap_count + 1))
+        max_severity="critical"
+      fi
+    fi
+  fi
+
+  # Check: test directory exists
+  if [ ! -d "$PROJECT_ROOT/tests" ] && [ ! -d "$PROJECT_ROOT/__tests__" ] && \
+     [ ! -d "$PROJECT_ROOT/test" ] && [ ! -d "$PROJECT_ROOT/spec" ]; then
+    local test_count
+    test_count=$(find "$PROJECT_ROOT" -maxdepth 3 -type f \( -name "*.test.*" -o -name "*.spec.*" -o -name "test_*.py" -o -name "*_test.go" \) 2>/dev/null | head -3 | wc -l | tr -d ' ')
+    if [ "$test_count" -eq 0 ] && [ "$TIER" != "builder" ]; then
+      gaps="${gaps}no tests, "
+      gap_count=$((gap_count + 1))
+      if [ "$max_severity" != "critical" ]; then max_severity="high"; fi
+    fi
+  fi
+
+  # Check: CI config exists
+  if [ ! -d "$PROJECT_ROOT/.github/workflows" ] && \
+     [ ! -f "$PROJECT_ROOT/.gitlab-ci.yml" ] && \
+     [ ! -f "$PROJECT_ROOT/.circleci/config.yml" ] && \
+     [ ! -f "$PROJECT_ROOT/Jenkinsfile" ]; then
+    if [ "$TIER" = "engineer" ] || [ "$TIER" = "maker" ]; then
+      gaps="${gaps}no CI, "
+      gap_count=$((gap_count + 1))
+      if [ "$max_severity" = "none" ]; then max_severity="medium"; fi
+    fi
+  fi
+
+  # Check: linter configured
+  local has_linter="false"
+  if [ -f "$PROJECT_ROOT/eslint.config.js" ] || [ -f "$PROJECT_ROOT/eslint.config.mjs" ] || \
+     [ -f "$PROJECT_ROOT/.eslintrc.js" ] || [ -f "$PROJECT_ROOT/.eslintrc.json" ] || \
+     [ -f "$PROJECT_ROOT/.eslintrc.yml" ] || [ -f "$PROJECT_ROOT/ruff.toml" ] || \
+     [ -f "$PROJECT_ROOT/.golangci.yml" ]; then
+    has_linter="true"
+  fi
+  # Check pyproject.toml for ruff config
+  if [ "$has_linter" = "false" ] && [ -f "$PROJECT_ROOT/pyproject.toml" ]; then
+    if grep -q '\[tool\.ruff\]' "$PROJECT_ROOT/pyproject.toml" 2>/dev/null; then
+      has_linter="true"
+    fi
+  fi
+  if [ "$has_linter" = "false" ] && [ "$TIER" != "builder" ]; then
+    gaps="${gaps}no linter, "
+    gap_count=$((gap_count + 1))
+    if [ "$max_severity" = "none" ]; then max_severity="medium"; fi
+  fi
+
+  # Check: architecture spec exists
+  if [ ! -f "$PROJECT_ROOT/.shipworthy/architecture.md" ]; then
+    gaps="${gaps}no architecture spec, "
+    gap_count=$((gap_count + 1))
+    if [ "$max_severity" = "none" ]; then max_severity="low"; fi
+  fi
+
+  # Output result
+  if [ "$gap_count" -eq 0 ]; then
+    echo "all checks passed"
+  else
+    # Remove trailing comma and space
+    gaps="${gaps%, }"
+    echo "${gap_count} gaps (${max_severity}): ${gaps}"
+  fi
+}
+
+PROJECT_HEALTH=$(diagnose_gaps)
 
 # --- Load master routing skill ---
 MASTER_SKILL_PATH="$PLUGIN_ROOT/skills/core/using-shipworthy/SKILL.md"
@@ -131,7 +237,29 @@ Detected tier: **$TIER**
 Adapt skill behavior to this tier. For example:
 - Brainstorming: 3-step for builder/maker, full 5-step for engineer
 - Quality gates: relaxed for builder, standard for maker, strict for engineer
-- Architecture awareness: suggest for builder, recommend for maker, require for engineer"
+- Architecture awareness: suggest for builder, recommend for maker, require for engineer
+
+## PROJECT HEALTH: $PROJECT_HEALTH
+
+Run \`/diagnose\` for a full infrastructure diagnosis with auto-fix options."
+
+# --- Inject preset information if loaded ---
+if [ -n "$PRESET_NAME" ]; then
+  PRESET_FILE="$PLUGIN_ROOT/presets/${PRESET_NAME}.json"
+  if [ -f "$PRESET_FILE" ]; then
+    SKIP_SKILLS=$(python3 -c "import json; d=json.load(open('$PRESET_FILE')); print(', '.join(d.get('skip_skills',[])))" 2>/dev/null || true)
+    ACTIVE_CATS=$(python3 -c "import json; d=json.load(open('$PRESET_FILE')); print(', '.join(d.get('active_categories',[])))" 2>/dev/null || true)
+    CONTEXT="$CONTEXT
+
+---
+
+## PRESET: $PRESET_NAME
+
+Active categories: $ACTIVE_CATS
+Skipped skills: $SKIP_SKILLS
+When routing to skills, respect these filters — skip the listed skills and prioritize active categories."
+  fi
+fi
 
 # --- Context budget: 4000 character limit ---
 CONTEXT_BUDGET=4000
@@ -202,6 +330,54 @@ This project does not yet have an architecture specification at \`.shipworthy/ar
 
 Do NOT block the user's first request — but weave architecture discovery into the work naturally.
 If the user explicitly says they don't want an architecture spec, respect that and proceed without one."
+fi
+
+# --- Surface in-progress plans and recent session ---
+PLANS_DIR="$PROJECT_ROOT/.shipworthy/plans"
+SESSIONS_DIR="$PROJECT_ROOT/.shipworthy/sessions"
+
+IN_PROGRESS_PLANS=""
+if [ -d "$PLANS_DIR" ]; then
+  for plan_file in "$PLANS_DIR"/*.md; do
+    [ -f "$plan_file" ] || continue
+    plan_name=$(basename "$plan_file" .md)
+    IN_PROGRESS_PLANS="${IN_PROGRESS_PLANS}${plan_name}, "
+  done
+fi
+
+if [ -n "$IN_PROGRESS_PLANS" ]; then
+  IN_PROGRESS_PLANS="${IN_PROGRESS_PLANS%, }"
+  CONTEXT="$CONTEXT
+
+---
+
+## IN-PROGRESS PLANS
+
+Plans found in \`.shipworthy/plans/\`: **${IN_PROGRESS_PLANS}**
+Check if any should be resumed before starting new work. Ask: \"You have plans for [feature]. Resume or start fresh?\""
+fi
+
+# Surface recent session summary
+if [ -d "$SESSIONS_DIR" ]; then
+  LATEST_SESSION=$(ls -t "$SESSIONS_DIR"/*.md 2>/dev/null | head -1)
+  if [ -n "$LATEST_SESSION" ] && [ -f "$LATEST_SESSION" ]; then
+    SESSION_DATE=$(basename "$LATEST_SESSION" .md)
+    # Only surface if within last 7 days (basic check: file modified in last 7 days)
+    if [ "$(find "$LATEST_SESSION" -mtime -7 2>/dev/null)" ]; then
+      SESSION_SUMMARY=$(head -20 "$LATEST_SESSION" 2>/dev/null || true)
+      if [ -n "$SESSION_SUMMARY" ]; then
+        CONTEXT="$CONTEXT
+
+---
+
+## PREVIOUS SESSION ($SESSION_DATE)
+
+$(echo "$SESSION_SUMMARY" | head -15)
+
+(Full session log at \`.shipworthy/sessions/${SESSION_DATE}.md\`)"
+      fi
+    fi
+  fi
 fi
 
 # --- Load tech debt summary if present ---

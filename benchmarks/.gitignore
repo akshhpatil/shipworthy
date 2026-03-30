@@ -1,7 +1,8 @@
 # Benchmark results contain generated projects with node_modules
-# Only commit score JSON files and logs, not the full project directories
+# Only commit score files, logs, and summary directories (no node_modules)
 results/*/
 !results/.gitkeep
 !results/*-score.json
 !results/*-scores.json
 !results/*-log*.txt
+!results/expense-tracker-v2/

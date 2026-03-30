@@ -267,6 +267,71 @@ fi
 cleanup "$TMPDIR"
 
 # ---------------------------------------------------------------
+# Test 12: Fast diagnosis - no .gitignore detected
+# ---------------------------------------------------------------
+echo "Test 12: Fast diagnosis - no .gitignore = gap detected"
+TMPDIR=$(setup_temp_project)
+echo '{"name":"test","version":"1.0.0"}' > "$TMPDIR/package.json"
+mkdir -p "$TMPDIR/tests"
+echo "test('x', () => {});" > "$TMPDIR/tests/a.test.js"
+OUTPUT=$(cd "$TMPDIR" && "$HOOK_PATH" 2>/dev/null || true)
+if echo "$OUTPUT" | validate_json; then
+  if echo "$OUTPUT" | grep -qi 'PROJECT HEALTH'; then
+    pass "Fast diagnosis surfaces project health"
+  else
+    fail "Expected PROJECT HEALTH section in output" "Output snippet: $(echo "$OUTPUT" | head -c 400)"
+  fi
+else
+  fail "Output not valid JSON for diagnosis test"
+fi
+cleanup "$TMPDIR"
+
+# ---------------------------------------------------------------
+# Test 13: Fast diagnosis - all checks pass for well-configured project
+# ---------------------------------------------------------------
+echo "Test 13: Fast diagnosis - well-configured project"
+TMPDIR=$(setup_temp_project)
+echo '{"name":"test","version":"1.0.0"}' > "$TMPDIR/package.json"
+mkdir -p "$TMPDIR/tests"
+echo "test('x', () => {});" > "$TMPDIR/tests/a.test.js"
+mkdir -p "$TMPDIR/.github/workflows"
+echo "name: CI" > "$TMPDIR/.github/workflows/ci.yml"
+mkdir -p "$TMPDIR/.shipworthy"
+echo "# Arch" > "$TMPDIR/.shipworthy/architecture.md"
+echo ".env" > "$TMPDIR/.gitignore"
+echo '{"extends":["eslint:recommended"]}' > "$TMPDIR/.eslintrc.json"
+OUTPUT=$(cd "$TMPDIR" && "$HOOK_PATH" 2>/dev/null || true)
+if echo "$OUTPUT" | validate_json; then
+  if echo "$OUTPUT" | grep -qi 'all checks passed'; then
+    pass "Well-configured project passes all checks"
+  else
+    fail "Expected 'all checks passed' for well-configured project" "Output snippet: $(echo "$OUTPUT" | head -c 400)"
+  fi
+else
+  fail "Output not valid JSON for well-configured project"
+fi
+cleanup "$TMPDIR"
+
+# ---------------------------------------------------------------
+# Test 14: In-progress plans surfaced
+# ---------------------------------------------------------------
+echo "Test 14: In-progress plans surfaced at session start"
+TMPDIR=$(setup_temp_project)
+mkdir -p "$TMPDIR/.shipworthy/plans"
+echo "# Plan: User Auth" > "$TMPDIR/.shipworthy/plans/user-auth.md"
+OUTPUT=$(cd "$TMPDIR" && "$HOOK_PATH" 2>/dev/null || true)
+if echo "$OUTPUT" | validate_json; then
+  if echo "$OUTPUT" | grep -qi 'IN-PROGRESS PLANS\|user-auth'; then
+    pass "In-progress plans surfaced"
+  else
+    fail "Expected in-progress plans in output" "Output snippet: $(echo "$OUTPUT" | head -c 400)"
+  fi
+else
+  fail "Output not valid JSON with plans"
+fi
+cleanup "$TMPDIR"
+
+# ---------------------------------------------------------------
 # Summary
 # ---------------------------------------------------------------
 echo ""

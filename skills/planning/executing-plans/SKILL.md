@@ -11,7 +11,7 @@ invoke_when: An implementation plan has been written and approved, and it's time
 For each task in the plan:
 
 ### 1. Announce
-Tell the user which task you're starting and what files you'll touch.
+Tell the user which task you're starting and what files you'll touch. Mark the corresponding Task as `in_progress` using `TaskUpdate`.
 
 ### 2. Write the Test First
 - Write the failing test as specified in the plan
@@ -33,6 +33,7 @@ Tell the user which task you're starting and what files you'll touch.
 - Re-run tests after refactoring
 
 ### 6. Mark Complete
+- Mark the corresponding Task as `completed` using `TaskUpdate`
 - Announce task completion with evidence (test output, build output)
 - Move to the next task
 

@@ -22,6 +22,16 @@
             "timeout": 3000
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/pre-tool-use-bash\"",
+            "timeout": 3000
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -31,6 +41,16 @@
           {
             "type": "command",
             "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/post-tool-use\"",
+            "timeout": 3000
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/post-tool-use-write\"",
             "timeout": 3000
           }
         ]

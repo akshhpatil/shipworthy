@@ -84,16 +84,18 @@ Do NOT spin up brainstorming or planning for trivially small changes. The overhe
 ### Feature (5-60 minutes estimated)
 Examples: new API endpoint, new component, refactor a module, add a new test suite.
 **Workflow**:
-1. **Brainstorming** (streamlined for Builder/Maker, full for Engineer)
-2. **Planning** via `writing-plans` (skip for Maker/Builder if task is well-understood)
-3. **Execution** via `executing-plans` + `test-driven-development`
-4. **Verification** via `verification-before-completion`
+1. **Spec** via `intent-to-spec` (invisible for Builder, summary for Maker, full for Engineer)
+2. **Brainstorming** (streamlined for Builder/Maker, full for Engineer)
+3. **Planning** via `writing-plans` (skip for Maker/Builder if task is well-understood)
+4. **Execution** via `executing-plans` + `test-driven-development`
+5. **Verification** via `verification-before-completion`
 
 ### Project (> 60 minutes estimated)
 Examples: new service, major refactor, multi-component feature, migration.
 **Workflow** (all tiers):
-1. **Brainstorming** via `brainstorming` (full process)
-2. **Planning** via `writing-plans` (detailed plan with milestones)
+1. **Spec** via `intent-to-spec` (all tiers — presented for review on Project-size tasks)
+2. **Brainstorming** via `brainstorming` (full process)
+3. **Planning** via `writing-plans` (detailed plan with milestones)
 3. **Execution** via `executing-plans` + `test-driven-development`
 4. **Quality Gates** via `quality-gates` (at each milestone)
 5. **Verification** via `verification-before-completion`
@@ -107,7 +109,7 @@ Examples: new service, major refactor, multi-component feature, migration.
 
 | Task Type | Invoke These Skills | Tier Notes |
 |-----------|-------------------|------------|
-| Starting something new | `brainstorming` then `writing-plans` | Builder/Maker: 3-step brainstorm. Engineer: full 5-step |
+| Starting something new | `intent-to-spec` then `brainstorming` then `writing-plans` | Builder: spec is invisible. Engineer: spec shown for approval. Quick Fixes skip spec. |
 | Implementing code | `executing-plans`, `test-driven-development` | Builder: suggest tests. Maker/Engineer: require tests |
 | No architecture spec exists | `architecture-awareness` | Builder: suggest. Maker: recommend. Engineer: require |
 | Writing API endpoints | `api-design-standards`, `security-first-development` | All tiers |

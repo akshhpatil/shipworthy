@@ -176,6 +176,105 @@ else
 fi
 cleanup "$TMPDIR"
 
+# ===============================================================
+# Tests for pre-tool-use-bash (destructive command detection)
+# ===============================================================
+BASH_HOOK_PATH="$(cd "$(dirname "$0")/../../hooks" && pwd)/pre-tool-use-bash"
+
+echo ""
+echo "--- pre-tool-use-bash tests ---"
+echo ""
+
+# ---------------------------------------------------------------
+# Test 8: rm -rf -> warning
+# ---------------------------------------------------------------
+echo "Test 8: rm -rf -> warning"
+TMPDIR=$(setup_temp_project)
+INPUT='{"tool_name":"Bash","tool_input":{"command":"rm -rf /tmp/myproject"}}'
+OUTPUT=$(cd "$TMPDIR" && echo "$INPUT" | "$BASH_HOOK_PATH" 2>/dev/null || true)
+if echo "$OUTPUT" | validate_json; then
+  if echo "$OUTPUT" | grep -qi 'destructive\|rm'; then
+    pass "rm -rf triggers warning"
+  else
+    fail "Expected destructive rm warning" "Got: $OUTPUT"
+  fi
+else
+  fail "Output is not valid JSON" "Got: $OUTPUT"
+fi
+cleanup "$TMPDIR"
+
+# ---------------------------------------------------------------
+# Test 9: git push --force -> warning
+# ---------------------------------------------------------------
+echo "Test 9: git push --force -> warning"
+TMPDIR=$(setup_temp_project)
+INPUT='{"tool_name":"Bash","tool_input":{"command":"git push --force origin main"}}'
+OUTPUT=$(cd "$TMPDIR" && echo "$INPUT" | "$BASH_HOOK_PATH" 2>/dev/null || true)
+if echo "$OUTPUT" | validate_json; then
+  if echo "$OUTPUT" | grep -qi 'force\|push'; then
+    pass "git push --force triggers warning"
+  else
+    fail "Expected force push warning" "Got: $OUTPUT"
+  fi
+else
+  fail "Output is not valid JSON" "Got: $OUTPUT"
+fi
+cleanup "$TMPDIR"
+
+# ---------------------------------------------------------------
+# Test 10: git reset --hard -> warning
+# ---------------------------------------------------------------
+echo "Test 10: git reset --hard -> warning"
+TMPDIR=$(setup_temp_project)
+INPUT='{"tool_name":"Bash","tool_input":{"command":"git reset --hard HEAD~3"}}'
+OUTPUT=$(cd "$TMPDIR" && echo "$INPUT" | "$BASH_HOOK_PATH" 2>/dev/null || true)
+if echo "$OUTPUT" | validate_json; then
+  if echo "$OUTPUT" | grep -qi 'reset.*hard\|discard'; then
+    pass "git reset --hard triggers warning"
+  else
+    fail "Expected reset hard warning" "Got: $OUTPUT"
+  fi
+else
+  fail "Output is not valid JSON" "Got: $OUTPUT"
+fi
+cleanup "$TMPDIR"
+
+# ---------------------------------------------------------------
+# Test 11: DROP TABLE -> warning
+# ---------------------------------------------------------------
+echo "Test 11: DROP TABLE -> warning"
+TMPDIR=$(setup_temp_project)
+INPUT='{"tool_name":"Bash","tool_input":{"command":"psql -c \"DROP TABLE users;\""}}'
+OUTPUT=$(cd "$TMPDIR" && echo "$INPUT" | "$BASH_HOOK_PATH" 2>/dev/null || true)
+if echo "$OUTPUT" | validate_json; then
+  if echo "$OUTPUT" | grep -qi 'destructive\|DROP\|database'; then
+    pass "DROP TABLE triggers warning"
+  else
+    fail "Expected destructive database warning" "Got: $OUTPUT"
+  fi
+else
+  fail "Output is not valid JSON" "Got: $OUTPUT"
+fi
+cleanup "$TMPDIR"
+
+# ---------------------------------------------------------------
+# Test 12: Safe bash command -> no warning
+# ---------------------------------------------------------------
+echo "Test 12: Safe bash command -> no warning"
+TMPDIR=$(setup_temp_project)
+INPUT='{"tool_name":"Bash","tool_input":{"command":"npm test"}}'
+OUTPUT=$(cd "$TMPDIR" && echo "$INPUT" | "$BASH_HOOK_PATH" 2>/dev/null || true)
+if echo "$OUTPUT" | validate_json; then
+  if echo "$OUTPUT" | grep -qi 'Warning\|destructive'; then
+    fail "Safe command should not trigger warning" "Got: $OUTPUT"
+  else
+    pass "Safe bash command produces no warning"
+  fi
+else
+  fail "Output is not valid JSON" "Got: $OUTPUT"
+fi
+cleanup "$TMPDIR"
+
 # ---------------------------------------------------------------
 # Summary
 # ---------------------------------------------------------------
