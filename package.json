@@ -1,8 +1,22 @@
 {
   "name": "shipworthy",
   "version": "1.0.0",
-  "description": "Production engineering guardrails for vibe coders. Auto-activating Claude Code plugin with architecture awareness, TDD, quality gates, security, and 25+ skills.",
+  "description": "Is your code worthy of shipping? Auto-activating engineering guardrails for AI coding agents. 42 skills, 6 agents, architecture awareness, TDD, quality gates, security.",
   "type": "module",
+  "bin": {
+    "shipworthy": "./bin/shipworthy.cjs"
+  },
+  "files": [
+    "bin",
+    "skills",
+    "hooks",
+    "templates",
+    "agents",
+    "adapters",
+    "commands",
+    "extensions",
+    "presets"
+  ],
   "author": "Vimal Kumar",
   "license": "MIT",
   "repository": {
@@ -11,11 +25,18 @@
   },
   "keywords": [
     "claude-code",
+    "cursor",
+    "copilot",
+    "codex",
+    "windsurf",
+    "gemini",
     "plugin",
     "architecture",
     "tdd",
     "vibe-coding",
     "engineering",
-    "quality-gates"
+    "quality-gates",
+    "guardrails",
+    "ai-coding"
   ]
 }

@@ -24,11 +24,32 @@ You end up building the same feature three times: once to get it working, once t
 
 **Shipworthy** is a Claude Code plugin that auto-activates every session and silently enforces production engineering practices. It detects your project type, generates an architecture spec, and maintains it across sessions. You vibe code at full speed -- the plugin handles TDD, security, quality gates, and 29 engineering skills invisibly. No configuration, no ceremony, no workflow changes.
 
-## What Happens In Your First Session
+## Install
 
-```
+```bash
+# Claude Code (full experience — hooks + skills + quality gates)
 /plugin install shipworthy
+
+# Any AI agent (CLI setup)
+npx shipworthy init
+
+# Specific agent
+npx shipworthy init --agent cursor
+npx shipworthy init --agent copilot
 ```
+
+## Supported AI Agents
+
+| Agent | Setup | Hooks | Skills | Quality Gates |
+|-------|-------|-------|--------|--------------|
+| **Claude Code** | `/plugin install` | Full | Full (42) | Automated |
+| **Cursor** | `npx shipworthy init --agent cursor` | Rules | Full | Manual |
+| **GitHub Copilot** | `npx shipworthy init --agent copilot` | Rules | Full | Manual |
+| **OpenAI Codex** | `npx shipworthy init --agent codex` | Rules | Full | Manual |
+| **Windsurf** | `npx shipworthy init --agent windsurf` | Rules | Full | Manual |
+| **Gemini CLI** | `npx shipworthy init --agent gemini` | Rules | Full | Manual |
+
+## What Happens In Your First Session
 
 That is the only setup. Here is what happens next:
 

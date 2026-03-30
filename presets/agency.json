@@ -1,0 +1,20 @@
+{
+  "name": "agency",
+  "description": "Client work preset — balanced speed and quality. Focused on delivery with documentation.",
+  "tier": "maker",
+  "quality_gate_level": 2,
+  "active_categories": ["core", "planning", "quality", "security", "architecture", "documentation", "debugging"],
+  "skip_skills": [
+    "slo-sli-definition",
+    "incident-response",
+    "migration-strategies",
+    "compliance-awareness",
+    "dispatching-parallel-agents"
+  ],
+  "overrides": {
+    "brainstorming_mode": "lite",
+    "tdd_mode": "pragmatic",
+    "require_documentation": true,
+    "require_handoff_notes": true
+  }
+}

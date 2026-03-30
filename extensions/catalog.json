@@ -1,0 +1,40 @@
+{
+  "version": "1.0.0",
+  "extensions": [
+    {
+      "name": "healthcare",
+      "description": "HIPAA compliance, PHI handling, audit trails, and healthcare-specific security patterns",
+      "skills": ["compliance-awareness", "threat-modeling"],
+      "author": "community",
+      "status": "planned"
+    },
+    {
+      "name": "fintech",
+      "description": "PCI-DSS compliance, payment processing patterns, financial calculations, audit logging",
+      "skills": ["payment-security", "audit-logging", "financial-math"],
+      "author": "community",
+      "status": "planned"
+    },
+    {
+      "name": "e-commerce",
+      "description": "Cart management, inventory patterns, order lifecycle, shipping integration",
+      "skills": ["cart-patterns", "inventory-management", "order-lifecycle"],
+      "author": "community",
+      "status": "planned"
+    },
+    {
+      "name": "mobile",
+      "description": "React Native and Flutter patterns, offline-first architecture, push notifications",
+      "skills": ["mobile-architecture", "offline-first", "push-notifications"],
+      "author": "community",
+      "status": "planned"
+    },
+    {
+      "name": "enterprise",
+      "description": "SOC2 compliance, RBAC patterns, multi-tenancy, enterprise auth flows",
+      "skills": ["multi-tenancy", "rbac-patterns", "enterprise-auth"],
+      "author": "community",
+      "status": "planned"
+    }
+  ]
+}

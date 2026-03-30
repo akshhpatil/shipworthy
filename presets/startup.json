@@ -1,0 +1,21 @@
+{
+  "name": "startup",
+  "description": "Fast iteration with essential guardrails. Perfect for MVPs and early-stage products.",
+  "tier": "builder",
+  "quality_gate_level": 1,
+  "active_categories": ["core", "planning", "quality", "security", "architecture"],
+  "skip_skills": [
+    "compliance-awareness",
+    "incident-response",
+    "slo-sli-definition",
+    "feature-flag-discipline",
+    "migration-strategies",
+    "design-documents",
+    "dispatching-parallel-agents"
+  ],
+  "overrides": {
+    "brainstorming_mode": "lite",
+    "tdd_mode": "invisible",
+    "max_quality_gate": 2
+  }
+}

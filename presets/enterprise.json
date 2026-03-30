@@ -1,0 +1,15 @@
+{
+  "name": "enterprise",
+  "description": "Full engineering rigor for production systems. All skills active, all quality gates enforced.",
+  "tier": "engineer",
+  "quality_gate_level": 4,
+  "active_categories": ["core", "planning", "quality", "security", "architecture", "collaboration", "operations", "frontend", "documentation", "debugging", "meta"],
+  "skip_skills": [],
+  "overrides": {
+    "brainstorming_mode": "full",
+    "tdd_mode": "full",
+    "require_design_doc_above_loc": 500,
+    "require_threat_model": true,
+    "require_architecture_spec": true
+  }
+}

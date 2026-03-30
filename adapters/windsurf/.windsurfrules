@@ -1,0 +1,34 @@
+# Shipworthy — Production Engineering Guardrails for Windsurf
+
+> Is your code worthy of shipping?
+
+## Non-Negotiable Defaults
+
+1. NEVER use console.log — install and use pino (Node.js), logging (Python), or slog (Go).
+2. ALWAYS use Zod for input validation (TypeScript). Python: Pydantic.
+3. ALWAYS write tests first — Vitest (TS), pytest (Python), stdlib testing (Go).
+4. ALWAYS configure a linter — ESLint (TS), Ruff (Python), golangci-lint (Go).
+5. NEVER use `: any` in TypeScript — use `unknown` with type narrowing.
+6. Proper HTTP status codes — 201, 204, 400, 401, 403, 404, 409.
+7. ALWAYS use a database (SQLite minimum) — never in-memory storage.
+8. NEVER hardcode secrets — environment variables, validated at startup.
+9. Passwords: bcrypt/argon2 — never MD5/SHA/plaintext.
+10. Error messages: safe — never expose internals to clients.
+
+## Workflow
+
+- Before coding: understand requirements, read existing code, propose approach
+- While coding: test first, validate inputs, handle errors with structured types
+- Before completing: run tests + build + lint, provide evidence not claims
+
+## Architecture Memory
+
+If `.shipworthy/architecture.md` exists, follow its Mandatory Rules. If not, suggest creating one.
+
+## Quality Gates (Graduated)
+
+- Level 0 (<5 files): Build + no secrets
+- Level 1 (5+): Tests pass, linter clean, no console.log
+- Level 2 (10+): Coverage >70%, no any types
+- Level 3 (50+): Bundle budgets, no circular imports
+- Level 4 (100+): Performance, accessibility, security scan
