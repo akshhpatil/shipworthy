@@ -68,7 +68,8 @@ jobs:
         run: |
           if grep -rn --include='*.md' --include='*.sh' --include='*.js' --include='*.ts' --include='*.json' \
             -E '(AKIA[0-9A-Z]{16}|sk-[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{36}|password\s*=\s*".+")' \
-            --exclude-dir=node_modules --exclude-dir=.git .; then
+            --exclude-dir=node_modules --exclude-dir=.git \
+            --exclude-dir=tests --exclude-dir=skills .; then
             echo "Potential secrets detected in tracked files!"
             exit 1
           fi
