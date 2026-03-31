@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Updated README.md skill and agent counts to match repo content (52 skills, 5 agents)
+- Updated README.md tables to include all 52 skills across 11 categories
+- Added project-doctor to agents list in README.md
+
+
 ## [1.0.0] - 2026-03-26
 
 ### Added
