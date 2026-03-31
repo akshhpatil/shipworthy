@@ -22,7 +22,7 @@ You end up building the same feature three times: once to get it working, once t
 
 ## The Solution
 
-**Shipworthy** is a Claude Code plugin that auto-activates every session and silently enforces production engineering practices. It detects your project type, generates an architecture spec, and maintains it across sessions. You vibe code at full speed -- the plugin handles TDD, security, quality gates, and 29 engineering skills invisibly. No configuration, no ceremony, no workflow changes.
+**Shipworthy** is a Claude Code plugin that auto-activates every session and silently enforces production engineering practices. It detects your project type, generates an architecture spec, and maintains it across sessions. You vibe code at full speed -- the plugin handles TDD, security, quality gates, and 52 engineering skills invisibly. No configuration, no ceremony, no workflow changes.
 
 ## Install
 
@@ -42,7 +42,7 @@ npx shipworthy init --agent copilot
 
 | Agent | Setup | Hooks | Skills | Quality Gates |
 |-------|-------|-------|--------|--------------|
-| **Claude Code** | `/plugin install` | Full | Full (42) | Automated |
+| **Claude Code** | `/plugin install` | Full | Full (52) | Automated |
 | **Cursor** | `npx shipworthy init --agent cursor` | Rules | Full | Manual |
 | **GitHub Copilot** | `npx shipworthy init --agent copilot` | Rules | Full | Manual |
 | **OpenAI Codex** | `npx shipworthy init --agent codex` | Rules | Full | Manual |
@@ -79,18 +79,22 @@ A weekend prototype should not face the same ceremony as an enterprise platform.
 | **Maker** | Some experience, growing project | Moderate ceremony. Explains why tests matter. Offers choices on architecture decisions. |
 | **Engineer** | Production codebase, CI/CD | Full TDD, quality gates, architecture enforcement. Every PR is verified before completion. |
 
-## Skills (29)
+## Skills (52)
 
 ### Core
 | Skill | What It Does |
 |-------|-------------|
-| **using-shipworthy** | Master router -- loaded every session, dispatches to relevant skills |
+| **using-shipworthy** | Master routing skill -- loaded at every session start. Defines skill priority and routing. |
 | **architecture-awareness** | Auto-detects project type, generates and enforces architecture spec |
+| **intent-to-spec** | Automatically generates a lightweight specification before code starts flowing |
+| **project-diagnosis** | Structured gap analysis that identifies what a project is missing entirely |
 
 ### Planning
 | Skill | What It Does |
 |-------|-------------|
 | **brainstorming** | 9-step design discovery before any code is written |
+| **decision-frameworks** | Guides technology choices with opinionated defaults for different user tiers |
+| **design-documents** | Formal RFC/design doc template for significant engineering changes |
 | **writing-plans** | Breaks work into bite-sized TDD implementation plans |
 | **executing-plans** | Systematic task execution with verification at each step |
 
@@ -101,21 +105,30 @@ A weekend prototype should not face the same ceremony as an enterprise platform.
 | **quality-gates** | Graduated pre-commit checks that scale with project size |
 | **verification-before-completion** | Requires evidence (passing tests, clean build) before marking work done |
 | **error-handling-patterns** | Structured errors, recovery strategies, and user-facing messages |
+| **code-complexity** | Enforces cyclomatic complexity, function length, and nesting depth limits |
 
 ### Security
 | Skill | What It Does |
 |-------|-------------|
 | **security-first-development** | OWASP-aware coding -- input validation, auth, secrets management |
+| **threat-modeling** | Applies the STRIDE framework to identify and mitigate security threats |
 | **dependency-management** | Vet, audit, and pin packages before adding them |
+| **pii-detection** | Detects and flags PII in code, test fixtures, and logs |
+| **compliance-awareness** | Engineering guidance for SOC 2, GDPR, HIPAA, and data classification |
+| **container-security** | Dockerfile best practices, secure base images, and non-root execution |
 
 ### Architecture
 | Skill | What It Does |
 |-------|-------------|
-| **api-design-standards** | REST conventions, type-safe contracts, consistent error responses |
-| **database-design** | Schemas, migrations, indexing, N+1 prevention |
-| **performance-budgets** | Bundle size limits, response time targets, query count caps |
-| **observability-by-default** | Structured logging, tracing, health checks from day one |
-| **resilience-patterns** | Circuit breakers, bulkheads, retries, timeouts, graceful degradation |
+| **api-design-standards** | REST conventions, type-safe contracts, and consistent error responses |
+| **api-versioning** | Breaking change detection and versioning strategies |
+| **api-backward-compatibility** | Design and evolve APIs without breaking existing consumers |
+| **database-design** | Schemas, migrations, indexing, and N+1 prevention |
+| **distributed-systems** | Patterns for idempotency, saga, outbox, and eventual consistency |
+| **performance-budgets** | Bundle size limits, response time targets, and query count caps |
+| **observability-by-default** | Structured logging, tracing, and health checks from day one |
+| **resilience-patterns** | Circuit breakers, retries, timeouts, and graceful degradation |
+| **twelve-factor-app** | Apply modern Twelve-Factor App methodology for cloud-native apps |
 
 ### Collaboration
 | Skill | What It Does |
@@ -128,21 +141,30 @@ A weekend prototype should not face the same ceremony as an enterprise platform.
 ### Operations
 | Skill | What It Does |
 |-------|-------------|
+| **environment-setup** | Auto-generates .env.example and validates environment configuration |
+| **session-memory** | Cross-session memory system for specs, decisions, and plans |
+| **tech-debt-tracking** | Document shortcuts so they get fixed, not forgotten |
+| **feature-flag-discipline** | Manage feature flags with expiration dates and kill switches |
+| **ci-cd-awareness** | Pipeline design, rollback strategies, and feature flags |
 | **using-git-worktrees** | Isolated workspaces for parallel development branches |
 | **finishing-a-development-branch** | 5-step completion workflow: tests, cleanup, docs, PR, verify |
-| **ci-cd-awareness** | Pipeline design, rollback strategies, feature flags |
-| **tech-debt-tracking** | Document shortcuts so they get fixed, not forgotten |
+| **mcp-integration** | Detects and suggests useful MCP servers for the project |
+| **migration-strategies** | Execute system changes via strangler fig, expand-contract, or parallel run |
+| **zero-downtime-migrations** | Backward-compatible schema changes and feature flags for migrations |
+| **production-readiness** | Pre-launch checklist covering security, performance, and reliability |
+| **slo-sli-definition** | Define SLIs, SLOs, and error budgets for production services |
+| **incident-response** | Blameless post-mortems, runbooks, and on-call readiness |
 
 ### Frontend
 | Skill | What It Does |
 |-------|-------------|
 | **accessibility** | WCAG 2.1 AA baseline for every UI component |
-| **frontend-standards** | Component patterns, state management, rendering best practices |
+| **frontend-standards** | Component patterns, state management, and rendering best practices |
 
 ### Documentation
 | Skill | What It Does |
 |-------|-------------|
-| **documentation-as-code** | JSDoc, README sync, ADRs, changelog -- documentation that stays current |
+| **documentation-as-code** | JSDoc, README sync, ADRs, and changelog maintenance |
 
 ### Debugging
 | Skill | What It Does |
@@ -152,7 +174,8 @@ A weekend prototype should not face the same ceremony as an enterprise platform.
 ### Meta
 | Skill | What It Does |
 |-------|-------------|
-| **writing-skills** | TDD for documentation -- create new skills using the RED-GREEN-REFACTOR process |
+| **writing-skills** | TDD for documentation -- create new skills using RED-GREEN-REFACTOR |
+| **retrospective** | Self-improving loop that extracts learnings from sessions |
 
 ## Graduated Quality Gates
 
@@ -179,7 +202,7 @@ Pre-built architecture specs for common stacks. The plugin selects the right one
 | `generic-python.md` | Python (general-purpose, scripts or packages) |
 | `monorepo.md` | Monorepo (multi-package, shared dependencies) |
 
-## Agents (4)
+## Agents (5)
 
 Specialized AI personas dispatched by skills for focused review:
 
@@ -189,6 +212,7 @@ Specialized AI personas dispatched by skills for focused review:
 | **architecture-analyzer** | Validates structural decisions against the architecture spec |
 | **security-auditor** | Scans for vulnerabilities, secrets, auth gaps, injection risks |
 | **test-strategist** | Evaluates test coverage, suggests missing test cases, reviews test quality |
+| **project-doctor** | Fixes diagnosed infrastructure gaps — creating missing configs, CI workflows, and health checks |
 
 ## Commands
 
