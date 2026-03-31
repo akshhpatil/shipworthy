@@ -131,6 +131,7 @@ Examples: new service, major refactor, multi-component feature, migration.
 | Taking a shortcut | `tech-debt-tracking` | All tiers |
 | Writing documentation | `documentation-as-code` | All tiers |
 | Creating a new skill | `writing-skills` | All tiers |
+| Session complete / work done | `retrospective` | All tiers — run /retro to learn from the session |
 | Architecture decisions | `decision-frameworks`, `design-documents` | Maker/Engineer |
 | Compliance/regulatory | `compliance-awareness`, `threat-modeling`, `pii-detection` | Maker/Engineer |
 | Container/Docker work | `container-security` | All tiers |

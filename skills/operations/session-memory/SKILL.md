@@ -16,6 +16,7 @@ Claude Code sessions are stateless — each new session starts fresh. But projec
 .shipworthy/
 ├── architecture.md          # Project architecture spec (managed by architecture-awareness skill)
 ├── tech-debt.md             # Tech debt tracker (managed by tech-debt-tracking skill)
+├── config.json              # Per-project configuration and overrides
 ├── specs/                   # Feature specifications (managed by intent-to-spec skill)
 │   ├── user-auth.md
 │   ├── invoice-system.md
@@ -25,6 +26,10 @@ Claude Code sessions are stateless — each new session starts fresh. But projec
 │   └── ...
 ├── decisions/               # Architecture Decision Records (ADRs)
 │   ├── 001-database-choice.md
+│   └── ...
+├── learnings/               # What this project has taught us (managed by retrospective skill)
+│   ├── database-preferences.md
+│   ├── api-patterns.md
 │   └── ...
 └── sessions/                # Session summaries for continuity
     ├── 2026-03-29.md

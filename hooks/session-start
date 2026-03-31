@@ -374,6 +374,31 @@ $(echo "$SESSION_SUMMARY" | head -15)
   fi
 fi
 
+# --- Surface project learnings from retrospectives ---
+LEARNINGS_DIR="$PROJECT_ROOT/.shipworthy/learnings"
+if [ -d "$LEARNINGS_DIR" ]; then
+  LEARNING_FILES=""
+  LEARNING_COUNT=0
+  for learning_file in "$LEARNINGS_DIR"/*.md; do
+    [ -f "$learning_file" ] || continue
+    learning_name=$(basename "$learning_file" .md)
+    LEARNING_FILES="${LEARNING_FILES}${learning_name}, "
+    LEARNING_COUNT=$((LEARNING_COUNT + 1))
+  done
+  if [ "$LEARNING_COUNT" -gt 0 ]; then
+    LEARNING_FILES="${LEARNING_FILES%, }"
+    CONTEXT="$CONTEXT
+
+---
+
+## PROJECT LEARNINGS (from retrospectives)
+
+**${LEARNING_COUNT} learning file(s)** in \`.shipworthy/learnings/\`: ${LEARNING_FILES}
+These capture what previous sessions taught us — preferences, patterns that work, patterns to avoid.
+Read relevant learnings before starting similar work. Run \`/retro\` after completing work to capture new learnings."
+  fi
+fi
+
 # --- Load tech debt summary if present ---
 TECH_DEBT_PATH="$PROJECT_ROOT/.shipworthy/tech-debt.md"
 
