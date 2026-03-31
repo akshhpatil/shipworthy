@@ -1,4 +1,4 @@
-# Contributing to Engineering With Vibes
+# Contributing to Shipworthy
 
 Welcome, and thank you for considering a contribution. This project exists because production-quality software should be accessible to everyone who builds with AI -- whether you are shipping your first prototype or hardening a system for scale. Every contribution that helps close the gap between "vibe coding" and production engineering is valued.
 

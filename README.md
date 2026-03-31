@@ -200,13 +200,13 @@ Specialized AI personas dispatched by skills for focused review:
 
 ## Before and After
 
-**Without Engineering With Vibes:**
+**Without Shipworthy:**
 - Session 1: Build auth. Works great.
 - Session 2: Build payments. Breaks auth. Claude forgot the auth middleware pattern.
 - Session 3: Fix auth. Break payments. No tests to catch the regression.
 - Ship: Security vulnerabilities, no tests, hardcoded secrets, inconsistent API responses.
 
-**With Engineering With Vibes:**
+**With Shipworthy:**
 - Session 1: Build auth. Architecture spec generated. Tests written automatically. Auth patterns documented.
 - Session 2: Build payments. Architecture rules prevent breaking auth. Security skill catches missing input validation.
 - Session 3: Add features. Quality gates catch issues before you see them. Tech debt is tracked, not hidden.

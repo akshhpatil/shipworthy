@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Engineering With Vibes — Test Runner
+# Shipworthy — Test Runner
 # Executes all test scripts and reports overall results
 
 set -uo pipefail
@@ -11,7 +11,7 @@ FAILED_SUITES=0
 FAILED_NAMES=""
 
 echo "============================================"
-echo "  Engineering With Vibes — Test Runner"
+echo "  Shipworthy — Test Runner"
 echo "============================================"
 echo ""
 
