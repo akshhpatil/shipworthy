@@ -4,686 +4,656 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shipworthy — Production Engineering Guardrails for AI Coding</title>
-  <meta name="description" content="Open source Claude Code plugin that turns vibe coding into production-ready software. 52 invisible engineering skills. Zero configuration.">
-  <meta property="og:title" content="Shipworthy — Vibe Code. Ship Production.">
-  <meta property="og:description" content="52 invisible engineering skills that make AI-generated code production-ready. Open source Claude Code plugin.">
-  <meta property="og:type" content="website">
+  <meta name="description" content="Open source Claude Code plugin. 52 invisible engineering skills turn vibe coding into production-ready software.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg-primary: #06060a;
-      --bg-secondary: #0c0c14;
-      --bg-card: #111119;
-      --bg-card-hover: #16161f;
-      --border: #1e1e2e;
-      --border-light: #2a2a3d;
-      --text-primary: #e4e4ed;
-      --text-secondary: #8888a4;
-      --text-muted: #55556a;
-      --accent-primary: #6c5ce7;
-      --accent-secondary: #a29bfe;
-      --accent-glow: rgba(108, 92, 231, 0.15);
-      --green: #00d68f;
-      --green-glow: rgba(0, 214, 143, 0.12);
-      --red: #ff6b6b;
-      --red-glow: rgba(255, 107, 107, 0.12);
-      --orange: #ffa94d;
-      --cyan: #22d3ee;
-      --gradient-1: linear-gradient(135deg, #6c5ce7, #a29bfe, #22d3ee);
-      --gradient-2: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 50%, #00d68f 100%);
-      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+      --bg-0: #020209;
+      --bg-1: #07070f;
+      --bg-2: #0d0d18;
+      --bg-3: #131320;
+      --bg-card: rgba(15, 15, 28, 0.7);
+      --bg-card-solid: #0f0f1c;
+      --border: rgba(255, 255, 255, 0.06);
+      --border-hover: rgba(255, 255, 255, 0.12);
+      --text-1: #f0f0f8;
+      --text-2: #a0a0bc;
+      --text-3: #5c5c78;
+      --purple: #8b5cf6;
+      --purple-light: #a78bfa;
+      --purple-glow: rgba(139, 92, 246, 0.15);
+      --blue: #3b82f6;
+      --cyan: #06b6d4;
+      --green: #10b981;
+      --green-glow: rgba(16, 185, 129, 0.12);
+      --red: #ef4444;
+      --red-glow: rgba(239, 68, 68, 0.1);
+      --orange: #f59e0b;
+      --font: 'Inter', system-ui, sans-serif;
+      --mono: 'JetBrains Mono', 'Fira Code', monospace;
     }
 
-    html { scroll-behavior: smooth; font-size: 16px; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); background: var(--bg-0); color: var(--text-1); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
 
-    body {
-      font-family: var(--font-sans);
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      line-height: 1.7;
-      overflow-x: hidden;
-    }
+    ::selection { background: var(--purple); color: #fff; }
 
-    /* --- NOISE TEXTURE OVERLAY --- */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 0;
+    a { color: inherit; text-decoration: none; }
+    .container { max-width: 1180px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* ============ ANIMATED GRID BACKGROUND ============ */
+    .grid-bg {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 20%, transparent 70%);
     }
 
-    section, nav, footer { position: relative; z-index: 1; }
+    /* ============ SCROLL REVEAL ============ */
+    .reveal {
+      opacity: 0; transform: translateY(40px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
 
-    a { color: var(--accent-secondary); text-decoration: none; transition: color 0.2s; }
-    a:hover { color: var(--accent-primary); }
+    /* ============ NAV ============ */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      padding: 0.75rem 0; transition: all 0.3s;
+    }
+    .nav.scrolled { background: rgba(2, 2, 9, 0.85); backdrop-filter: blur(24px) saturate(1.2); border-bottom: 1px solid var(--border); }
+    .nav .container { display: flex; align-items: center; justify-content: space-between; }
+    .nav-brand { display: flex; align-items: center; gap: 0.6rem; font-weight: 800; font-size: 1.15rem; letter-spacing: -0.02em; }
+    .nav-brand svg { width: 28px; height: 28px; }
+    .nav-links { display: flex; align-items: center; gap: 1.75rem; }
+    .nav-links a { font-size: 0.82rem; color: var(--text-3); font-weight: 500; transition: color 0.2s; letter-spacing: 0.01em; }
+    .nav-links a:hover { color: var(--text-1); }
+    .btn-gh {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+      padding: 0.45rem 1rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600;
+      color: var(--text-2); transition: all 0.2s;
+    }
+    .btn-gh:hover { background: rgba(255,255,255,0.1); color: var(--text-1); border-color: var(--border-hover); }
+    .btn-gh svg { width: 16px; height: 16px; }
 
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+    /* ============ HERO ============ */
+    .hero { min-height: 100vh; display: flex; align-items: center; position: relative; padding: 6rem 0; overflow: hidden; }
 
-    /* --- NAV --- */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      background: rgba(6, 6, 10, 0.8);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      padding: 1rem 0;
+    /* Gradient orbs */
+    .orb {
+      position: absolute; border-radius: 50%; filter: blur(100px); pointer-events: none;
+      animation: float 20s ease-in-out infinite;
     }
-    nav .container {
-      display: flex; align-items: center; justify-content: space-between;
+    .orb-1 { width: 600px; height: 600px; top: -15%; left: -10%; background: rgba(139, 92, 246, 0.08); animation-delay: 0s; }
+    .orb-2 { width: 500px; height: 500px; top: 10%; right: -15%; background: rgba(6, 182, 212, 0.06); animation-delay: -7s; }
+    .orb-3 { width: 400px; height: 400px; bottom: -10%; left: 30%; background: rgba(16, 185, 129, 0.05); animation-delay: -14s; }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -20px) scale(1.05); }
+      66% { transform: translate(-20px, 15px) scale(0.95); }
     }
-    .nav-logo {
-      font-weight: 800; font-size: 1.25rem; letter-spacing: -0.02em;
-      background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .nav-links { display: flex; gap: 2rem; align-items: center; }
-    .nav-links a { color: var(--text-secondary); font-size: 0.875rem; font-weight: 500; }
-    .nav-links a:hover { color: var(--text-primary); }
-    .btn-nav {
-      background: var(--accent-primary); color: #fff; padding: 0.5rem 1.25rem;
-      border-radius: 8px; font-weight: 600; font-size: 0.875rem;
-      transition: all 0.2s; border: none; cursor: pointer;
-    }
-    .btn-nav:hover { background: #7c6df0; transform: translateY(-1px); color: #fff; }
 
-    /* --- HERO --- */
-    .hero {
-      min-height: 100vh; display: flex; align-items: center; justify-content: center;
-      text-align: center; padding: 8rem 2rem 6rem;
-      position: relative; overflow: hidden;
-    }
-    .hero::before {
-      content: ''; position: absolute; top: -40%; left: 50%; transform: translateX(-50%);
-      width: 800px; height: 800px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(108, 92, 231, 0.12) 0%, rgba(108, 92, 231, 0.03) 40%, transparent 70%);
-      pointer-events: none;
-    }
-    .hero::after {
-      content: ''; position: absolute; top: 20%; right: -10%;
-      width: 400px; height: 400px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(34, 211, 238, 0.06) 0%, transparent 60%);
-      pointer-events: none;
-    }
-    .hero-badge {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      background: var(--accent-glow); border: 1px solid rgba(108, 92, 231, 0.3);
-      padding: 0.4rem 1rem; border-radius: 100px;
-      font-size: 0.8rem; font-weight: 500; color: var(--accent-secondary);
+    .hero-inner { position: relative; z-index: 2; max-width: 760px; }
+
+    .hero-pill {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      padding: 0.35rem 0.9rem 0.35rem 0.5rem; border-radius: 100px;
+      background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.18);
+      font-size: 0.75rem; font-weight: 500; color: var(--purple-light);
       margin-bottom: 2rem;
     }
-    .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s ease-in-out infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-
-    .hero h1 {
-      font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 900; letter-spacing: -0.04em;
-      line-height: 1.1; max-width: 800px; margin: 0 auto 1.5rem;
-    }
-    .hero h1 .gradient {
-      background: var(--gradient-2); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .hero p {
-      font-size: 1.2rem; color: var(--text-secondary); max-width: 600px;
-      margin: 0 auto 2.5rem; line-height: 1.6;
-    }
-    .hero-cta { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 3rem; }
-
-    .btn-primary {
-      background: var(--accent-primary); color: #fff; padding: 0.85rem 2rem;
-      border-radius: 10px; font-weight: 600; font-size: 1rem;
-      transition: all 0.25s; border: none; cursor: pointer;
-      box-shadow: 0 0 30px rgba(108, 92, 231, 0.3);
-    }
-    .btn-primary:hover { background: #7c6df0; transform: translateY(-2px); box-shadow: 0 0 40px rgba(108, 92, 231, 0.4); color: #fff; }
-
-    .btn-secondary {
-      background: transparent; color: var(--text-primary); padding: 0.85rem 2rem;
-      border-radius: 10px; font-weight: 600; font-size: 1rem;
-      border: 1px solid var(--border-light); transition: all 0.25s; cursor: pointer;
-    }
-    .btn-secondary:hover { border-color: var(--accent-primary); background: var(--accent-glow); }
-
-    .hero-install {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 12px; padding: 1rem 2rem; display: inline-flex;
-      align-items: center; gap: 1rem; font-family: var(--font-mono);
-      font-size: 0.95rem;
-    }
-    .hero-install .prompt { color: var(--text-muted); }
-    .hero-install code { color: var(--green); }
-
-    /* --- STATS BAR --- */
-    .stats-bar {
-      padding: 3rem 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-      background: var(--bg-secondary);
-    }
-    .stats-bar .container {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 2rem; text-align: center;
-    }
-    .stat-item .stat-number {
-      font-size: 2rem; font-weight: 800; letter-spacing: -0.02em;
-      background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .stat-item .stat-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; text-transform: uppercase; letter-spacing: 0.08em; }
-
-    /* --- PROBLEM SECTION --- */
-    .problem { padding: 7rem 0; }
-    .section-label {
-      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em;
-      color: var(--accent-secondary); font-weight: 600; margin-bottom: 1rem;
-    }
-    .section-title {
-      font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 800;
-      letter-spacing: -0.03em; line-height: 1.2; margin-bottom: 1.5rem;
-      max-width: 700px;
-    }
-    .section-desc { color: var(--text-secondary); font-size: 1.1rem; max-width: 600px; margin-bottom: 3rem; }
-
-    .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-    @media (max-width: 768px) { .comparison-grid { grid-template-columns: 1fr; } }
-
-    .comparison-card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 16px; padding: 2rem; position: relative; overflow: hidden;
-    }
-    .comparison-card.bad { border-color: rgba(255, 107, 107, 0.2); }
-    .comparison-card.bad::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-      background: linear-gradient(90deg, var(--red), transparent);
-    }
-    .comparison-card.good { border-color: rgba(0, 214, 143, 0.2); }
-    .comparison-card.good::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-      background: linear-gradient(90deg, var(--green), transparent);
-    }
-    .comparison-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
-    .comparison-card .score {
-      font-family: var(--font-mono); font-size: 2.5rem; font-weight: 800;
-      margin-bottom: 0.25rem;
-    }
-    .comparison-card.bad .score { color: var(--red); }
-    .comparison-card.good .score { color: var(--green); }
-    .comparison-card .grade { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; }
-
-    .check-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
-    .check-list li {
-      font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 0.5rem;
-    }
-    .check-list .icon-pass { color: var(--green); flex-shrink: 0; }
-    .check-list .icon-fail { color: var(--red); flex-shrink: 0; }
-
-    /* --- FEATURES --- */
-    .features { padding: 7rem 0; background: var(--bg-secondary); }
-    .features-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 1.5rem; margin-top: 3rem;
-    }
-    .feature-card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 16px; padding: 2rem; transition: all 0.3s;
-    }
-    .feature-card:hover {
-      border-color: var(--border-light); background: var(--bg-card-hover);
-      transform: translateY(-2px); box-shadow: 0 8px 40px rgba(0,0,0,0.3);
-    }
-    .feature-icon {
-      width: 44px; height: 44px; border-radius: 12px; display: flex;
-      align-items: center; justify-content: center; font-size: 1.3rem;
-      margin-bottom: 1.25rem;
-    }
-    .feature-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; }
-    .feature-card p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; }
-    .icon-spec { background: rgba(108, 92, 231, 0.15); }
-    .icon-tdd { background: rgba(0, 214, 143, 0.12); }
-    .icon-hooks { background: rgba(255, 107, 107, 0.12); }
-    .icon-gates { background: rgba(255, 169, 77, 0.12); }
-    .icon-retro { background: rgba(34, 211, 238, 0.12); }
-    .icon-enterprise { background: rgba(162, 155, 254, 0.12); }
-
-    /* --- HOW IT WORKS --- */
-    .how-it-works { padding: 7rem 0; }
-    .steps { display: flex; flex-direction: column; gap: 0; margin-top: 3rem; position: relative; }
-    .steps::before {
-      content: ''; position: absolute; left: 28px; top: 40px; bottom: 40px;
-      width: 2px; background: linear-gradient(to bottom, var(--accent-primary), var(--green));
-    }
-    @media (max-width: 768px) { .steps::before { left: 20px; } }
-
-    .step {
-      display: flex; gap: 2rem; align-items: flex-start; padding: 1.5rem 0;
-    }
-    .step-number {
-      width: 56px; height: 56px; border-radius: 50%; flex-shrink: 0;
-      background: var(--bg-card); border: 2px solid var(--accent-primary);
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 1.1rem; color: var(--accent-secondary);
-      position: relative; z-index: 2;
-    }
-    .step-content h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; }
-    .step-content p { color: var(--text-secondary); font-size: 0.95rem; }
-
-    /* --- CODE BLOCK --- */
-    .code-section { padding: 5rem 0; background: var(--bg-secondary); }
-    .code-block {
-      background: #0a0a12; border: 1px solid var(--border); border-radius: 16px;
-      overflow: hidden; max-width: 700px; margin: 2rem auto 0;
-    }
-    .code-header {
-      display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem;
-      background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--border);
-    }
-    .code-dot { width: 10px; height: 10px; border-radius: 50%; }
-    .code-dot.r { background: #ff5f57; }
-    .code-dot.y { background: #febc2e; }
-    .code-dot.g { background: #28c840; }
-    .code-header span { margin-left: auto; font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); }
-    .code-body {
-      padding: 1.5rem; font-family: var(--font-mono); font-size: 0.85rem;
-      line-height: 1.8; overflow-x: auto;
-    }
-    .code-body .comment { color: #555570; }
-    .code-body .cmd { color: var(--green); }
-    .code-body .output { color: var(--text-secondary); }
-    .code-body .accent { color: var(--accent-secondary); }
-    .code-body .warn { color: var(--orange); }
-
-    /* --- SKILLS GRID --- */
-    .skills-section { padding: 7rem 0; }
-    .skills-categories {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem; margin-top: 3rem;
-    }
-    .skill-cat {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 12px; padding: 1.25rem 1.5rem;
-      display: flex; align-items: center; gap: 1rem;
-      transition: all 0.2s;
-    }
-    .skill-cat:hover { border-color: var(--border-light); background: var(--bg-card-hover); }
-    .skill-cat .cat-count {
-      font-family: var(--font-mono); font-weight: 700; font-size: 1.4rem;
-      color: var(--accent-secondary); min-width: 32px;
-    }
-    .skill-cat .cat-name { font-weight: 600; font-size: 0.9rem; }
-    .skill-cat .cat-desc { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.15rem; }
-
-    /* --- FLYWHEEL --- */
-    .flywheel { padding: 7rem 0; background: var(--bg-secondary); text-align: center; }
-    .flywheel-visual {
-      display: flex; align-items: center; justify-content: center; gap: 0;
-      flex-wrap: wrap; margin: 3rem auto; max-width: 900px;
-    }
-    .flywheel-step {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 12px; padding: 1.25rem 1.5rem; text-align: center;
-      min-width: 160px; flex: 1;
-    }
-    .flywheel-step h4 { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.25rem; }
-    .flywheel-step p { font-size: 0.75rem; color: var(--text-muted); }
-    .flywheel-arrow {
-      font-size: 1.5rem; color: var(--accent-primary); padding: 0 0.5rem; flex-shrink: 0;
-    }
-    @media (max-width: 768px) {
-      .flywheel-visual { flex-direction: column; gap: 0; }
-      .flywheel-arrow { transform: rotate(90deg); padding: 0.5rem 0; }
-    }
-
-    /* --- CONTEXT --- */
-    .context-section { padding: 7rem 0; }
-    .context-bar {
-      max-width: 600px; margin: 2rem auto 0; background: var(--bg-card);
-      border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 2rem;
-    }
-    .bar-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
-    .bar-row:last-child { margin-bottom: 0; }
-    .bar-label { font-size: 0.8rem; color: var(--text-secondary); min-width: 120px; }
-    .bar-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
-    .bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
-    .bar-fill.small { width: 1%; background: var(--green); }
-    .bar-fill.med { width: 3%; background: var(--accent-secondary); }
-    .bar-fill.large { width: 10%; background: var(--orange); }
-    .bar-value { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); min-width: 50px; text-align: right; }
-
-    /* --- CTA --- */
-    .cta {
-      padding: 7rem 0; text-align: center;
-      background: linear-gradient(to bottom, var(--bg-secondary), var(--bg-primary));
+    .hero-pill .pulse-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--green);
       position: relative;
     }
-    .cta::before {
-      content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-      width: 600px; height: 600px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(108, 92, 231, 0.08) 0%, transparent 60%);
+    .hero-pill .pulse-dot::after {
+      content: ''; position: absolute; inset: -3px; border-radius: 50%;
+      border: 1px solid var(--green); animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; opacity: 0;
+    }
+    @keyframes ping { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(2.2); opacity: 0; } }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 6.5vw, 5rem); font-weight: 900; letter-spacing: -0.045em;
+      line-height: 1.05; margin-bottom: 1.5rem;
+    }
+    .hero h1 .glow-text {
+      background: linear-gradient(135deg, var(--purple-light) 0%, var(--cyan) 50%, var(--green) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+      animation: shimmer 8s linear infinite;
+    }
+    @keyframes shimmer { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+
+    .hero-sub {
+      font-size: 1.15rem; line-height: 1.65; color: var(--text-2); margin-bottom: 2.5rem;
+      max-width: 560px; font-weight: 400;
+    }
+    .hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 3.5rem; }
+
+    .btn-main {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.8rem 1.75rem; border-radius: 10px; font-weight: 700;
+      font-size: 0.9rem; border: none; cursor: pointer; transition: all 0.25s;
+      background: var(--purple); color: #fff;
+      box-shadow: 0 0 0 1px rgba(139,92,246,0.3), 0 4px 24px rgba(139,92,246,0.25), inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .btn-main:hover { transform: translateY(-2px); box-shadow: 0 0 0 1px rgba(139,92,246,0.5), 0 8px 40px rgba(139,92,246,0.35), inset 0 1px 0 rgba(255,255,255,0.15); }
+    .btn-main svg { width: 18px; height: 18px; }
+
+    .btn-outline {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.8rem 1.75rem; border-radius: 10px; font-weight: 600;
+      font-size: 0.9rem; border: 1px solid var(--border-hover); cursor: pointer;
+      color: var(--text-2); background: transparent; transition: all 0.25s;
+    }
+    .btn-outline:hover { border-color: var(--purple); color: var(--text-1); background: var(--purple-glow); }
+
+    .hero-terminal {
+      background: var(--bg-card-solid); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden; max-width: 520px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03);
+    }
+    .term-bar {
+      display: flex; align-items: center; padding: 0.65rem 1rem; gap: 6px;
+      background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border);
+    }
+    .term-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .term-dot.r { background: #ff5f56; } .term-dot.y { background: #ffbd2e; } .term-dot.g { background: #27c93f; }
+    .term-title { margin-left: auto; font-size: 0.7rem; color: var(--text-3); font-family: var(--mono); }
+    .term-body { padding: 1.25rem; font-family: var(--mono); font-size: 0.82rem; line-height: 2; }
+    .term-line { display: flex; gap: 0.5rem; }
+    .t-prompt { color: var(--green); user-select: none; }
+    .t-cmd { color: var(--text-1); }
+    .t-comment { color: var(--text-3); }
+    .t-output { color: var(--purple-light); }
+    .t-cursor { display: inline-block; width: 8px; height: 16px; background: var(--purple); animation: blink 1.2s step-end infinite; vertical-align: text-bottom; margin-left: 2px; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    /* ============ LOGOS / STATS ============ */
+    .metrics {
+      padding: 4rem 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      background: linear-gradient(to bottom, var(--bg-1), var(--bg-0));
+    }
+    .metrics-grid {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.5rem; text-align: center;
+    }
+    @media (max-width: 768px) { .metrics-grid { grid-template-columns: repeat(3, 1fr); } }
+
+    .metric { padding: 1rem 0; }
+    .metric-val {
+      font-size: 2.5rem; font-weight: 900; letter-spacing: -0.03em;
+      background: linear-gradient(135deg, var(--text-1), var(--purple-light));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .metric-label { font-size: 0.7rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 0.3rem; font-weight: 500; }
+
+    /* ============ SECTION STYLES ============ */
+    .section { padding: 7rem 0; position: relative; }
+    .section-alt { background: var(--bg-1); }
+    .sec-label {
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.18em; font-weight: 600;
+      color: var(--purple-light); margin-bottom: 0.75rem;
+    }
+    .sec-title {
+      font-size: clamp(1.8rem, 3.5vw, 2.75rem); font-weight: 800; letter-spacing: -0.035em;
+      line-height: 1.15; margin-bottom: 1rem; max-width: 650px;
+    }
+    .sec-desc { color: var(--text-2); font-size: 1.05rem; max-width: 540px; line-height: 1.7; margin-bottom: 3.5rem; }
+    .sec-center { text-align: center; }
+    .sec-center .sec-title, .sec-center .sec-desc { margin-left: auto; margin-right: auto; }
+
+    /* ============ BENCHMARK ============ */
+    .bench-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    @media (max-width: 768px) { .bench-grid { grid-template-columns: 1fr; } }
+
+    .bench-card {
+      position: relative; border-radius: 20px; padding: 2.5rem; overflow: hidden;
+      background: var(--bg-card); backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .bench-card:hover { transform: translateY(-4px); }
+
+    /* Glow border */
+    .bench-card::before {
+      content: ''; position: absolute; inset: 0; border-radius: 20px; padding: 1px;
+      background: linear-gradient(135deg, transparent 40%, var(--border-hover));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
+    }
+
+    .bench-card.fail::before { background: linear-gradient(135deg, transparent 30%, rgba(239,68,68,0.3)); }
+    .bench-card.fail:hover { box-shadow: 0 20px 60px rgba(239,68,68,0.08); }
+    .bench-card.pass::before { background: linear-gradient(135deg, transparent 30%, rgba(16,185,129,0.3)); }
+    .bench-card.pass:hover { box-shadow: 0 20px 60px rgba(16,185,129,0.08); }
+
+    .bench-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+    .bench-label { font-size: 0.8rem; font-weight: 600; color: var(--text-2); }
+    .bench-badge {
+      font-family: var(--mono); font-size: 0.7rem; font-weight: 700;
+      padding: 0.2rem 0.6rem; border-radius: 6px;
+    }
+    .bench-card.fail .bench-badge { background: var(--red-glow); color: var(--red); }
+    .bench-card.pass .bench-badge { background: var(--green-glow); color: var(--green); }
+
+    .bench-score { font-size: 4rem; font-weight: 900; letter-spacing: -0.04em; line-height: 1; margin-bottom: 0.3rem; }
+    .bench-card.fail .bench-score { color: var(--red); }
+    .bench-card.pass .bench-score { color: var(--green); }
+    .bench-sub { font-size: 0.8rem; color: var(--text-3); margin-bottom: 2rem; font-family: var(--mono); }
+
+    .bench-checks { display: flex; flex-direction: column; gap: 0.55rem; }
+    .bench-check { display: flex; align-items: center; gap: 0.6rem; font-size: 0.82rem; color: var(--text-2); }
+    .chk-icon { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.65rem; font-weight: 700; }
+    .chk-pass { background: var(--green-glow); color: var(--green); }
+    .chk-fail { background: var(--red-glow); color: var(--red); }
+
+    /* ============ FEATURES ============ */
+    .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+    @media (max-width: 900px) { .feat-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .feat-grid { grid-template-columns: 1fr; } }
+
+    .feat-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 2rem; transition: all 0.35s; position: relative; overflow: hidden;
+    }
+    .feat-card::after {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-hover), transparent);
+      opacity: 0; transition: opacity 0.35s;
+    }
+    .feat-card:hover { border-color: var(--border-hover); transform: translateY(-3px); box-shadow: 0 16px 48px rgba(0,0,0,0.3); }
+    .feat-card:hover::after { opacity: 1; }
+
+    .feat-icon {
+      width: 48px; height: 48px; border-radius: 14px; display: flex;
+      align-items: center; justify-content: center; margin-bottom: 1.25rem;
+      font-size: 1.35rem; position: relative;
+    }
+    .feat-icon::after {
+      content: ''; position: absolute; inset: -1px; border-radius: 14px;
+      background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.08));
       pointer-events: none;
     }
-    .cta h2 {
-      font-size: clamp(2rem, 4vw, 3rem); font-weight: 800;
-      letter-spacing: -0.03em; margin-bottom: 1rem;
-    }
-    .cta p { color: var(--text-secondary); font-size: 1.1rem; max-width: 500px; margin: 0 auto 2.5rem; }
+    .fi-purple { background: rgba(139,92,246,0.1); }
+    .fi-green { background: rgba(16,185,129,0.1); }
+    .fi-red { background: rgba(239,68,68,0.08); }
+    .fi-orange { background: rgba(245,158,11,0.1); }
+    .fi-cyan { background: rgba(6,182,212,0.1); }
+    .fi-blue { background: rgba(59,130,246,0.1); }
 
-    /* --- FOOTER --- */
-    footer {
-      padding: 3rem 0; border-top: 1px solid var(--border);
-      text-align: center; color: var(--text-muted); font-size: 0.85rem;
-    }
-    footer a { color: var(--text-secondary); }
+    .feat-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.01em; }
+    .feat-card p { font-size: 0.85rem; color: var(--text-2); line-height: 1.6; }
 
-    /* --- RESPONSIVE --- */
+    /* ============ FLOW STEPS ============ */
+    .flow { position: relative; margin-top: 3rem; }
+    .flow-line {
+      position: absolute; left: 31px; top: 50px; bottom: 50px; width: 2px;
+      background: linear-gradient(to bottom, var(--purple), var(--cyan), var(--green));
+      opacity: 0.4;
+    }
+    @media (max-width: 600px) { .flow-line { left: 23px; } }
+
+    .flow-step { display: flex; gap: 1.75rem; padding: 1.75rem 0; position: relative; z-index: 1; }
+    .flow-num {
+      width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0;
+      background: var(--bg-card-solid); border: 2px solid rgba(139,92,246,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 1.1rem; color: var(--purple-light);
+      box-shadow: 0 0 20px rgba(139,92,246,0.1);
+    }
+    .flow-step:hover .flow-num { border-color: var(--purple); box-shadow: 0 0 30px rgba(139,92,246,0.2); }
+    .flow-text h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.35rem; }
+    .flow-text p { color: var(--text-2); font-size: 0.9rem; line-height: 1.6; max-width: 500px; }
+
+    /* ============ SKILLS SECTION ============ */
+    .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; }
+
+    .skill-pill {
+      display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1.15rem;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+      transition: all 0.2s;
+    }
+    .skill-pill:hover { border-color: var(--border-hover); background: rgba(20,20,35,0.8); }
+    .skill-num { font-family: var(--mono); font-weight: 700; font-size: 1.3rem; color: var(--purple-light); min-width: 28px; }
+    .skill-info .skill-name { font-weight: 600; font-size: 0.82rem; }
+    .skill-info .skill-sub { font-size: 0.7rem; color: var(--text-3); margin-top: 0.1rem; }
+
+    /* ============ FLYWHEEL ============ */
+    .wheel { display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap; margin: 3rem auto; }
+    .wheel-node {
+      padding: 1rem 1.5rem; background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 14px; text-align: center; min-width: 140px;
+      transition: all 0.3s;
+    }
+    .wheel-node:hover { border-color: var(--purple); background: var(--purple-glow); transform: scale(1.05); }
+    .wheel-node h4 { font-size: 0.85rem; font-weight: 700; }
+    .wheel-node p { font-size: 0.72rem; color: var(--text-3); margin-top: 0.2rem; }
+    .wheel-arrow { color: var(--purple); font-size: 1.2rem; opacity: 0.5; }
+    @media (max-width: 768px) {
+      .wheel { flex-direction: column; }
+      .wheel-arrow { transform: rotate(90deg); }
+    }
+
+    /* ============ CONTEXT BARS ============ */
+    .ctx-card {
+      max-width: 580px; margin: 2.5rem auto 0; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: 16px; padding: 2rem;
+    }
+    .ctx-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }
+    .ctx-row:last-child { margin-bottom: 0; }
+    .ctx-label { font-size: 0.78rem; color: var(--text-2); min-width: 100px; font-weight: 500; }
+    .ctx-track { flex: 1; height: 6px; background: rgba(255,255,255,0.04); border-radius: 3px; overflow: hidden; }
+    .ctx-fill { height: 100%; border-radius: 3px; }
+    .ctx-fill.f1 { width: 1%; background: var(--green); box-shadow: 0 0 8px var(--green); }
+    .ctx-fill.f2 { width: 1.7%; background: var(--purple-light); box-shadow: 0 0 8px var(--purple); }
+    .ctx-fill.f3 { width: 3%; background: var(--orange); box-shadow: 0 0 8px var(--orange); }
+    .ctx-pct { font-family: var(--mono); font-size: 0.75rem; color: var(--text-3); min-width: 45px; text-align: right; font-weight: 500; }
+
+    /* ============ CTA ============ */
+    .cta { padding: 8rem 0; text-align: center; position: relative; }
+    .cta .orb { position: absolute; width: 500px; height: 500px; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(139,92,246,0.06); border-radius: 50%; filter: blur(120px); }
+    .cta h2 { font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 900; letter-spacing: -0.04em; margin-bottom: 1rem; position: relative; z-index: 1; }
+    .cta .sec-desc { margin-bottom: 2.5rem; position: relative; z-index: 1; }
+    .cta-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
+    .cta-note { margin-top: 2rem; font-size: 0.8rem; color: var(--text-3); position: relative; z-index: 1; }
+
+    /* ============ FOOTER ============ */
+    footer { padding: 2.5rem 0; border-top: 1px solid var(--border); text-align: center; font-size: 0.8rem; color: var(--text-3); }
+    footer a { color: var(--text-2); transition: color 0.2s; }
+    footer a:hover { color: var(--purple-light); }
+    footer .footer-links { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 0.75rem; }
+
+    /* ============ RESPONSIVE ============ */
     @media (max-width: 768px) {
       .nav-links { display: none; }
-      .comparison-grid { grid-template-columns: 1fr; }
-      .features-grid { grid-template-columns: 1fr; }
-      .hero { padding: 7rem 1.5rem 4rem; }
-      .hero-install { flex-direction: column; gap: 0.5rem; font-size: 0.8rem; }
+      .hero { padding: 5rem 0 3rem; }
+      .section { padding: 5rem 0; }
+      .bench-score { font-size: 3rem; }
+      .flow-num { width: 48px; height: 48px; font-size: 0.9rem; }
     }
   </style>
 </head>
 <body>
 
+<div class="grid-bg"></div>
+
 <!-- NAV -->
-<nav>
+<header class="nav" id="nav">
   <div class="container">
-    <a href="#" class="nav-logo">Shipworthy</a>
+    <a href="#" class="nav-brand">
+      <svg viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="url(#g1)" stroke-width="2"/><path d="M9 14.5l3.5 3.5 7-7" stroke="url(#g1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="g1" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#8b5cf6"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs></svg>
+      Shipworthy
+    </a>
     <div class="nav-links">
       <a href="#features">Features</a>
       <a href="#how-it-works">How It Works</a>
-      <a href="#skills">Skills</a>
       <a href="#benchmark">Benchmark</a>
-      <a href="https://github.com/Vimalk0703/shipworthy" class="btn-nav">GitHub</a>
+      <a href="#skills">Skills</a>
+      <a href="https://github.com/Vimalk0703/shipworthy" class="btn-gh">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
     </div>
   </div>
-</nav>
+</header>
 
 <!-- HERO -->
 <section class="hero">
+  <div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
   <div class="container">
-    <div class="hero-badge"><span class="dot"></span> Open Source &middot; Zero Dependencies &middot; One Install</div>
-    <h1>Vibe Code.<br><span class="gradient">Ship Production.</span></h1>
-    <p>An invisible engineering layer for Claude Code. You describe what you want. Shipworthy makes sure what gets built is actually production-ready.</p>
-    <div class="hero-cta">
-      <a href="https://github.com/Vimalk0703/shipworthy" class="btn-primary">View on GitHub</a>
-      <a href="#how-it-works" class="btn-secondary">See How It Works</a>
-    </div>
-    <div class="hero-install">
-      <span class="prompt">$</span>
-      <code>claude plugin install shipworthy</code>
-    </div>
-  </div>
-</section>
-
-<!-- STATS BAR -->
-<section class="stats-bar">
-  <div class="container">
-    <div class="stat-item"><div class="stat-number">52</div><div class="stat-label">Engineering Skills</div></div>
-    <div class="stat-item"><div class="stat-number">5</div><div class="stat-label">Automated Hooks</div></div>
-    <div class="stat-item"><div class="stat-number">5</div><div class="stat-label">Agent Personas</div></div>
-    <div class="stat-item"><div class="stat-number">190</div><div class="stat-label">Tests Passing</div></div>
-    <div class="stat-item"><div class="stat-number">0</div><div class="stat-label">Dependencies</div></div>
-  </div>
-</section>
-
-<!-- PROBLEM / BENCHMARK -->
-<section class="problem" id="benchmark">
-  <div class="container">
-    <div class="section-label">The Problem</div>
-    <div class="section-title">Same Prompts. Same Model.<br>Completely Different Quality.</div>
-    <div class="section-desc">We ran two Claude Code agents on identical founder prompts building the same product. The only difference: one had Shipworthy installed.</div>
-    <div class="comparison-grid">
-      <div class="comparison-card bad">
-        <h3><span>&#x2718;</span> Without Shipworthy</h3>
-        <div class="score">41%</div>
-        <div class="grade">Grade F &middot; 15/36 checks passed</div>
-        <ul class="check-list">
-          <li><span class="icon-fail">&#x2718;</span> In-memory arrays (data lost on restart)</li>
-          <li><span class="icon-fail">&#x2718;</span> No input validation</li>
-          <li><span class="icon-fail">&#x2718;</span> No linter configured</li>
-          <li><span class="icon-fail">&#x2718;</span> No .gitignore</li>
-          <li><span class="icon-fail">&#x2718;</span> console.log in production</li>
-          <li><span class="icon-fail">&#x2718;</span> 5 instances of TypeScript : any</li>
-          <li><span class="icon-fail">&#x2718;</span> No error handling on routes</li>
-          <li><span class="icon-pass">&#x2714;</span> Tests exist (but minimal)</li>
-          <li><span class="icon-pass">&#x2714;</span> Build succeeds</li>
-        </ul>
+    <div class="hero-inner reveal">
+      <div class="hero-pill"><span class="pulse-dot"></span> Open Source &middot; 52 Skills &middot; Zero Config</div>
+      <h1>Vibe Code.<br><span class="glow-text">Ship Production.</span></h1>
+      <p class="hero-sub">An invisible engineering layer for Claude Code. You describe what you want in plain English. Shipworthy makes sure what gets built is production-ready software.</p>
+      <div class="hero-actions">
+        <a href="https://github.com/Vimalk0703/shipworthy" class="btn-main">
+          <svg viewBox="0 0 16 16" fill="currentColor" width="18" height="18"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          View on GitHub
+        </a>
+        <a href="#how-it-works" class="btn-outline">See How It Works</a>
       </div>
-      <div class="comparison-card good">
-        <h3><span>&#x2714;</span> With Shipworthy</h3>
-        <div class="score">97%</div>
-        <div class="grade">Grade A &middot; 35/36 checks passed</div>
-        <ul class="check-list">
-          <li><span class="icon-pass">&#x2714;</span> SQLite database with schemas</li>
-          <li><span class="icon-pass">&#x2714;</span> Zod validation on every route</li>
-          <li><span class="icon-pass">&#x2714;</span> ESLint strict config passing</li>
-          <li><span class="icon-pass">&#x2714;</span> .gitignore with .env</li>
-          <li><span class="icon-pass">&#x2714;</span> Pino structured logging</li>
-          <li><span class="icon-pass">&#x2714;</span> Zero : any types</li>
-          <li><span class="icon-pass">&#x2714;</span> Error handling + proper status codes</li>
-          <li><span class="icon-pass">&#x2714;</span> 39 tests passing</li>
-          <li><span class="icon-pass">&#x2714;</span> Architecture spec generated</li>
-        </ul>
+      <div class="hero-terminal">
+        <div class="term-bar"><span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span><span class="term-title">zsh</span></div>
+        <div class="term-body">
+          <div class="term-line"><span class="t-prompt">$</span><span class="t-cmd">claude plugin install shipworthy</span></div>
+          <div class="term-line"><span class="t-output">Installed. 52 skills active. Zero config needed.</span></div>
+          <div>&nbsp;</div>
+          <div class="term-line"><span class="t-prompt">$</span><span class="t-cmd">claude</span></div>
+          <div class="term-line"><span class="t-comment"># Just start talking. Guardrails are invisible.</span></div>
+          <div class="term-line"><span class="t-cmd">You:</span> <span class="t-output">Build me an invoice app with payments</span><span class="t-cursor"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- METRICS -->
+<section class="metrics">
+  <div class="container">
+    <div class="metrics-grid reveal">
+      <div class="metric"><div class="metric-val">52</div><div class="metric-label">Engineering Skills</div></div>
+      <div class="metric"><div class="metric-val">5</div><div class="metric-label">Automated Hooks</div></div>
+      <div class="metric"><div class="metric-val">5</div><div class="metric-label">Agent Personas</div></div>
+      <div class="metric"><div class="metric-val">190</div><div class="metric-label">Tests Passing</div></div>
+      <div class="metric"><div class="metric-val">0</div><div class="metric-label">Dependencies</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- BENCHMARK -->
+<section class="section" id="benchmark">
+  <div class="container">
+    <div class="sec-label reveal">Benchmark</div>
+    <div class="sec-title reveal">Same Prompts. Same Model.<br>Different Universe of Quality.</div>
+    <div class="sec-desc reveal">Two agents. Identical 7-turn founder prompts. One had Shipworthy. Scoring was automated with 25 objective checks written before either agent ran.</div>
+    <div class="bench-grid">
+      <div class="bench-card fail reveal">
+        <div class="bench-header"><span class="bench-label">Without Shipworthy</span><span class="bench-badge">GRADE F</span></div>
+        <div class="bench-score">41%</div>
+        <div class="bench-sub">15 / 36 checks passed</div>
+        <div class="bench-checks">
+          <div class="bench-check"><span class="chk-icon chk-fail">&#x2717;</span> In-memory arrays — data lost on restart</div>
+          <div class="bench-check"><span class="chk-icon chk-fail">&#x2717;</span> No input validation on any route</div>
+          <div class="bench-check"><span class="chk-icon chk-fail">&#x2717;</span> No linter, no coverage config</div>
+          <div class="bench-check"><span class="chk-icon chk-fail">&#x2717;</span> console.log in production code</div>
+          <div class="bench-check"><span class="chk-icon chk-fail">&#x2717;</span> 5 instances of TypeScript : any</div>
+          <div class="bench-check"><span class="chk-icon chk-fail">&#x2717;</span> No .gitignore — secrets exposed</div>
+          <div class="bench-check"><span class="chk-icon chk-fail">&#x2717;</span> No error handling on routes</div>
+          <div class="bench-check"><span class="chk-icon chk-pass">&#x2713;</span> Build succeeds</div>
+        </div>
+      </div>
+      <div class="bench-card pass reveal reveal-delay-1">
+        <div class="bench-header"><span class="bench-label">With Shipworthy</span><span class="bench-badge">GRADE A</span></div>
+        <div class="bench-score">97%</div>
+        <div class="bench-sub">35 / 36 checks passed</div>
+        <div class="bench-checks">
+          <div class="bench-check"><span class="chk-icon chk-pass">&#x2713;</span> SQLite database with proper schemas</div>
+          <div class="bench-check"><span class="chk-icon chk-pass">&#x2713;</span> Zod validation on every route</div>
+          <div class="bench-check"><span class="chk-icon chk-pass">&#x2713;</span> ESLint strict config — passing</div>
+          <div class="bench-check"><span class="chk-icon chk-pass">&#x2713;</span> Pino structured logging — 0 console.log</div>
+          <div class="bench-check"><span class="chk-icon chk-pass">&#x2713;</span> Zero : any types — strict TypeScript</div>
+          <div class="bench-check"><span class="chk-icon chk-pass">&#x2713;</span> .gitignore + .env protected</div>
+          <div class="bench-check"><span class="chk-icon chk-pass">&#x2713;</span> Error handling + proper status codes</div>
+          <div class="bench-check"><span class="chk-icon chk-pass">&#x2713;</span> 39 tests passing + coverage</div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- FEATURES -->
-<section class="features" id="features">
+<section class="section section-alt" id="features">
   <div class="container">
-    <div class="section-label">Capabilities</div>
-    <div class="section-title">Everything Happens Invisibly</div>
-    <div class="section-desc">You keep vibe coding. Shipworthy handles the engineering you don't know to ask for.</div>
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon icon-spec">&#x1f4dd;</div>
-        <h3>Invisible Specs</h3>
-        <p>Before code starts, a lightweight spec is generated silently. What you asked for, deliverables, acceptance criteria. You never see it. Claude builds against it.</p>
+    <div class="sec-label reveal">Capabilities</div>
+    <div class="sec-title reveal">Everything Happens Invisibly</div>
+    <div class="sec-desc reveal">You keep vibe coding at full speed. Shipworthy handles the engineering you don't know to ask for.</div>
+    <div class="feat-grid">
+      <div class="feat-card reveal">
+        <div class="feat-icon fi-purple">&#x1f4cb;</div>
+        <h3>Invisible Specifications</h3>
+        <p>Before code starts, a lightweight spec is generated silently. Deliverables, acceptance criteria, constraints. You never see it. Claude builds against it.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon icon-tdd">&#x2705;</div>
+      <div class="feat-card reveal reveal-delay-1">
+        <div class="feat-icon fi-green">&#x2705;</div>
         <h3>Tests Before Code</h3>
-        <p>TDD happens automatically. Failing test first, then implementation, then verification. You see "it works." Behind the scenes: 12 tests prove it.</p>
+        <p>TDD happens automatically. Failing test first, then implementation, then verification. You see "it works." Underneath: 12 tests prove it.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon icon-hooks">&#x1f6e1;</div>
+      <div class="feat-card reveal reveal-delay-2">
+        <div class="feat-icon fi-red">&#x1f6e1;</div>
         <h3>Real-Time Guardrails</h3>
-        <p>5 hooks guard every action. Secrets caught before files are written. Destructive commands blocked before they run. TypeScript : any flagged after writes.</p>
+        <p>5 hooks guard every action. Secrets caught before files are written. Destructive commands blocked before execution. All advisory, never blocking.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon icon-gates">&#x1f4ca;</div>
+      <div class="feat-card reveal">
+        <div class="feat-icon fi-orange">&#x1f4c8;</div>
         <h3>Scaling Quality Gates</h3>
-        <p>5 files? Light touch. 50 files? Coverage thresholds. 500 files? Performance budgets, security scans, circular import detection. Scales automatically.</p>
+        <p>5 files: light touch. 50 files: coverage thresholds. 500 files: security scans, performance budgets, circular import detection. Automatic.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon icon-retro">&#x1f504;</div>
+      <div class="feat-card reveal reveal-delay-1">
+        <div class="feat-icon fi-cyan">&#x1f504;</div>
         <h3>Self-Improving Loop</h3>
-        <p>Run /retro after a session. Sub-agents analyze corrections, patterns, and gaps. Learnings persist. Next session starts smarter. Eventually: one-shot execution.</p>
+        <p>Run /retro after a session. Sub-agents analyze corrections, patterns, and gaps. Learnings persist. Next session starts smarter. Eventually: one-shot.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon icon-enterprise">&#x1f3e2;</div>
+      <div class="feat-card reveal reveal-delay-2">
+        <div class="feat-icon fi-blue">&#x1f3e2;</div>
         <h3>Enterprise Ready</h3>
-        <p>PII detection, container security, API versioning, zero-downtime migrations, code complexity limits. Per-project configuration. Preset bundles.</p>
+        <p>PII detection, container security, API versioning, zero-downtime migrations, code complexity limits. Per-project configuration and preset bundles.</p>
       </div>
     </div>
   </div>
 </section>
 
 <!-- HOW IT WORKS -->
-<section class="how-it-works" id="how-it-works">
+<section class="section" id="how-it-works">
   <div class="container">
-    <div class="section-label">Under The Hood</div>
-    <div class="section-title">What Happens When You Say<br>"Build Me an Invoice App"</div>
-    <div class="steps">
-      <div class="step">
-        <div class="step-number">1</div>
-        <div class="step-content">
-          <h3>Session Start</h3>
-          <p>Hook fires in &lt;2s. Detects project type, maturity tier, diagnoses gaps, loads architecture spec and learnings from previous sessions.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-number">2</div>
-        <div class="step-content">
-          <h3>Intent to Spec</h3>
-          <p>Generates a lightweight specification silently. What you want, deliverables, acceptance criteria. For non-technical users: completely invisible.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-number">3</div>
-        <div class="step-content">
-          <h3>Architecture Awareness</h3>
-          <p>Detects tech stack, generates architecture spec with mandatory rules. Persists across sessions. Claude remembers your project structure tomorrow.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-number">4</div>
-        <div class="step-content">
-          <h3>Test-Driven Development</h3>
-          <p>Writes failing test. Implements code to pass. Verifies. Installs validation libraries, structured logging, real database. All automatic.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-number">5</div>
-        <div class="step-content">
-          <h3>Verification</h3>
-          <p>Runs proof commands. Tests pass. Linter clean. Build succeeds. Not "should work" — proven with evidence.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-number">6</div>
-        <div class="step-content">
-          <h3>Retrospective</h3>
-          <p>Run /retro to extract session learnings. Corrections, patterns, gaps saved. Next session starts where this one ended — smarter.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- INSTALL CODE BLOCK -->
-<section class="code-section">
-  <div class="container" style="text-align: center;">
-    <div class="section-label">Get Started</div>
-    <div class="section-title" style="margin-left: auto; margin-right: auto;">One Command. Zero Configuration.</div>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-dot r"></span>
-        <span class="code-dot y"></span>
-        <span class="code-dot g"></span>
-        <span>terminal</span>
-      </div>
-      <div class="code-body">
-        <div><span class="comment"># Install the plugin</span></div>
-        <div><span class="cmd">$ claude plugin install shipworthy</span></div>
-        <div>&nbsp;</div>
-        <div><span class="comment"># That's it. Start coding normally.</span></div>
-        <div><span class="cmd">$ claude</span></div>
-        <div><span class="output">[shipworthy] Tier: builder | Health: all checks passed</span></div>
-        <div>&nbsp;</div>
-        <div><span class="accent">You:</span> <span class="output">Build me an expense tracker with categories and budgets</span></div>
-        <div>&nbsp;</div>
-        <div><span class="comment"># Behind the scenes: spec generated, tests written,</span></div>
-        <div><span class="comment"># SQLite configured, Zod validation installed,</span></div>
-        <div><span class="comment"># pino logger set up, ESLint configured...</span></div>
-        <div>&nbsp;</div>
-        <div><span class="warn"># After completing work:</span></div>
-        <div><span class="cmd">You:</span> <span class="output">/retro</span></div>
-        <div><span class="comment"># Analyzes session, saves learnings, next session = smarter</span></div>
-      </div>
+    <div class="sec-label reveal">Under The Hood</div>
+    <div class="sec-title reveal">What Happens When You Say<br>"Build Me an Invoice App"</div>
+    <div class="flow">
+      <div class="flow-line"></div>
+      <div class="flow-step reveal"><div class="flow-num">1</div><div class="flow-text"><h3>Session Starts</h3><p>Hook fires in &lt;2s. Detects project type, maturity tier, diagnoses gaps, loads architecture spec and learnings from previous retrospectives.</p></div></div>
+      <div class="flow-step reveal"><div class="flow-num">2</div><div class="flow-text"><h3>Intent to Spec</h3><p>Generates a lightweight specification silently. What you want, deliverables, acceptance criteria. For non-technical users: completely invisible.</p></div></div>
+      <div class="flow-step reveal"><div class="flow-num">3</div><div class="flow-text"><h3>Architecture Awareness</h3><p>Detects tech stack, generates architecture spec with mandatory rules. Persists across sessions. Claude remembers your project structure tomorrow.</p></div></div>
+      <div class="flow-step reveal"><div class="flow-num">4</div><div class="flow-text"><h3>Test-Driven Development</h3><p>Writes failing test. Implements minimal code to pass. Verifies. Installs validation libraries, structured logging, real database. All automatic.</p></div></div>
+      <div class="flow-step reveal"><div class="flow-num">5</div><div class="flow-text"><h3>Verification</h3><p>Runs proof commands: tests pass, linter clean, build succeeds. Not "should work" — proven with evidence from actual command output.</p></div></div>
+      <div class="flow-step reveal"><div class="flow-num">6</div><div class="flow-text"><h3>Retrospective</h3><p>Run /retro to extract session learnings. Corrections, patterns, and gaps are analyzed by sub-agents. Approved learnings persist for next session.</p></div></div>
     </div>
   </div>
 </section>
 
 <!-- SKILLS -->
-<section class="skills-section" id="skills">
-  <div class="container">
-    <div class="section-label">52 Skills</div>
-    <div class="section-title">Engineering Expertise, Encoded as Markdown</div>
-    <div class="section-desc">Each skill is a Markdown file with instructions. No code. No dependencies. Just knowledge that makes Claude smarter.</div>
-    <div class="skills-categories">
-      <div class="skill-cat"><span class="cat-count">3</span><div><div class="cat-name">Core</div><div class="cat-desc">Routing, architecture, intent-to-spec</div></div></div>
-      <div class="skill-cat"><span class="cat-count">5</span><div><div class="cat-name">Planning</div><div class="cat-desc">Brainstorming, plans, decisions</div></div></div>
-      <div class="skill-cat"><span class="cat-count">5</span><div><div class="cat-name">Quality</div><div class="cat-desc">TDD, gates, verification, complexity</div></div></div>
-      <div class="skill-cat"><span class="cat-count">5</span><div><div class="cat-name">Security</div><div class="cat-desc">OWASP, PII, containers, compliance</div></div></div>
-      <div class="skill-cat"><span class="cat-count">8</span><div><div class="cat-name">Architecture</div><div class="cat-desc">APIs, databases, observability, resilience</div></div></div>
-      <div class="skill-cat"><span class="cat-count">4</span><div><div class="cat-name">Collaboration</div><div class="cat-desc">Sub-agents, code review, parallel work</div></div></div>
-      <div class="skill-cat"><span class="cat-count">12</span><div><div class="cat-name">Operations</div><div class="cat-desc">CI/CD, git, migrations, feature flags</div></div></div>
-      <div class="skill-cat"><span class="cat-count">2</span><div><div class="cat-name">Frontend</div><div class="cat-desc">Accessibility, component standards</div></div></div>
-      <div class="skill-cat"><span class="cat-count">2</span><div><div class="cat-name">Meta</div><div class="cat-desc">Writing skills, retrospective</div></div></div>
-      <div class="skill-cat"><span class="cat-count">2</span><div><div class="cat-name">Extensions</div><div class="cat-desc">E-commerce patterns</div></div></div>
+<section class="section section-alt" id="skills">
+  <div class="container sec-center">
+    <div class="sec-label reveal">52 Skills</div>
+    <div class="sec-title reveal">Engineering Expertise,<br>Encoded as Markdown</div>
+    <div class="sec-desc reveal">Each skill is a Markdown file with YAML frontmatter. No code. No dependencies. No runtime. Just instructions that make Claude a better engineer.</div>
+    <div class="skills-grid reveal">
+      <div class="skill-pill"><span class="skill-num">3</span><div class="skill-info"><div class="skill-name">Core</div><div class="skill-sub">Routing, architecture, specs</div></div></div>
+      <div class="skill-pill"><span class="skill-num">5</span><div class="skill-info"><div class="skill-name">Planning</div><div class="skill-sub">Brainstorming, plans, decisions</div></div></div>
+      <div class="skill-pill"><span class="skill-num">5</span><div class="skill-info"><div class="skill-name">Quality</div><div class="skill-sub">TDD, gates, verification</div></div></div>
+      <div class="skill-pill"><span class="skill-num">5</span><div class="skill-info"><div class="skill-name">Security</div><div class="skill-sub">OWASP, PII, containers</div></div></div>
+      <div class="skill-pill"><span class="skill-num">8</span><div class="skill-info"><div class="skill-name">Architecture</div><div class="skill-sub">APIs, DB, observability</div></div></div>
+      <div class="skill-pill"><span class="skill-num">4</span><div class="skill-info"><div class="skill-name">Collaboration</div><div class="skill-sub">Agents, code review</div></div></div>
+      <div class="skill-pill"><span class="skill-num">12</span><div class="skill-info"><div class="skill-name">Operations</div><div class="skill-sub">CI/CD, git, migrations</div></div></div>
+      <div class="skill-pill"><span class="skill-num">2</span><div class="skill-info"><div class="skill-name">Frontend</div><div class="skill-sub">Accessibility, standards</div></div></div>
+      <div class="skill-pill"><span class="skill-num">2</span><div class="skill-info"><div class="skill-name">Meta</div><div class="skill-sub">Writing skills, retro</div></div></div>
+      <div class="skill-pill"><span class="skill-num">2</span><div class="skill-info"><div class="skill-name">Extensions</div><div class="skill-sub">E-commerce patterns</div></div></div>
     </div>
   </div>
 </section>
 
 <!-- FLYWHEEL -->
-<section class="flywheel">
+<section class="section sec-center">
   <div class="container">
-    <div class="section-label">The Loop</div>
-    <div class="section-title" style="margin-left: auto; margin-right: auto;">Every Session Makes the Next One Better</div>
-    <div class="section-desc" style="margin-left: auto; margin-right: auto;">Static tools stay the same forever. Shipworthy compounds.</div>
-    <div class="flywheel-visual">
-      <div class="flywheel-step"><h4>Build</h4><p>Vibe code normally</p></div>
-      <div class="flywheel-arrow">&rarr;</div>
-      <div class="flywheel-step"><h4>Correct</h4><p>Fix what's wrong</p></div>
-      <div class="flywheel-arrow">&rarr;</div>
-      <div class="flywheel-step"><h4>/retro</h4><p>Extract patterns</p></div>
-      <div class="flywheel-arrow">&rarr;</div>
-      <div class="flywheel-step"><h4>Learn</h4><p>Save to project</p></div>
-      <div class="flywheel-arrow">&rarr;</div>
-      <div class="flywheel-step"><h4>Improve</h4><p>Next session: smarter</p></div>
+    <div class="sec-label reveal">The Loop</div>
+    <div class="sec-title reveal">Every Session Makes<br>the Next One Better</div>
+    <div class="sec-desc reveal">Static tools stay the same forever. Shipworthy compounds with every piece of work you do.</div>
+    <div class="wheel reveal">
+      <div class="wheel-node"><h4>Build</h4><p>Vibe code normally</p></div>
+      <span class="wheel-arrow">&rarr;</span>
+      <div class="wheel-node"><h4>Correct</h4><p>Fix what's off</p></div>
+      <span class="wheel-arrow">&rarr;</span>
+      <div class="wheel-node"><h4>/retro</h4><p>Extract patterns</p></div>
+      <span class="wheel-arrow">&rarr;</span>
+      <div class="wheel-node"><h4>Learn</h4><p>Save to project</p></div>
+      <span class="wheel-arrow">&rarr;</span>
+      <div class="wheel-node"><h4>Improve</h4><p>Next session: smarter</p></div>
     </div>
   </div>
 </section>
 
-<!-- CONTEXT USAGE -->
-<section class="context-section">
-  <div class="container" style="text-align: center;">
-    <div class="section-label">Lightweight by Design</div>
-    <div class="section-title" style="margin-left: auto; margin-right: auto;">Uses Less Than 1% of Context</div>
-    <div class="section-desc" style="margin-left: auto; margin-right: auto;">Master skill in context. Everything else on demand. Skills load in, do their job, scroll out.</div>
-    <div class="context-bar">
-      <div class="bar-row">
-        <span class="bar-label">Session start</span>
-        <div class="bar-track"><div class="bar-fill small"></div></div>
-        <span class="bar-value">1.0%</span>
-      </div>
-      <div class="bar-row">
-        <span class="bar-label">Active work</span>
-        <div class="bar-track"><div class="bar-fill med"></div></div>
-        <span class="bar-value">1.7%</span>
-      </div>
-      <div class="bar-row">
-        <span class="bar-label">Heavy work</span>
-        <div class="bar-track"><div class="bar-fill large"></div></div>
-        <span class="bar-value">3.0%</span>
-      </div>
+<!-- CONTEXT -->
+<section class="section section-alt sec-center">
+  <div class="container">
+    <div class="sec-label reveal">Lightweight</div>
+    <div class="sec-title reveal">Uses Less Than 1%<br>of Your Context Window</div>
+    <div class="sec-desc reveal">Master skill in context. Everything else loads on demand. Skills do their job and scroll out naturally.</div>
+    <div class="ctx-card reveal">
+      <div class="ctx-row"><span class="ctx-label">Session start</span><div class="ctx-track"><div class="ctx-fill f1"></div></div><span class="ctx-pct">1.0%</span></div>
+      <div class="ctx-row"><span class="ctx-label">Active work</span><div class="ctx-track"><div class="ctx-fill f2"></div></div><span class="ctx-pct">1.7%</span></div>
+      <div class="ctx-row"><span class="ctx-label">Heavy work</span><div class="ctx-track"><div class="ctx-fill f3"></div></div><span class="ctx-pct">3.0%</span></div>
     </div>
   </div>
 </section>
 
 <!-- CTA -->
 <section class="cta">
+  <div class="orb"></div>
   <div class="container">
-    <h2>Ready to Ship Production?</h2>
-    <p>One install command. Zero configuration. Your code stays yours. The guardrails are invisible.</p>
-    <div class="hero-cta">
-      <a href="https://github.com/Vimalk0703/shipworthy" class="btn-primary">View on GitHub</a>
-      <a href="https://github.com/Vimalk0703/shipworthy/blob/main/CONTRIBUTING.md" class="btn-secondary">Contribute</a>
+    <h2 class="reveal">Ready to Ship<br><span class="glow-text">Production-Grade Software?</span></h2>
+    <p class="sec-desc reveal" style="margin-left:auto;margin-right:auto;">One command. Zero configuration. Your code stays yours.<br>The guardrails are invisible.</p>
+    <div class="cta-actions reveal">
+      <a href="https://github.com/Vimalk0703/shipworthy" class="btn-main">
+        <svg viewBox="0 0 16 16" fill="currentColor" width="18" height="18"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        View on GitHub
+      </a>
+      <a href="https://github.com/Vimalk0703/shipworthy/blob/main/CONTRIBUTING.md" class="btn-outline">Contribute</a>
     </div>
-    <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 2rem;">MIT Licensed &middot; Markdown + Shell &middot; Works Everywhere Bash Runs</p>
+    <p class="cta-note reveal">MIT Licensed &middot; Markdown + Shell Scripts &middot; Works Everywhere Bash Runs</p>
   </div>
 </section>
 
 <!-- FOOTER -->
 <footer>
   <div class="container">
-    <p>Built by <a href="https://www.linkedin.com/in/vimal-kumar-parthasarathy/">Vimal Kumar</a> &middot; <a href="https://github.com/Vimalk0703/shipworthy">GitHub</a> &middot; Vibe coding is how you start. Engineering is what keeps it alive.</p>
+    <div class="footer-links">
+      <a href="https://github.com/Vimalk0703/shipworthy">GitHub</a>
+      <a href="https://github.com/Vimalk0703/shipworthy/blob/main/docs/blog/from-hackathon-win-to-open-source.md">Blog</a>
+      <a href="https://www.linkedin.com/in/vimal-kumar-parthasarathy/">LinkedIn</a>
+      <a href="https://github.com/Vimalk0703/shipworthy/blob/main/CONTRIBUTING.md">Contributing</a>
+    </div>
+    <p>Built by <a href="https://www.linkedin.com/in/vimal-kumar-parthasarathy/">Vimal Kumar</a> &middot; Vibe coding is how you start. Engineering is what keeps it alive.</p>
   </div>
 </footer>
 
+<script>
+// Scroll reveal
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// Nav scroll effect
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// Smooth anchor links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+});
+</script>
 </body>
 </html>
