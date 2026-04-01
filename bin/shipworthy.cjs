@@ -53,6 +53,113 @@ function detectStack(projectDir) {
   return null;
 }
 
+// --- Claude Code Setup ---
+
+function setupClaudeCode(projectDir, pluginRoot) {
+  // Warn if running from a temporary npx cache
+  const isNpxCache = pluginRoot.includes('/_npx/') || pluginRoot.includes('\\_npx\\');
+  if (isNpxCache) {
+    console.log(yellow('  ⚠') + '  Running from npx cache — hooks will break when cache is cleaned.');
+    console.log(yellow('  ⚠') + '  For a stable setup, install permanently:');
+    console.log(dim('       npm install -g shipworthy'));
+    console.log(dim('       Then re-run: shipworthy init\n'));
+  }
+
+  // Ensure hook scripts are executable
+  const hookScripts = ['session-start', 'pre-tool-use', 'pre-tool-use-bash', 'post-tool-use', 'post-tool-use-write'];
+  for (const script of hookScripts) {
+    const hookPath = path.join(pluginRoot, 'hooks', script);
+    if (fs.existsSync(hookPath)) {
+      try { fs.chmodSync(hookPath, 0o755); } catch {}
+    }
+  }
+
+  // Build hooks config with absolute paths
+  const hooksConfig = {
+    hooks: {
+      SessionStart: [
+        {
+          matcher: '',
+          hooks: [
+            {
+              type: 'command',
+              command: `"${path.join(pluginRoot, 'hooks', 'session-start')}"`,
+              timeout: 5000,
+            },
+          ],
+        },
+      ],
+      PreToolUse: [
+        {
+          matcher: 'Write|Edit',
+          hooks: [
+            {
+              type: 'command',
+              command: `"${path.join(pluginRoot, 'hooks', 'pre-tool-use')}"`,
+              timeout: 3000,
+            },
+          ],
+        },
+        {
+          matcher: 'Bash',
+          hooks: [
+            {
+              type: 'command',
+              command: `"${path.join(pluginRoot, 'hooks', 'pre-tool-use-bash')}"`,
+              timeout: 3000,
+            },
+          ],
+        },
+      ],
+      PostToolUse: [
+        {
+          matcher: 'Bash',
+          hooks: [
+            {
+              type: 'command',
+              command: `"${path.join(pluginRoot, 'hooks', 'post-tool-use')}"`,
+              timeout: 3000,
+            },
+          ],
+        },
+        {
+          matcher: 'Write|Edit',
+          hooks: [
+            {
+              type: 'command',
+              command: `"${path.join(pluginRoot, 'hooks', 'post-tool-use-write')}"`,
+              timeout: 3000,
+            },
+          ],
+        },
+      ],
+    },
+  };
+
+  // Write or merge into .claude/settings.json
+  const claudeDir = path.join(projectDir, '.claude');
+  if (!fs.existsSync(claudeDir)) {
+    fs.mkdirSync(claudeDir, { recursive: true });
+  }
+
+  const settingsPath = path.join(claudeDir, 'settings.json');
+  let existingSettings = {};
+  if (fs.existsSync(settingsPath)) {
+    try {
+      existingSettings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+    } catch {}
+  }
+
+  // Merge: replace hooks section, preserve everything else
+  existingSettings.hooks = hooksConfig.hooks;
+  fs.writeFileSync(settingsPath, JSON.stringify(existingSettings, null, 2) + '\n');
+  console.log(green('  ✓') + ' Configured hooks in .claude/settings.json');
+
+  if (!isNpxCache) {
+    console.log(dim(`    Hooks point to: ${path.join(pluginRoot, 'hooks')}`));
+  }
+}
+
 // --- Commands ---
 
 function init(args) {
@@ -86,7 +193,6 @@ function init(args) {
 
   // 3. Copy agent-specific config
   const adapterMap = {
-    claude: null, // Claude uses plugin system
     cursor: { src: 'adapters/cursor/.cursorrules', dest: '.cursorrules' },
     copilot: { src: 'adapters/copilot/.github/copilot-instructions.md', dest: '.github/copilot-instructions.md' },
     codex: { src: 'adapters/codex/AGENTS.md', dest: 'AGENTS.md' },
@@ -94,20 +200,22 @@ function init(args) {
     gemini: { src: 'adapters/gemini/GEMINI.md', dest: 'GEMINI.md' },
   };
 
-  const adapter = adapterMap[agent];
-  if (adapter) {
-    const srcPath = path.join(pluginRoot, adapter.src);
-    const destPath = path.join(projectDir, adapter.dest);
-    const destDir = path.dirname(destPath);
-    if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, { recursive: true });
-    if (fs.existsSync(srcPath)) {
-      fs.copyFileSync(srcPath, destPath);
-      console.log(green('  ✓') + ` Copied ${adapter.dest}`);
-    } else {
-      console.log(yellow('  →') + ` Adapter file not found: ${adapter.src}`);
-    }
+  if (agent === 'claude') {
+    setupClaudeCode(projectDir, pluginRoot);
   } else {
-    console.log(green('  ✓') + ' Claude Code: use /plugin install shipworthy');
+    const adapter = adapterMap[agent];
+    if (adapter) {
+      const srcPath = path.join(pluginRoot, adapter.src);
+      const destPath = path.join(projectDir, adapter.dest);
+      const destDir = path.dirname(destPath);
+      if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, { recursive: true });
+      if (fs.existsSync(srcPath)) {
+        fs.copyFileSync(srcPath, destPath);
+        console.log(green('  ✓') + ` Copied ${adapter.dest}`);
+      } else {
+        console.log(yellow('  →') + ` Adapter file not found: ${adapter.src}`);
+      }
+    }
   }
 
   // 4. Detect stack and suggest template
@@ -186,6 +294,12 @@ function doctor() {
     { name: '.shipworthy/ directory', check: () => fs.existsSync(path.join(projectDir, SHIPWORTHY_DIR)) },
     { name: 'Architecture spec', check: () => fs.existsSync(path.join(projectDir, SHIPWORTHY_DIR, 'architecture.md')) },
     { name: 'Agent config', check: () => detectAgent(projectDir) !== null },
+    { name: 'Claude Code hooks', check: () => {
+      try {
+        const settings = JSON.parse(fs.readFileSync(path.join(projectDir, '.claude', 'settings.json'), 'utf8'));
+        return !!settings.hooks?.SessionStart;
+      } catch { return false; }
+    }},
     { name: '.gitignore exists', check: () => fs.existsSync(path.join(projectDir, '.gitignore')) },
     { name: '.env in .gitignore', check: () => {
       try { return fs.readFileSync(path.join(projectDir, '.gitignore'), 'utf8').includes('.env'); } catch { return false; }

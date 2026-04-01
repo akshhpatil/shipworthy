@@ -1,7 +1,7 @@
 ---
 name: brainstorming
 description: Design discovery process that scales with task size and user tier. Prevents wasted work on wrong assumptions while staying out of the way for small tasks. Enforces design-before-code discipline with architecture-aware constraints.
-invoke_when: User wants to build something new, add a significant feature, or redesign existing functionality. First determine task size and user tier, then follow the appropriate mode.
+invoke_when: Use when building something new, adding a significant feature, or redesigning existing functionality. First determine task size and user tier, then follow the appropriate mode.
 ---
 
 # Brainstorming
@@ -110,6 +110,12 @@ This is the complete design discovery process. It exists because big decisions m
 - Ask for explicit approval before proceeding
 - "Does this approach make sense? Should I proceed with writing the implementation plan?"
 
+<HARD-GATE>
+DO NOT proceed to Step 9 (Transition to Planning) until your human partner has explicitly approved the design.
+Acceptable approval signals: "looks good", "approved", "go ahead", "yes", "proceed", "ship it", or similar affirmative.
+NOT acceptable: silence, "hmm", "interesting", or ambiguous responses. If unclear, ASK: "Should I proceed with this approach?"
+</HARD-GATE>
+
 ### Step 9: Transition to Planning
 - Once approved, invoke the `writing-plans` skill
 - Pass the approved design spec as context
@@ -131,3 +137,18 @@ These apply at every size, but proportionally:
 - Don't propose alternatives when there's one obviously correct answer
 - Don't write a spec when a comment would do
 - Don't block progress with process — process serves progress, not the other way around
+
+---
+
+## Rationalization Pressure Test
+
+These are excuses you might generate to skip brainstorming. Each one is wrong.
+
+| Rationalization | Why It's Wrong | What To Do Instead |
+|----------------|---------------|-------------------|
+| "This is too simple for brainstorming" | Simple projects are where unexamined assumptions cause the most wasted work | Use Lite Mode — it takes 30 seconds |
+| "I already know the answer" | If you already know, writing it down costs nothing. If you're wrong, it saves hours | Write it down. You'll be surprised how often "obvious" answers have gaps |
+| "The user seems impatient" | A broken result wastes more time than a 2-minute brainstorm | Use Lite Mode for speed. Never skip entirely |
+| "I'll figure it out as I code" | This is how scope creep, rework, and architectural mistakes happen | Even a 1-minute mental model prevents 1-hour rewrites |
+| "The user didn't ask for brainstorming" | They asked for working software. Brainstorming is how you deliver that | The skill is invisible to Builder-tier. Just do it |
+| "This is just a refactor" | Refactors without understanding the full picture break things | At minimum, read the code and understand dependencies first |

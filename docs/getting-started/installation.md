@@ -5,15 +5,7 @@
 - An AI coding agent (Claude Code, Cursor, Copilot, Codex, Windsurf, or Gemini)
 - Node.js 18+ (for the CLI tool and scoring)
 
-## Method 1: Claude Code Plugin (Recommended)
-
-```bash
-/plugin install shipworthy
-```
-
-This gives you the full experience: auto-activating hooks, skill injection, and quality gates on every session.
-
-## Method 2: CLI (Any Agent)
+## Method 1: CLI (Recommended)
 
 ```bash
 npx shipworthy init
@@ -29,9 +21,13 @@ npx shipworthy init --agent windsurf
 npx shipworthy init --agent gemini
 ```
 
-This copies the appropriate rules file into your project and creates `.shipworthy/`.
+The CLI auto-detects your AI agent and tech stack:
 
-## Method 3: Manual
+- **Claude Code**: Configures hooks in `.claude/settings.json` (session-start, pre/post-tool-use) for the full experience — auto-activating skills, guardrails, and quality gates.
+- **Other agents**: Copies the appropriate rules file (`.cursorrules`, `AGENTS.md`, etc.) into your project.
+- **All agents**: Creates `.shipworthy/` with project config and prepares architecture detection.
+
+## Method 2: Manual
 
 Copy the rules file for your agent directly:
 

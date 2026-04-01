@@ -1,7 +1,7 @@
 ---
 name: api-versioning
 description: Breaking change detection, versioning strategies (URL path vs header), deprecation policies, backward compatibility rules, and OpenAPI spec maintenance.
-invoke_when: Designing or modifying APIs, changing request/response schemas, planning deprecations, or reviewing PRs that alter API contracts.
+invoke_when: Use when designing or modifying APIs, changing request/response schemas, planning deprecations, or reviewing PRs that alter API contracts.
 ---
 
 # API Versioning

@@ -1,7 +1,7 @@
 ---
 name: receiving-code-review
 description: Process code review feedback with technical verification — not performative agreement. Fix real issues, push back on incorrect feedback with evidence.
-invoke_when: Code review feedback has been received and needs to be addressed.
+invoke_when: Use when processing code review feedback, addressing reviewer comments, or responding to PR review requests.
 ---
 
 # Receiving Code Review

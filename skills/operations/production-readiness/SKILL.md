@@ -1,7 +1,7 @@
 ---
 name: production-readiness
 description: Pre-launch checklist covering security, performance, reliability, legal, SEO, monitoring, backups, and custom domains. Each item has both a plain-language explanation and technical implementation detail. Ensures nothing critical is missed before going live.
-invoke_when: User is preparing to launch, deploy to production, go live, or asks "is my app ready for production" or "what do I need before launch".
+invoke_when: Use when preparing to launch, deploying to production, going live, or evaluating whether an app is ready for production.
 ---
 
 # Production Readiness

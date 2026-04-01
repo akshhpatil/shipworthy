@@ -1,7 +1,7 @@
 ---
 name: test-driven-development
 description: Testing discipline that adapts to user tier and task type. Rigorous RED-GREEN-REFACTOR for critical code. Invisible testing for Builder-tier users. Pragmatic skip for trivial changes. The goal is confidence that the code works, not ceremony.
-invoke_when: Writing any production code, adding features, fixing bugs, or refactoring. Adapts approach based on user tier and what's being changed.
+invoke_when: Use when writing any production code, adding features, fixing bugs, or refactoring. Adapts approach based on user tier and task type.
 ---
 
 # Test-Driven Development
@@ -198,3 +198,20 @@ Read `architecture.md` to determine:
 - Coverage thresholds (if specified)
 
 Follow whatever the architecture spec says. If it doesn't specify, default to Vitest for TypeScript, pytest for Python, stdlib testing for Go.
+
+---
+
+## Rationalization Pressure Test
+
+These are excuses you might generate to skip testing. Each one is wrong.
+
+| Rationalization | Why It's Wrong | What To Do Instead |
+|----------------|---------------|-------------------|
+| "This change is too small to test" | Small changes cause big bugs. A one-line auth fix without tests is how breaches happen | If it's small, the test is small too — write it |
+| "I'll add tests later" | Later never comes. Untested code breeds more untested code | Write the test FIRST. That's what TDD means |
+| "The test would be trivial" | If it's trivial, it takes 30 seconds. If it's not trivial, you definitely need it | Write the "trivial" test and move on |
+| "Testing this would require too much setup" | Complex test setup signals complex code that needs testing the most | Simplify the code or invest in test fixtures. Either way, test it |
+| "The user didn't ask for tests" | Production code gets tests. That's not optional. Your human partner is paying for working software | Write tests. Report results, not methodology |
+| "This is just a prototype" | Shipworthy exists to prevent prototypes from becoming unmaintainable production code | Test the prototype. It's faster than debugging it later |
+| "I can verify this manually" | Manual verification misses edge cases and regressions. Run the command | Write an automated test. Run it. Trust the output |
+| "The existing tests already cover this" | If they do, adding one more is cheap insurance. If they don't, you need it | Check coverage. If covered, great. If not, add a test |

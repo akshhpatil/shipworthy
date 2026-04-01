@@ -1,7 +1,7 @@
 ---
 name: code-complexity
 description: Enforce cyclomatic complexity limits, function/file length limits, nesting depth, parameter counts, and duplication detection. Keeps code readable and maintainable.
-invoke_when: Writing or reviewing functions that are growing long, deeply nested, or have many parameters. Also invoke when refactoring complex code or setting up linting rules.
+invoke_when: Use when writing or reviewing functions that are growing long, deeply nested, or have many parameters, or when refactoring complex code or setting up linting rules.
 ---
 
 # Code Complexity

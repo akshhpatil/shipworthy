@@ -1,7 +1,7 @@
 ---
 name: observability-by-default
 description: Structured logging, request tracing, health checks, error tracking, and key metrics. Every service should be observable from day one.
-invoke_when: Creating services, API endpoints, background jobs, or when setting up logging/monitoring.
+invoke_when: Use when creating services, API endpoints, background jobs, or setting up logging, monitoring, tracing, or health checks.
 ---
 
 # Observability by Default

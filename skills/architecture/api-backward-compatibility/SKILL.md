@@ -1,7 +1,7 @@
 ---
 name: api-backward-compatibility
 description: Design and evolve APIs without breaking existing consumers. Covers additive-only changes, versioning strategies, deprecation workflows, consumer-driven contract testing, and backward-compatible defaults. References Stripe's API stability as the gold standard.
-invoke_when: The user is designing a new API, modifying an existing API, adding or removing fields, changing response shapes, discussing versioning, or planning a deprecation. Also invoke when reviewing API changes for backward compatibility.
+invoke_when: Use when designing a new API, modifying an existing API, adding or removing fields, changing response shapes, discussing versioning, planning a deprecation, or reviewing API changes for backward compatibility.
 ---
 
 # API Backward Compatibility

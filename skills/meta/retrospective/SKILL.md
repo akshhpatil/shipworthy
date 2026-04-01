@@ -1,7 +1,7 @@
 ---
 name: retrospective
 description: Self-improving loop — after completing work, sub-agents analyze the conversation to extract signals (corrections, improvised steps, what worked first try, what failed). Proposes updates to project learnings and skill effectiveness. Every session makes the next one better.
-invoke_when: User runs /retro, session ends naturally, or after completing a significant piece of work. Never runs mid-task — only after work is done.
+invoke_when: Use when running /retro, ending a session naturally, or after completing a significant piece of work. Never runs mid-task — only after work is done.
 ---
 
 # Retrospective

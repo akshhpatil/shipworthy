@@ -1,7 +1,7 @@
 ---
 name: quality-gates
 description: Graduated pre-commit quality checks that scale with project complexity and user tier. Level 0 for Builder-tier small projects, up to Level 4 for enterprise codebases. Thresholds configurable in architecture.md.
-invoke_when: Before committing code, before creating a PR, or when the user asks for a quality audit. Also triggered by the post-tool-use hook when git commit is detected.
+invoke_when: Use when committing code, creating a PR, running a quality audit, or when the post-tool-use hook detects a git commit.
 ---
 
 # Quality Gates
@@ -114,3 +114,17 @@ Level 4 (150+ files): [custom checks]
 Coverage threshold: 80%
 Bundle size limit: 250KB
 ```
+
+---
+
+## Rationalization Pressure Test
+
+These are excuses you might generate to skip quality gates. Each one is wrong.
+
+| Rationalization | Why It's Wrong | What To Do Instead |
+|----------------|---------------|-------------------|
+| "The user just wants to commit quickly" | A fast commit with bugs is slower than a 2-minute quality check | Run the gates. They take less time than fixing a broken deploy |
+| "This is a WIP commit" | WIP commits become permanent commits. Standards apply always | At minimum, run Level 0 (build + no secrets). Always |
+| "Quality gates are too strict for this project" | The gates are graduated — Level 0 has only 2 checks. That's not strict | Apply the level that matches the project. Don't skip entirely |
+| "I already checked manually" | Manual checks miss things. That's why automated gates exist | Run the automated checks. Trust the output over your memory |
+| "This is just documentation" | Docs can contain secrets, broken links, and incorrect information | Run Level 0 at minimum. Secrets scanners catch credentials in any file |

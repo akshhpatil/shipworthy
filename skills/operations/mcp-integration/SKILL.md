@@ -1,7 +1,7 @@
 ---
 name: mcp-integration
 description: Detects when a project could benefit from connecting to an MCP server and suggests it. Advisory only — never auto-installs. Recognizes common patterns (database, GitHub, file search, etc.) and maps them to known MCP servers.
-invoke_when: When setting up a new project, when the user mentions connecting to an external service, or when project diagnosis finds an integration opportunity.
+invoke_when: Use when setting up a new project, connecting to an external service, or when project diagnosis finds an MCP integration opportunity.
 ---
 
 # MCP Integration Awareness

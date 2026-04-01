@@ -1,7 +1,7 @@
 ---
 name: distributed-systems
 description: Apply distributed systems patterns including idempotency, saga pattern, outbox pattern, eventual consistency, and CQRS to build reliable, consistent distributed services.
-invoke_when: The user is designing multi-service architectures, handling distributed transactions, dealing with data consistency across services, or discussing event-driven systems. Also invoke when the user asks about idempotency, sagas, outbox pattern, or CQRS.
+invoke_when: Use when designing multi-service architectures, handling distributed transactions, dealing with data consistency across services, or discussing event-driven systems, idempotency, sagas, outbox pattern, or CQRS.
 ---
 
 # Distributed Systems Patterns

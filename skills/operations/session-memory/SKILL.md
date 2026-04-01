@@ -1,7 +1,7 @@
 ---
 name: session-memory
 description: Formalizes the .shipworthy/ directory as the cross-session memory system. Ensures specs, decisions, plans, and session summaries persist across Claude Code sessions for continuity. Surfaces in-progress work at session start.
-invoke_when: At session start (automatically via hook context), when saving specs/plans/decisions, or when the user asks about previous session work.
+invoke_when: Use when starting a session (automatically via hook), saving specs, plans, or decisions, or when the user asks about previous session work.
 ---
 
 # Session Memory

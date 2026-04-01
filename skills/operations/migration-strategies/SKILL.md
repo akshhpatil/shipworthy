@@ -1,7 +1,7 @@
 ---
 name: migration-strategies
 description: Choose and execute the right migration strategy for system changes -- strangler fig, parallel run, expand-contract, blue-green, or feature flag migration. Each with rollback plans and verification strategies.
-invoke_when: The user is migrating between systems, replacing a legacy service, changing databases, switching providers, refactoring a monolith into microservices, or planning any large-scale system change that cannot be done in a single deployment.
+invoke_when: Use when migrating between systems, replacing a legacy service, changing databases, switching providers, refactoring a monolith into microservices, or planning any large-scale system change.
 ---
 
 # Migration Strategies

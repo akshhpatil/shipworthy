@@ -1,7 +1,7 @@
 ---
 name: api-design-standards
 description: REST API conventions — consistent naming, proper HTTP methods/status codes, pagination, versioning, error responses, and type-safe contracts.
-invoke_when: Creating API routes, controllers, endpoint handlers, or designing API contracts.
+invoke_when: Use when creating API routes, controllers, endpoint handlers, or designing API contracts.
 ---
 
 # API Design Standards

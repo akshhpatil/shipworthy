@@ -32,10 +32,10 @@ No commands to learn. No workflow to follow. No configuration files to maintain.
 
 ## What I Built
 
-Shipworthy is an open source Claude Code plugin. You install it with one command:
+Shipworthy is an open source engineering layer for AI coding agents. You install it with one command:
 
 ```bash
-claude plugin install shipworthy
+npx shipworthy init
 ```
 
 From that moment, every Claude Code session has invisible engineering guardrails.

@@ -1,7 +1,7 @@
 ---
 name: executing-plans
 description: Systematic task-by-task execution with TDD flow, verification checkpoints after each task, and architecture compliance checks. Updates tech debt tracker if shortcuts are taken.
-invoke_when: An implementation plan has been written and approved, and it's time to start coding.
+invoke_when: Use when executing an approved implementation plan, starting task-by-task coding from a written plan.
 ---
 
 # Executing Plans
@@ -61,3 +61,20 @@ Before each task, re-read the relevant Mandatory Rules from architecture.md. If 
 - Commit after each task (or group of tightly related tasks)
 - Commit message should reference the plan task number
 - Never batch all tasks into one giant commit
+
+---
+
+## Rationalization Pressure Test
+
+These are excuses you might generate to deviate from the plan without approval. Each one is wrong.
+
+| Rationalization | Why It's Wrong | What To Do Instead |
+|----------------|---------------|-------------------|
+| "I found a better approach mid-implementation" | The plan was approved. Changing it unilaterally breaks the contract with your human partner | Stop. Explain the better approach. Get approval. Then change the plan |
+| "This small deviation doesn't need approval" | Small deviations compound. Three "small" changes can shift the entire architecture | If it changes what files are touched, what APIs look like, or what the user will see — get approval |
+| "Asking for approval will slow us down" | Building the wrong thing is infinitely slower than a 30-second approval conversation | Ask. "I found X, suggest we change Y. OK?" takes seconds |
+| "The tests pass, so the deviation is fine" | Tests verify behavior, not intent. Code can pass tests and still be the wrong code | Passing tests are necessary but not sufficient. Alignment with the plan matters |
+| "I'll tell the user about the change after" | After means the user lost their chance to say no. That's not partnership, that's unilateral action | Tell them before. Always before |
+| "The plan didn't account for this edge case" | Correct — that's exactly why you stop and discuss it | Plans are living documents. Update the plan, get approval, continue |
+| "I'm just refactoring, not changing behavior" | Refactors change file structure, naming, and patterns — all of which affect the plan | If it changes the File Map, it changes the plan. Get approval |
+| "Skipping verification this once is fine" | Verification is not optional. "It should work" is not evidence that it works | Run the command. Read the output. Report the result. Every time |

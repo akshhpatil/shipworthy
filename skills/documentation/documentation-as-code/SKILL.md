@@ -1,7 +1,7 @@
 ---
 name: documentation-as-code
 description: JSDoc/docstrings on exports, README sync, API documentation, architecture decision records, and changelog entries.
-invoke_when: Creating public APIs, modules, completing features, or when documentation is stale or missing.
+invoke_when: Use when creating public APIs, writing modules, completing features, or when documentation is stale, missing, or out of sync with code.
 ---
 
 # Documentation as Code

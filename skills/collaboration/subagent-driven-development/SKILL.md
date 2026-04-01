@@ -1,7 +1,7 @@
 ---
 name: subagent-driven-development
 description: Dispatch fresh subagents per task with precisely crafted instructions. Two-stage review (spec compliance + code quality) ensures high-quality output.
-invoke_when: Implementing a plan with multiple tasks, when tasks are independent enough for isolated execution, or when the user requests subagent-driven development.
+invoke_when: Use when implementing a plan with multiple tasks, dispatching independent tasks for isolated execution, or when the user requests subagent-driven development.
 ---
 
 # Subagent-Driven Development

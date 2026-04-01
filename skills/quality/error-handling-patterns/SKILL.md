@@ -1,7 +1,7 @@
 ---
 name: error-handling-patterns
 description: Structured error types, recovery strategies, and boundary-aware error handling. Prevents raw string errors, leaked stack traces, and silent failures.
-invoke_when: Writing try/catch blocks, defining error types, creating API error responses, or handling async operations that can fail.
+invoke_when: Use when writing try/catch blocks, defining error types, creating API error responses, or handling async operations that can fail.
 ---
 
 # Error Handling Patterns

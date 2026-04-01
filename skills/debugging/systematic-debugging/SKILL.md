@@ -1,7 +1,7 @@
 ---
 name: systematic-debugging
 description: 4-phase root cause investigation — observe, hypothesize, test, implement. Prevents trial-and-error debugging and enforces a 3-fix limit before reassessment.
-invoke_when: A bug is reported, a test fails unexpectedly, behavior doesn't match expectations, or when previous fixes haven't resolved the issue.
+invoke_when: Use when debugging a bug report, investigating a failing test, diagnosing unexpected behavior, or when previous fixes have not resolved the issue.
 ---
 
 # Systematic Debugging

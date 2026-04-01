@@ -1,7 +1,7 @@
 ---
 name: intent-to-spec
 description: Automatically generates a lightweight specification before code starts flowing. Captures what the user wants, what will be built, acceptance criteria, and constraints — in a single invisible pass. Skipped for Quick Fixes. Invisible for Builder tier, presented for Engineer tier.
-invoke_when: User requests a new feature, new project, or significant new functionality. Fires BEFORE brainstorming. Skip for Quick Fix tasks (typo, config change, one-line fix, rename). Skip if a spec already exists in .shipworthy/specs/ for this feature.
+invoke_when: Use when a user requests a new feature, new project, or significant new functionality. Fires BEFORE brainstorming. Skip for Quick Fix tasks (typo, config change, one-line fix, rename). Skip if a spec already exists in .shipworthy/specs/.
 ---
 
 # Intent-to-Spec

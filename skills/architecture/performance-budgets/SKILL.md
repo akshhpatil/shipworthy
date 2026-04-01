@@ -1,7 +1,7 @@
 ---
 name: performance-budgets
 description: Bundle size limits, API response time budgets, query limits, image optimization, lazy loading, and caching strategies.
-invoke_when: Architecture.md defines performance budgets, writing frontend bundles, creating API endpoints, or when performance is a concern.
+invoke_when: Use when writing frontend bundles, creating API endpoints, optimizing performance, or when architecture.md defines performance budgets.
 ---
 
 # Performance Budgets

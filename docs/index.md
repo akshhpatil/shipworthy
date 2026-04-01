@@ -15,10 +15,6 @@ Shipworthy auto-activates every AI coding session and silently enforces 42 engin
 ## Quick Start
 
 ```bash
-# Claude Code
-/plugin install shipworthy
-
-# Any other AI agent
 npx shipworthy init
 ```
 

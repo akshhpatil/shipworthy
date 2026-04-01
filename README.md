@@ -27,22 +27,22 @@ You end up building the same feature three times: once to get it working, once t
 ## Install
 
 ```bash
-# Claude Code (full experience — hooks + skills + quality gates)
-/plugin install shipworthy
-
-# Any AI agent (CLI setup)
+# Any AI agent (CLI setup — hooks + skills + quality gates)
 npx shipworthy init
 
 # Specific agent
 npx shipworthy init --agent cursor
 npx shipworthy init --agent copilot
+npx shipworthy init --agent codex
+npx shipworthy init --agent windsurf
+npx shipworthy init --agent gemini
 ```
 
 ## Supported AI Agents
 
 | Agent | Setup | Hooks | Skills | Quality Gates |
 |-------|-------|-------|--------|--------------|
-| **Claude Code** | `/plugin install` | Full | Full (42) | Automated |
+| **Claude Code** | `npx shipworthy init` | Full | Full (42) | Automated |
 | **Cursor** | `npx shipworthy init --agent cursor` | Rules | Full | Manual |
 | **GitHub Copilot** | `npx shipworthy init --agent copilot` | Rules | Full | Manual |
 | **OpenAI Codex** | `npx shipworthy init --agent codex` | Rules | Full | Manual |

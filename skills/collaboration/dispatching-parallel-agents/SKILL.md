@@ -1,7 +1,7 @@
 ---
 name: dispatching-parallel-agents
 description: Run independent agents concurrently for unrelated tasks. Maximizes throughput when tasks have no shared state.
-invoke_when: Multiple independent tasks need execution simultaneously, such as fixing unrelated bugs, implementing features in separate modules, or running parallel research.
+invoke_when: Use when multiple independent tasks need executing simultaneously, such as fixing unrelated bugs, implementing features in separate modules, or running parallel research.
 ---
 
 # Dispatching Parallel Agents

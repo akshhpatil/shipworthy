@@ -1,7 +1,7 @@
 ---
 name: environment-setup
 description: Eliminates the number one blocker for non-technical users — environment variable configuration. Explains what .env files are, auto-generates .env.example, provides step-by-step guides for getting API keys, and validates setup at startup.
-invoke_when: User is setting up a project for the first time, adding a new service integration, encountering "missing environment variable" errors, or asking about API keys, secrets, or configuration.
+invoke_when: Use when setting up a project for the first time, adding a new service integration, encountering "missing environment variable" errors, or configuring API keys, secrets, or .env files.
 ---
 
 # Environment Setup

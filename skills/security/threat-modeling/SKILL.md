@@ -1,7 +1,7 @@
 ---
 name: threat-modeling
 description: Apply the STRIDE framework to identify and mitigate security threats. Covers Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, and Elevation of Privilege with practical questions, verification steps, and mitigations for each threat category.
-invoke_when: The user is designing a new system, reviewing security of an existing system, preparing for a security review, adding authentication or authorization, handling sensitive data, or discussing threat modeling.
+invoke_when: Use when designing a new system, reviewing security of an existing system, preparing for a security review, adding authentication or authorization, handling sensitive data, or discussing threat modeling.
 ---
 
 # Threat Modeling with STRIDE

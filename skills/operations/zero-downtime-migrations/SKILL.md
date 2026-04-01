@@ -1,7 +1,7 @@
 ---
 name: zero-downtime-migrations
 description: Expand-contract pattern, backward-compatible schema changes, feature flags for migrations, rollback plans, and production-like testing for database migrations.
-invoke_when: Writing database migrations, altering schemas, renaming or removing columns, changing data types, or planning data model changes in production systems.
+invoke_when: Use when writing database migrations, altering schemas, renaming or removing columns, changing data types, or planning data model changes in production systems.
 ---
 
 # Zero-Downtime Migrations
