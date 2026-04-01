@@ -52,7 +52,7 @@ skills/<category>/<skill-name>/
   SKILL.md          # The skill itself (frontmatter + body)
 ```
 
-The frontmatter must include `name`, `description`, and `invoke_when` fields. Skills can cross-reference other skills using the `shipworthy:<skill-name>` format (e.g., `shipworthy:tdd-workflow` to reference the TDD workflow skill). Use this to avoid duplicating guidance that already exists in another skill.
+The frontmatter must include `name`, `description`, and `invoke_when` fields. Skills can cross-reference other skills using the `shipworthy:<skill-name>` format (e.g., `shipworthy:test-driven-development` to reference the TDD skill). Use this to avoid duplicating guidance that already exists in another skill.
 
 ## How to Add a New Template
 

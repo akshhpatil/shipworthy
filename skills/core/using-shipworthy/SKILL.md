@@ -145,6 +145,7 @@ Examples: new service, major refactor, multi-component feature, migration.
 | Feature rollout | `feature-flag-discipline` | Maker/Engineer |
 | Environment or setup | `environment-setup` | All tiers |
 | MCP server opportunity | `mcp-integration` | All tiers (advisory) |
+| Before pushing code | Run `/validate` or dispatch `pre-push-validator` agent | All tiers |
 
 ## Conflict Resolution Rules
 
