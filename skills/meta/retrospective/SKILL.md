@@ -74,6 +74,11 @@ For each approved finding:
 
 **Project Learnings** → Save to `.shipworthy/learnings/[topic].md`:
 ```markdown
+---
+description: [One-line summary of what this learning covers — used by INDEX.md for quick scanning]
+last_updated: YYYY-MM-DD
+---
+
 # [Topic] Learnings
 
 ## Preferences
@@ -84,10 +89,9 @@ For each approved finding:
 
 ## Patterns That Failed
 - [What was tried and didn't work — avoid repeating]
-
-## Last Updated
-- [Date] — from retrospective after [what work was done]
 ```
+
+The `description` field is critical — it appears in `.shipworthy/INDEX.md` and is the only thing visible when deciding which learning file to read. Make it specific: "Team prefers PostgreSQL with Drizzle ORM" not "Database stuff".
 
 **Skill Updates** → Propose a specific diff to the skill file. Show the exact change. Do NOT auto-apply to skill files — only to learnings files. Skill file changes require explicit confirmation because they affect all future sessions.
 
@@ -107,6 +111,34 @@ After the retrospective, enhance the session summary (`.shipworthy/sessions/[dat
 - Skill gaps: [list]
 - Learnings saved: [count]
 ```
+
+### Phase 5.5: Consolidate Memory (when needed)
+
+**Trigger:** Run this phase when `.shipworthy/learnings/` has more than 5 files OR `.shipworthy/sessions/` has more than 10 files. Skip otherwise.
+
+When triggered, offer consolidation to the user:
+
+```
+## Memory Consolidation
+
+Your project memory has grown. Proposing cleanup:
+
+| Action | Details |
+|--------|---------|
+| Merge learnings | [file-a.md] and [file-b.md] cover the same topic → merge into [combined.md] |
+| Prune sessions | [N] session files found, keeping 10 most recent, deleting [list] |
+| Update stale entries | [file.md] references [function/file] that no longer exists → remove entry |
+| Fix relative dates | [file.md] says "last week" → converting to YYYY-MM-DD |
+
+Approve consolidation? (approve all / select items / skip)
+```
+
+**Consolidation rules:**
+1. **Merge by topic, not by date** — two files about database patterns should become one file, even if written months apart
+2. **Preserve the most specific version** — if one file says "use PostgreSQL" and another says "use PostgreSQL with connection pooling via pgBouncer", keep the specific one
+3. **Delete entries that contradict current code** — if a learning says "we use Express" but package.json shows Fastify, remove the stale entry
+4. **Convert all relative dates to absolute** — "yesterday", "last week", "recently" → YYYY-MM-DD based on the file's modification date
+5. **Regenerate INDEX.md** after any consolidation changes
 
 ## Learnings Directory Structure
 
@@ -137,3 +169,6 @@ Session N: One-shot execution. System knows your patterns.
 4. **Don't duplicate auto-memory** — if something is already captured by Claude's auto-memory system, reference it instead of duplicating.
 5. **Learnings are project-scoped** — they live in `.shipworthy/learnings/` and apply to this project. User-level preferences go to Claude's auto-memory.
 6. **Always show the table** — never silently save learnings. The user must see what was learned and approve it.
+7. **Dedup before writing** — before creating a new learning file, list existing files in `.shipworthy/learnings/`. If an existing file covers the same topic, update it instead of creating a new one. Two files about the same topic is worse than one well-maintained file.
+8. **Always use absolute dates** — write `2026-04-01`, never "today" or "last week". Relative dates become meaningless in future sessions. Use the current date at time of writing.
+9. **Regenerate INDEX.md** — after writing, updating, or deleting any file in `.shipworthy/`, regenerate `.shipworthy/INDEX.md` by listing all files with their frontmatter descriptions. This keeps the index fresh for mid-session discovery.

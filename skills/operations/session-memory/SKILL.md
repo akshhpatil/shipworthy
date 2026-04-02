@@ -14,6 +14,7 @@ Claude Code sessions are stateless — each new session starts fresh. But projec
 
 ```
 .shipworthy/
+├── INDEX.md                 # Auto-generated index of all project memory (refreshed each session + after /retro)
 ├── architecture.md          # Project architecture spec (managed by architecture-awareness skill)
 ├── tech-debt.md             # Tech debt tracker (managed by tech-debt-tracking skill)
 ├── config.json              # Per-project configuration and overrides
@@ -100,9 +101,34 @@ When a significant architectural decision is made (database choice, authenticati
 
 Only create ADRs for decisions that would be non-obvious to a future developer. "We use React" is not an ADR. "We use server components for data fetching instead of client-side useEffect" IS an ADR.
 
+## INDEX.md — Project Memory Index
+
+`.shipworthy/INDEX.md` is auto-generated at every session start and after every `/retro`. It provides a one-line summary of every file in `.shipworthy/` so Claude can quickly discover available project memory without scanning directories.
+
+**When to read it:** After context compaction, when you've lost track of what the project knows. Read `.shipworthy/INDEX.md` to see all specs, plans, learnings, decisions, and session history at a glance.
+
+**When it's regenerated:**
+- Automatically at session start (via session-start hook)
+- After `/retro` applies changes (via retrospective skill)
+- After any skill writes to `.shipworthy/` (the writing skill should regenerate it)
+
+**Do NOT edit INDEX.md manually** — it will be overwritten at next session start.
+
+## Session Pruning
+
+When writing a session summary, check the session count in `.shipworthy/sessions/`. If there are more than 10 session files:
+1. Sort by filename (date-based names sort chronologically)
+2. Keep the 10 most recent
+3. Delete older session files
+4. This prevents unbounded growth while preserving recent context
+
+Sessions older than 10 sessions ago are unlikely to contain actionable context. If important patterns were discovered in old sessions, they should already be captured in `.shipworthy/learnings/` via retrospectives.
+
 ## Rules
 
 1. **Always commit `.shipworthy/`** — remind the user to commit this directory. It IS the project's engineering memory.
 2. **Don't overwrite** — append to session summaries if multiple sessions happen on the same day. Don't overwrite specs or plans without user consent.
 3. **Keep it lightweight** — every file in `.shipworthy/` should be under 100 lines. If it's longer, you're over-documenting.
 4. **Plain Markdown only** — no special tooling required to read these files. Any developer (or AI) can understand them.
+5. **Always use absolute dates** — write `2026-04-01`, never "today", "yesterday", or "last week". Relative dates become meaningless when read in future sessions.
+6. **Prune sessions on write** — when saving a new session summary, delete session files beyond the 10 most recent. Old sessions that produced valuable learnings should have already been captured via `/retro`.
