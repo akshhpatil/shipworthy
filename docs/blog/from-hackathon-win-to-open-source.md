@@ -71,7 +71,7 @@ One command. Zero configuration after that.
 - Determines project maturity (new project vs established codebase)
 - Diagnoses gaps (no tests? no linter? .env not gitignored?)
 - Loads architecture constraints and learnings from previous sessions
-- Injects 52 engineering skills into Claude's routing
+- Injects 55 engineering skills into Claude's routing
 
 The user sees none of this.
 
@@ -92,7 +92,7 @@ The user sees none of this.
 
 All advisory. Warns but never blocks.
 
-### The 52 Skills
+### The 55 Skills
 
 Organized across 12 categories:
 
@@ -167,9 +167,9 @@ For teams building at scale:
 
 ### Context Window Efficiency
 
-A common concern: does loading 52 skills bloat the context?
+A common concern: does loading 55 skills bloat the context?
 
-No. Only the master routing skill (~2,000 tokens) loads at session start. The other 51 load on demand — when Claude determines one is relevant. After the task, skill content scrolls out naturally.
+No. Only the master routing skill (~2,000 tokens) loads at session start. The other 54 load on demand — when Claude determines one is relevant. After the task, skill content scrolls out naturally.
 
 | Scenario | Context Used | % of 200K | % of 1M |
 |----------|:-:|:-:|:-:|
@@ -185,9 +185,9 @@ Zero dependencies. Deliberately.
 
 ```
 shipworthy/
-├── skills/          52 Markdown files with engineering instructions
-├── hooks/           5 bash scripts + shared library (lib.sh)
-├── agents/          5 specialized agent personas
+├── skills/          55 Markdown files with engineering instructions
+├── hooks/           6 bash scripts + shared library (lib.sh)
+├── agents/          6 specialized agent personas
 ├── commands/        5 slash commands (/scaffold, /audit, /health, /diagnose, /retro)
 ├── templates/       8 architecture spec templates
 ├── extensions/      Industry-specific skill packs
@@ -244,7 +244,7 @@ I'm working on better collaboration infrastructure — contribution guides, issu
 
 **The repo: [github.com/Vimalk0703/shipworthy](https://github.com/Vimalk0703/shipworthy)**
 
-52 skills. 5 hooks. 5 agents. 190 tests. Zero dependencies.
+55 skills. 6 hooks. 6 agents. 190 tests. Zero dependencies.
 
 Research before code. Architecture before features. Community before scale.
 

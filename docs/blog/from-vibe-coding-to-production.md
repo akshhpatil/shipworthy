@@ -42,7 +42,7 @@ From that moment, every Claude Code session has invisible engineering guardrails
 
 ### How It Actually Works
 
-When you start a Claude Code session, a session-start hook fires in under 2 seconds. It detects your project type (Node.js, Python, Go), determines your project's maturity level, diagnoses what's missing (no tests? no linter? no .gitignore?), and injects a master routing skill that orchestrates 52 engineering skills.
+When you start a Claude Code session, a session-start hook fires in under 2 seconds. It detects your project type (Node.js, Python, Go), determines your project's maturity level, diagnoses what's missing (no tests? no linter? no .gitignore?), and injects a master routing skill that orchestrates 55 engineering skills.
 
 You see none of this. You just start talking.
 
@@ -122,9 +122,9 @@ The entire plugin is Markdown and shell scripts. Zero dependencies.
 
 ```
 shipworthy/
-├── skills/          52 engineering skills (Markdown with YAML frontmatter)
-├── hooks/           5 hook scripts (Bash) + shared library
-├── agents/          5 specialized agent personas (Markdown)
+├── skills/          55 engineering skills (Markdown with YAML frontmatter)
+├── hooks/           6 hook scripts (Bash) + shared library
+├── agents/          6 specialized agent personas (Markdown)
 ├── commands/        5 slash commands (/scaffold, /audit, /health, /diagnose, /retro)
 ├── templates/       8 architecture spec templates
 ├── extensions/      Industry-specific skill packs (e-commerce, etc.)
@@ -137,9 +137,9 @@ Skills are Markdown files with instructions. Hooks are shell scripts that run in
 
 ### Context Window Efficiency
 
-A common concern: "Doesn't loading 52 skills bloat the context window?"
+A common concern: "Doesn't loading 55 skills bloat the context window?"
 
-No. Only the master routing skill (~2,000 tokens) is loaded at session start. The other 51 skills load on demand — when Claude determines one is relevant, it reads that specific file. After the task, the skill content naturally scrolls out of context.
+No. Only the master routing skill (~2,000 tokens) is loaded at session start. The other 54 skills load on demand — when Claude determines one is relevant, it reads that specific file. After the task, the skill content naturally scrolls out of context.
 
 On Claude's 200K context window, Shipworthy consumes about 1% at session start. On the 1M window, it's 0.2%. During active work with 3-4 skills loaded, it's still under 2%.
 
@@ -171,6 +171,6 @@ That's what Shipworthy is trying to be.
 
 It's fully open source: [github.com/Vimalk0703/shipworthy](https://github.com/Vimalk0703/shipworthy)
 
-52 skills. 5 hooks. 5 agents. 190 tests. Zero dependencies. One install command.
+55 skills. 6 hooks. 6 agents. 190 tests. Zero dependencies. One install command.
 
 Vibe coding is how you start. Engineering is what keeps it alive.

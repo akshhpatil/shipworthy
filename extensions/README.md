@@ -1,6 +1,6 @@
 # Shipworthy Extensions
 
-Extensions add industry-specific skills on top of Shipworthy's core 42 skills.
+Extensions add industry-specific skills on top of Shipworthy's core 55 skills.
 
 ## Available Extensions
 

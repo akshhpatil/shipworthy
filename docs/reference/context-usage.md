@@ -21,7 +21,7 @@ The session-start hook injects a single `additionalContext` blob:
 
 ## What Does NOT Load At Session Start
 
-- The 52 SKILL.md files (loaded on demand when relevant)
+- The 55 SKILL.md files (loaded on demand when relevant)
 - Hook scripts (run as shell processes, not text in context)
 - Agent personas (loaded only when dispatched)
 - Extension skills (loaded only when activated)
@@ -36,7 +36,7 @@ When Claude determines a skill is relevant (via the routing table), it reads tha
 | Quick fix (typo, config change) | 1-2 | ~750 |
 | Feature build (new endpoint) | 3-4 | ~1,500 |
 | Complex feature (auth, payments) | 5-8 | ~3,000 |
-| /audit (comprehensive review) | All 52 | ~20,000 |
+| /audit (comprehensive review) | All 55 | ~20,000 |
 
 Skills load in, guide the work, and naturally scroll out of the active context window as the conversation continues.
 

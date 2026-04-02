@@ -20,6 +20,19 @@ Ask your AI to build a feature — just describe what you want:
 
 ### 4. Watch the Guardrails Work
 
+You'll see Shipworthy's transparency banner on session start:
+
+```
+┌─ ⚓ shipworthy ─────────────────────────────┐
+│  Tier: MAKER     │  Health: 1 gap (low)      │
+│  Skills: 55      │  Hooks: 6 active          │
+└──────────────────────────────────────────────┘
+```
+
+As the AI works, it announces which skills are active:
+
+> ⚓ **shipworthy** › skill: `api-design-standards` + `security-first-development` — designing secure user registration endpoint
+
 Without Shipworthy, the AI might produce code with manual validation, no tests, console.log everywhere, and maybe even hardcoded secrets.
 
 With Shipworthy, the AI automatically:
@@ -42,8 +55,11 @@ You should see a score of 18+ out of 25 (A grade).
 
 ## What Happens Behind the Scenes
 
-1. **Session start**: Shipworthy loads 42 engineering skills into the AI's context
-2. **Skill routing**: Based on your task (API, auth, database), the relevant skills activate
+1. **Session start**: Shipworthy loads 55 engineering skills and displays a transparency banner showing your project tier, health status, and active hooks
+2. **Skill routing**: Based on your task (API, auth, database), the relevant skills activate — each announced transparently before applying
 3. **Non-negotiable defaults**: Zod validation, structured logging, tests, no secrets in code
-4. **Verification**: Before claiming "done", the AI runs tests and build to prove it works
-5. **Architecture memory**: Your project's conventions are saved in `.shipworthy/architecture.md` and enforced on every future session
+4. **Security scanning**: Every file write and bash command is scanned, with results shown in your terminal (`⚓ shipworthy › All checks passed ✓`)
+5. **Verification**: Before claiming "done", the AI runs tests and build to prove it works
+6. **Architecture memory**: Your project's conventions are saved in `.shipworthy/architecture.md` and enforced on every future session
+
+All of this is visible in real time via the transparency system. Disable with `SHIPWORTHY_TRANSPARENCY=0` if you prefer silent operation.
