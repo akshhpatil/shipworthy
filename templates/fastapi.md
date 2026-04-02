@@ -1,5 +1,8 @@
 # Architecture Specification: FastAPI Service
 
+When applying this template, first output:
+> ⚓ **shipworthy** › template: `fastapi` — scaffolding FastAPI project structure
+
 ## Project Identity
 - **Type**: FastAPI REST/GraphQL service
 - **Language**: Python 3.11+ with type hints

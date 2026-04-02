@@ -1,5 +1,8 @@
 # Shipworthy — Production Engineering Guardrails for Cursor
 
+When using this adapter, first output:
+> ⚓ **shipworthy** › adapter: `cursor` — translating Shipworthy skills for Cursor
+
 > Is your code worthy of shipping?
 
 ## Non-Negotiable Defaults

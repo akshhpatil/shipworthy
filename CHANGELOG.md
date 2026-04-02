@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Full Transparency System** — two-track observability across every Shipworthy component
+  - **Shell track**: Color-coded ANSI stderr logging from all 6 hooks (session-start banner, security scan results, compliance checks, push validation)
+  - **Instruction track**: Transparency Protocol in master routing skill — Claude announces every skill activation, default enforcement, routing decision, conflict resolution, and architecture enforcement
+  - Transparency headers on all 6 commands, 6 agents, 8 templates, and 5 adapters
+  - Branded `⚓ shipworthy ›` prefix with cyan/green/yellow/red color scheme per severity level
+  - Toggleable via `SHIPWORTHY_TRANSPARENCY=0` env var or `"transparency": false` in config
+  - 10 new hook transparency tests + 5 instruction track tests (all passing)
+
 ## [1.1.0] - 2026-03-31
 
 ### Added

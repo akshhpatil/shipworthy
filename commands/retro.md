@@ -1,3 +1,8 @@
+Before executing this command, output:
+> ⚓ **shipworthy** › command: `/retro` — extracting session learnings
+
+---
+
 Run a retrospective on the current session.
 
 Analyze this entire conversation and extract what can be learned to make the next session better.

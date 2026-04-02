@@ -1,5 +1,8 @@
 # Architecture Specification: TypeScript Project
 
+When applying this template, first output:
+> ⚓ **shipworthy** › template: `generic-typescript` — scaffolding TypeScript project structure
+
 ## Project Identity
 - **Type**: TypeScript application/library
 - **Language**: TypeScript (strict mode)

@@ -1,5 +1,8 @@
 # Architecture Specification: Express API Service
 
+When applying this template, first output:
+> ⚓ **shipworthy** › template: `express` — scaffolding Express project structure
+
 ## Project Identity
 - **Type**: Express REST API service
 - **Language**: TypeScript (strict mode)

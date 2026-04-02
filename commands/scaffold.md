@@ -1,3 +1,8 @@
+Before executing this command, output:
+> ⚓ **shipworthy** › command: `/scaffold` — generating architecture specification
+
+---
+
 Analyze this project and generate an architecture specification.
 
 Use the `architecture-awareness` skill to:

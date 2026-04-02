@@ -25,6 +25,7 @@ debug_log "session-start" "Starting. PROJECT_ROOT=$PROJECT_ROOT"
 MARKER_FILE="/tmp/shipworthy-session-$(echo "$PROJECT_ROOT" | tr '/' '_')-${PPID:-$$}"
 # Allow force reload via env var
 if [ -f "$MARKER_FILE" ] && [ "${SHIPWORTHY_FORCE_RELOAD:-0}" != "1" ]; then
+  sw_log info session-start "Context already loaded (session reuse)"
   echo '{"hookSpecificOutput":{"additionalContext":"[shipworthy] Context already loaded for this session."}}'
   exit 0
 fi
@@ -106,6 +107,7 @@ if [ -f "$SHIPWORTHY_CONFIG" ]; then
 fi
 
 TIER=$(detect_tier)
+sw_log info session-start "Tier: $(echo "$TIER" | tr '[:lower:]' '[:upper:]')"
 
 # Override tier if preset specifies one
 if [ -n "$PRESET_NAME" ]; then
@@ -205,6 +207,7 @@ diagnose_gaps() {
 }
 
 PROJECT_HEALTH=$(diagnose_gaps)
+sw_log info session-start "Health: $PROJECT_HEALTH"
 
 # --- Load master routing skill ---
 MASTER_SKILL_PATH="$PLUGIN_ROOT/skills/core/using-shipworthy/SKILL.md"
@@ -238,6 +241,7 @@ Run \`/diagnose\` for a full infrastructure diagnosis with auto-fix options."
 
 # --- Inject preset information if loaded ---
 if [ -n "$PRESET_NAME" ]; then
+  sw_log info session-start "Preset: $PRESET_NAME"
   PRESET_FILE="$PLUGIN_ROOT/presets/${PRESET_NAME}.json"
   if [ -f "$PRESET_FILE" ]; then
     SKIP_SKILLS=$(python3 -c "import json; d=json.load(open('$PRESET_FILE')); print(', '.join(d.get('skip_skills',[])))" 2>/dev/null || true)
@@ -262,6 +266,7 @@ CONTEXT_BUDGET=8000
 ARCH_SPEC_PATH="$PROJECT_ROOT/.shipworthy/architecture.md"
 
 if [ -f "$ARCH_SPEC_PATH" ]; then
+  sw_log info session-start "Architecture spec: loaded"
   ARCH_SPEC=$(cat "$ARCH_SPEC_PATH")
   ARCH_SECTION="
 
@@ -308,6 +313,7 @@ Read the file directly when making architectural decisions."
     CONTEXT="$CONTEXT$ARCH_SECTION"
   fi
 else
+  sw_log info session-start "Architecture spec: not found"
   CONTEXT="$CONTEXT
 
 ---
@@ -341,6 +347,7 @@ fi
 
 if [ -n "$IN_PROGRESS_PLANS" ]; then
   IN_PROGRESS_PLANS="${IN_PROGRESS_PLANS%, }"
+  sw_log info session-start "In-progress plans: $IN_PROGRESS_PLANS"
   CONTEXT="$CONTEXT
 
 ---
@@ -533,6 +540,9 @@ if [ -f "$PROJECT_ROOT/.shipworthy/INDEX.md" ]; then
 
 Full index of all project memory at \`.shipworthy/INDEX.md\`. If context was compacted and you lose track of what the project knows, read that file to rediscover specs, plans, learnings, decisions, and session history."
 fi
+
+# --- Transparency banner ---
+sw_banner "$TIER" "$PROJECT_HEALTH"
 
 # --- Escape and output for Claude Code ---
 ESCAPED_CONTEXT=$(escape_json "$CONTEXT")

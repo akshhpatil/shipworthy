@@ -1,3 +1,8 @@
+Before executing this command, output:
+> ⚓ **shipworthy** › command: `/audit` — running full quality audit
+
+---
+
 Run a full quality audit on this project.
 
 Perform a comprehensive review covering:

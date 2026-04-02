@@ -1,5 +1,8 @@
 # Architecture Specification: Python Project
 
+When applying this template, first output:
+> ⚓ **shipworthy** › template: `generic-python` — scaffolding Python project structure
+
 ## Project Identity
 - **Type**: Python application/library
 - **Language**: Python 3.11+ with type hints

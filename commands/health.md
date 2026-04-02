@@ -1,3 +1,8 @@
+Before executing this command, output:
+> ⚓ **shipworthy** › command: `/health` — generating health dashboard
+
+---
+
 Show a comprehensive project and plugin health dashboard.
 
 ## Part 1: Plugin Installation Health
