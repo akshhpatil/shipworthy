@@ -1,7 +1,7 @@
 ---
 name: resilience-patterns
 description: Apply resilience patterns (circuit breakers, bulkheads, retries, timeouts, graceful degradation, DLQs) to distributed services to prevent cascading failures and maintain availability under partial outages.
-invoke_when: The user is designing or reviewing a system that calls external services, databases, or message queues and needs to handle failures gracefully. Also invoke when discussing reliability, fault tolerance, cascading failures, or service availability.
+invoke_when: Use when designing or reviewing systems that call external services, databases, or message queues, or when discussing reliability, fault tolerance, cascading failures, or service availability.
 ---
 
 # Resilience Patterns

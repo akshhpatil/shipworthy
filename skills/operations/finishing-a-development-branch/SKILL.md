@@ -1,7 +1,7 @@
 ---
 name: finishing-a-development-branch
 description: 5-step branch completion workflow — verify tests, determine base branch, present merge options, execute, and clean up.
-invoke_when: Feature work is complete and ready to be merged, or when the user says they're done with a branch.
+invoke_when: Use when finishing a feature branch, merging completed work, or when the user says they are done with a branch.
 ---
 
 # Finishing a Development Branch

@@ -6,7 +6,7 @@ Shipworthy works with any AI coding agent, not just Claude Code.
 
 | Agent | Setup | Auto-Hooks | Skills Context | Quality Gates |
 |-------|-------|------------|---------------|---------------|
-| **Claude Code** | `/plugin install shipworthy` | Full (session-start, pre/post-tool-use) | Full (42 skills) | Automated |
+| **Claude Code** | `npx shipworthy init` | Full (session-start, pre/post-tool-use) | Full (42 skills) | Automated |
 | **Cursor** | Copy `.cursorrules` to project root | Rules only | Condensed | Manual |
 | **GitHub Copilot** | Copy `copilot-instructions.md` to `.github/` | Rules only | Condensed | Manual |
 | **OpenAI Codex** | Copy `AGENTS.md` to project root | Rules only | Condensed | Manual |

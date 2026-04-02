@@ -1,7 +1,7 @@
 ---
 name: pii-detection
 description: Detect and flag PII (emails, SSNs, credit cards, phone numbers) in code, test fixtures, and logs. Enforce masking before logging and GDPR/CCPA-aware data handling.
-invoke_when: Writing or reviewing code that handles user data, creating test fixtures, building logging/observability, or working with strings that may contain personal information.
+invoke_when: Use when writing or reviewing code that handles user data, creating test fixtures, building logging/observability, or working with strings that may contain personal information (PII).
 ---
 
 # PII Detection

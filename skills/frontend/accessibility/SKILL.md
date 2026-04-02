@@ -1,7 +1,7 @@
 ---
 name: accessibility
 description: WCAG 2.1 AA baseline — semantic HTML, ARIA labels, color contrast, keyboard navigation, screen reader compatibility, and focus management.
-invoke_when: Writing JSX/TSX, HTML templates, UI components, or any user-facing interface.
+invoke_when: Use when writing JSX/TSX, HTML templates, UI components, or any user-facing interface that requires WCAG compliance.
 ---
 
 # Accessibility

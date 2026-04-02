@@ -1,7 +1,7 @@
 ---
 name: architecture-awareness
 description: Detects project type, analyzes existing patterns, generates architecture specifications, and maintains architectural consistency across sessions. The key innovation that turns CLAUDE.md-style contracts into automatic, evolving project specifications.
-invoke_when: Project has no .shipworthy/architecture.md, user runs /scaffold command, new technology is added to the project, or a significant architectural decision is made during brainstorming.
+invoke_when: Use when a project has no .shipworthy/architecture.md, running /scaffold, adding new technology to the project, or making a significant architectural decision during brainstorming.
 ---
 
 # Architecture Awareness

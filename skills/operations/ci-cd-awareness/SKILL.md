@@ -1,7 +1,7 @@
 ---
 name: ci-cd-awareness
 description: Pipeline design, environment configuration, secret management in CI, deployment rollback strategies, and feature flags for gradual rollout.
-invoke_when: Discussing deployment, pipelines, when the project has CI config files, or when setting up automated workflows.
+invoke_when: Use when configuring CI/CD pipelines, discussing deployment strategies, setting up automated workflows, or when the project has CI config files.
 ---
 
 # CI/CD Awareness

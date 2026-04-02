@@ -1,7 +1,7 @@
 ---
 name: slo-sli-definition
 description: Define SLIs (what to measure), SLOs (target values), SLAs (business contracts), error budgets (calculation and usage), and burn rate alerting for production services.
-invoke_when: The user is defining reliability targets, setting up monitoring, discussing service level objectives, configuring alerts, or planning capacity. Also invoke when evaluating whether a service is reliable enough to deploy new features vs. focusing on stability.
+invoke_when: Use when defining reliability targets, setting up monitoring, discussing SLOs/SLIs/SLAs, configuring alerts, planning capacity, or evaluating error budgets for deployment decisions.
 ---
 
 # SLO/SLI Definition

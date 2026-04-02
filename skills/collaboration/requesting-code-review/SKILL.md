@@ -1,7 +1,7 @@
 ---
 name: requesting-code-review
 description: Invoke the code-reviewer agent with git-based commit ranges to get structured feedback on code quality, architecture compliance, and correctness.
-invoke_when: After completing a feature, before merging a branch, or when the user asks for a code review.
+invoke_when: Use when requesting a code review after completing a feature, before merging a branch, or when the user asks for a review of their code.
 ---
 
 # Requesting Code Review

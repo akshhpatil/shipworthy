@@ -1,7 +1,7 @@
 ---
 name: feature-flag-discipline
 description: Manage feature flags with discipline -- expiration dates, kill switches, percentage rollouts, user targeting, and mandatory cleanup. Prevent feature flags from becoming permanent tech debt.
-invoke_when: The user is implementing feature flags, planning a gradual rollout, adding a kill switch, discussing flag cleanup, or reviewing code that uses feature flags. Also invoke when a service has flags that have been at 100% for more than 30 days.
+invoke_when: Use when implementing feature flags, planning a gradual rollout, adding a kill switch, cleaning up stale flags, or reviewing code that uses feature toggles.
 ---
 
 # Feature Flag Discipline

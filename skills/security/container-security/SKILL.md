@@ -1,7 +1,7 @@
 ---
 name: container-security
 description: Dockerfile best practices, secure base images, no secrets in build context, multi-stage builds, non-root execution, and image scanning guidance.
-invoke_when: Writing or reviewing Dockerfiles, docker-compose files, container build pipelines, or discussing container deployment and image security.
+invoke_when: Use when writing or reviewing Dockerfiles, docker-compose files, container build pipelines, or discussing container deployment and image security.
 ---
 
 # Container Security

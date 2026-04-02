@@ -59,7 +59,7 @@ That's when I decided to extract the engineering layer from my hackathon process
 The name is Shipworthy. As in: is this code worthy of shipping to real users?
 
 ```bash
-claude plugin install shipworthy
+npx shipworthy init
 ```
 
 One command. Zero configuration after that.

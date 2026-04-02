@@ -1,7 +1,7 @@
 ---
 name: decision-frameworks
 description: Guides non-technical users through technology choices with opinionated defaults. Recommends one option for Builder-tier users, presents comparisons for Engineer-tier users. Covers databases, hosting, payments, auth, email, and build-vs-buy decisions.
-invoke_when: User needs to choose a database, hosting provider, payment processor, auth solution, email service, or any technology component. Also when user asks "what should I use for X" or "should I build or buy X".
+invoke_when: Use when choosing a database, hosting provider, payment processor, auth solution, email service, or any technology component, including build-vs-buy decisions.
 ---
 
 # Decision Frameworks

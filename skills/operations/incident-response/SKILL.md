@@ -1,7 +1,7 @@
 ---
 name: incident-response
 description: Run blameless post-mortems, define incident severity levels, maintain runbooks, and prepare on-call readiness. Includes templates for post-mortem documents, runbooks, and severity classification.
-invoke_when: The user is setting up incident response processes, writing a post-mortem, defining severity levels, creating runbooks, preparing on-call rotations, or discussing incident management practices.
+invoke_when: Use when setting up incident response processes, writing a post-mortem, defining severity levels, creating runbooks, preparing on-call rotations, or discussing incident management.
 ---
 
 # Incident Response

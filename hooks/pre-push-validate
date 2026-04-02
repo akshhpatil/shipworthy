@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+# Shipworthy — Pre-Push Validation Hook
+# Fires before Bash commands. If the command is `git push`, runs the full
+# validation suite and BLOCKS the push if any check fails.
+# This hook runs with a longer timeout (90s) than other hooks.
+
+set -euo pipefail
+
+# --- Error recovery: always output valid JSON ---
+trap 'echo "{\"hookSpecificOutput\":{\"decision\":\"approve\"}}"' ERR
+
+# --- Source shared library ---
+PLUGIN_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+source "$PLUGIN_ROOT/hooks/lib.sh" 2>/dev/null || true
+
+# --- Read tool input from stdin ---
+INPUT=$(cat 2>/dev/null || true)
+
+if [ -z "$INPUT" ]; then
+  echo '{"hookSpecificOutput":{"decision":"approve"}}'
+  exit 0
+fi
+
+# --- Extract command ---
+COMMAND=$(parse_json_field "$INPUT" "command" 2>/dev/null || true)
+
+if [ -z "$COMMAND" ]; then
+  echo '{"hookSpecificOutput":{"decision":"approve"}}'
+  exit 0
+fi
+
+# --- Only intercept git push (not force push — that's caught by pre-tool-use-bash) ---
+if ! echo "$COMMAND" | grep -qE '^\s*git\s+push' 2>/dev/null; then
+  echo '{"hookSpecificOutput":{"decision":"approve"}}'
+  exit 0
+fi
+
+# --- Skip if pushing tags only ---
+if echo "$COMMAND" | grep -qE 'git\s+push\s+.*--tags' 2>/dev/null; then
+  echo '{"hookSpecificOutput":{"decision":"approve"}}'
+  exit 0
+fi
+
+# --- Check if we're inside the Shipworthy plugin repo itself ---
+# The validation suite lives in the plugin root. If we're pushing from
+# a user's project (not the plugin repo), skip plugin-level validation.
+VALIDATE_SCRIPT="$PLUGIN_ROOT/tests/validate-all.sh"
+if [ ! -f "$VALIDATE_SCRIPT" ]; then
+  echo '{"hookSpecificOutput":{"decision":"approve"}}'
+  exit 0
+fi
+
+# --- Also check if the current working directory IS the plugin repo ---
+# If the user is in their own project that installed shipworthy, don't
+# run shipworthy's internal tests — only run if we're IN the shipworthy repo
+CURRENT_REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || true)
+if [ -z "$CURRENT_REPO_ROOT" ]; then
+  echo '{"hookSpecificOutput":{"decision":"approve"}}'
+  exit 0
+fi
+
+# Check if validate-all.sh exists in the current repo (not just the plugin)
+REPO_VALIDATE="$CURRENT_REPO_ROOT/tests/validate-all.sh"
+if [ ! -f "$REPO_VALIDATE" ]; then
+  # Not a shipworthy-structured repo, just approve
+  echo '{"hookSpecificOutput":{"decision":"approve"}}'
+  exit 0
+fi
+
+# --- Run the validation suite ---
+debug_log "pre-push-validate" "git push detected, running validation suite"
+
+VALIDATION_OUTPUT=""
+VALIDATION_EXIT=0
+
+VALIDATION_OUTPUT=$(bash "$REPO_VALIDATE" 2>&1) || VALIDATION_EXIT=$?
+
+if [ "$VALIDATION_EXIT" -ne 0 ]; then
+  # --- BLOCK the push ---
+  # Extract the summary section for a concise error message
+  FAILURES=$(echo "$VALIDATION_OUTPUT" | grep -E '✗' | head -5 || true)
+
+  if [ -z "$FAILURES" ]; then
+    FAILURES="Validation failed. Run 'bash tests/validate-all.sh' for details."
+  fi
+
+  BLOCK_MSG="[shipworthy] Pre-push validation FAILED. Push blocked until all checks pass.
+
+${FAILURES}
+
+Run 'bash tests/validate-all.sh' to see full details and fix the issues."
+
+  ESCAPED_MSG=$(escape_json "$BLOCK_MSG" 2>/dev/null || printf '%s' "$BLOCK_MSG" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g' | tr '\n' ' ')
+
+  echo "{\"hookSpecificOutput\":{\"decision\":\"block\",\"reason\":\"${ESCAPED_MSG}\"}}"
+  exit 0
+fi
+
+# --- APPROVE the push ---
+# Extract pass count from summary
+PASS_COUNT=$(echo "$VALIDATION_OUTPUT" | grep -oE 'Passed: [0-9]+' | head -1 | grep -oE '[0-9]+' || echo "all")
+
+APPROVE_MSG="[shipworthy] Pre-push validation passed ($PASS_COUNT/7 checks). Safe to push."
+ESCAPED_MSG=$(printf '%s' "$APPROVE_MSG" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g' | tr -d '\n\r')
+
+echo "{\"hookSpecificOutput\":{\"decision\":\"approve\",\"message\":\"${ESCAPED_MSG}\"}}"

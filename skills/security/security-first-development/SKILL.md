@@ -1,7 +1,7 @@
 ---
 name: security-first-development
 description: OWASP-aware security practices — input validation, secrets management, auth patterns, injection prevention, CORS, rate limiting, and CSP headers.
-invoke_when: Writing auth logic, API endpoints, database queries, file operations, user input handling, or any code that touches external data.
+invoke_when: Use when writing auth logic, API endpoints, database queries, file operations, user input handling, or any code that touches external data.
 ---
 
 # Security-First Development

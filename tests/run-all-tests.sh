@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Shipworthy — Test Runner
-# Executes all test scripts and reports overall results
+# Shipworthy — Master Test Runner
+# Executes all test suites: hooks, skills, and structure validation
 
 set -uo pipefail
 
@@ -15,28 +15,41 @@ echo "  Shipworthy — Test Runner"
 echo "============================================"
 echo ""
 
-# Find and run all test scripts
-for test_file in "$SCRIPT_DIR"/hooks/test-*.sh; do
-  if [ ! -f "$test_file" ]; then
-    continue
+run_test_dir() {
+  local dir_name="$1"
+  local dir_path="$SCRIPT_DIR/$dir_name"
+
+  if [ ! -d "$dir_path" ]; then
+    return
   fi
 
-  SUITE_NAME=$(basename "$test_file" .sh)
-  TOTAL_SUITES=$((TOTAL_SUITES + 1))
+  for test_file in "$dir_path"/test-*.sh; do
+    if [ ! -f "$test_file" ]; then
+      continue
+    fi
 
-  echo "--------------------------------------------"
-  echo "Running: $SUITE_NAME"
-  echo "--------------------------------------------"
+    SUITE_NAME=$(basename "$test_file" .sh)
+    TOTAL_SUITES=$((TOTAL_SUITES + 1))
 
-  if bash "$test_file"; then
-    PASSED_SUITES=$((PASSED_SUITES + 1))
-  else
-    FAILED_SUITES=$((FAILED_SUITES + 1))
-    FAILED_NAMES="$FAILED_NAMES  - $SUITE_NAME\n"
-  fi
+    echo "--------------------------------------------"
+    echo "Running: $dir_name/$SUITE_NAME"
+    echo "--------------------------------------------"
 
-  echo ""
-done
+    if bash "$test_file"; then
+      PASSED_SUITES=$((PASSED_SUITES + 1))
+    else
+      FAILED_SUITES=$((FAILED_SUITES + 1))
+      FAILED_NAMES="$FAILED_NAMES  - $dir_name/$SUITE_NAME\n"
+    fi
+
+    echo ""
+  done
+}
+
+# Run all test categories
+run_test_dir "hooks"
+run_test_dir "skills"
+run_test_dir "structure"
 
 # Overall summary
 echo "============================================"

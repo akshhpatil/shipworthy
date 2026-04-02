@@ -1,7 +1,7 @@
 ---
 name: database-design
 description: Schema design, migrations, indexing, naming conventions, and query performance. Prevents N+1 queries, missing indexes, and irreversible schema changes.
-invoke_when: Writing schema definitions, creating migrations, adding database queries, or designing data models.
+invoke_when: Use when writing schema definitions, creating migrations, adding database queries, or designing data models.
 ---
 
 # Database Design

@@ -3,10 +3,10 @@
 ## Install
 
 ```bash
-claude plugin install shipworthy
+npx shipworthy init
 ```
 
-One command. Zero configuration required.
+One command. This configures Claude Code hooks in `.claude/settings.json` and creates the `.shipworthy/` directory. No further configuration required.
 
 ## What Happens Automatically
 

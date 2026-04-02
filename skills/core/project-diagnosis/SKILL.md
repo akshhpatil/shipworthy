@@ -1,7 +1,7 @@
 ---
 name: project-diagnosis
 description: Structured gap analysis that identifies what a project is missing — not what's done poorly (that's /audit), but what's absent entirely. Checks for tests, CI, security basics, linting, type safety, deployment readiness, and dependency health. Each finding has a severity and a concrete fix action.
-invoke_when: Session start (lightweight version via hook), user runs /diagnose (full version), or when the project-doctor agent needs a gap inventory before fixing things.
+invoke_when: Use when starting a session (lightweight via hook), running /diagnose for full gap analysis, or when the project-doctor agent needs a gap inventory before fixing things.
 ---
 
 # Project Diagnosis

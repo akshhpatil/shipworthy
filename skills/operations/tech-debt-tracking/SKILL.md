@@ -1,7 +1,7 @@
 ---
 name: tech-debt-tracking
 description: Track shortcuts with justifications, prevent debt accumulation, and surface outstanding debt at session start.
-invoke_when: Taking a shortcut, writing a TODO, bypassing a quality gate with justification, or when reviewing tech debt.
+invoke_when: Use when taking a shortcut, writing a TODO, bypassing a quality gate with justification, or reviewing accumulated tech debt.
 ---
 
 # Tech Debt Tracking

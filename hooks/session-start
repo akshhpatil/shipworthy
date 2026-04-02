@@ -414,6 +414,126 @@ There are **$DEBT_COUNT tech debt item(s)** tracked in \`.shipworthy/tech-debt.m
   fi
 fi
 
+# --- Generate .shipworthy/INDEX.md (auto-refreshed each session) ---
+# Survives context compaction — Claude can read this mid-session to rediscover project memory
+generate_index() {
+  [ -d "$PROJECT_ROOT/.shipworthy" ] || return 0
+
+  local idx="# .shipworthy/ Index
+> Auto-generated each session and after /retro. Read this to discover all project memory."
+
+  # Architecture
+  [ -f "$PROJECT_ROOT/.shipworthy/architecture.md" ] && \
+    idx="${idx}
+
+## Architecture
+- architecture.md — Project architecture specification"
+
+  # Config
+  [ -f "$PROJECT_ROOT/.shipworthy/config.json" ] && \
+    idx="${idx}
+
+## Configuration
+- config.json — Project overrides and preset"
+
+  # Specs
+  local spec_list=""
+  for f in "$PROJECT_ROOT/.shipworthy/specs"/*.md; do
+    [ -f "$f" ] || continue
+    spec_list="${spec_list}
+- $(basename "$f")"
+  done
+  [ -n "$spec_list" ] && idx="${idx}
+
+## Specs${spec_list}"
+
+  # Plans
+  local plan_list=""
+  for f in "$PROJECT_ROOT/.shipworthy/plans"/*.md; do
+    [ -f "$f" ] || continue
+    plan_list="${plan_list}
+- $(basename "$f")"
+  done
+  [ -n "$plan_list" ] && idx="${idx}
+
+## Plans${plan_list}"
+
+  # Decisions
+  local decision_list=""
+  for f in "$PROJECT_ROOT/.shipworthy/decisions"/*.md; do
+    [ -f "$f" ] || continue
+    decision_list="${decision_list}
+- $(basename "$f")"
+  done
+  [ -n "$decision_list" ] && idx="${idx}
+
+## Decisions${decision_list}"
+
+  # Learnings (with frontmatter descriptions when available)
+  local learning_list=""
+  for f in "$PROJECT_ROOT/.shipworthy/learnings"/*.md; do
+    [ -f "$f" ] || continue
+    local name
+    name=$(basename "$f")
+    local desc=""
+    desc=$(sed -n '/^---$/,/^---$/{ /^description:/{ s/^description: *//; p; q; } }' "$f" 2>/dev/null || true)
+    if [ -n "$desc" ]; then
+      learning_list="${learning_list}
+- ${name} — ${desc}"
+    else
+      learning_list="${learning_list}
+- ${name}"
+    fi
+  done
+  [ -n "$learning_list" ] && idx="${idx}
+
+## Learnings${learning_list}"
+
+  # Sessions (last 10 only)
+  local session_list=""
+  local shown=0
+  for f in $(ls -t "$PROJECT_ROOT/.shipworthy/sessions"/*.md 2>/dev/null | head -10); do
+    [ -f "$f" ] || continue
+    session_list="${session_list}
+- $(basename "$f")"
+    shown=$((shown + 1))
+  done
+  if [ -n "$session_list" ]; then
+    local total
+    total=$(ls "$PROJECT_ROOT/.shipworthy/sessions"/*.md 2>/dev/null | wc -l | tr -d ' ')
+    local hdr="## Sessions"
+    [ "$total" -gt 10 ] && hdr="## Sessions (${shown} of ${total})"
+    idx="${idx}
+
+${hdr}${session_list}"
+  fi
+
+  # Tech Debt
+  if [ -f "$PROJECT_ROOT/.shipworthy/tech-debt.md" ]; then
+    local dc
+    dc=$(grep -c "^## " "$PROJECT_ROOT/.shipworthy/tech-debt.md" 2>/dev/null || echo "0")
+    idx="${idx}
+
+## Tech Debt
+- tech-debt.md — ${dc} item(s)"
+  fi
+
+  printf '%s\n' "$idx" > "$PROJECT_ROOT/.shipworthy/INDEX.md" 2>/dev/null || true
+}
+
+generate_index 2>/dev/null || true
+
+# --- Add INDEX.md reference to context ---
+if [ -f "$PROJECT_ROOT/.shipworthy/INDEX.md" ]; then
+  CONTEXT="$CONTEXT
+
+---
+
+## PROJECT MEMORY INDEX
+
+Full index of all project memory at \`.shipworthy/INDEX.md\`. If context was compacted and you lose track of what the project knows, read that file to rediscover specs, plans, learnings, decisions, and session history."
+fi
+
 # --- Escape and output for Claude Code ---
 ESCAPED_CONTEXT=$(escape_json "$CONTEXT")
 

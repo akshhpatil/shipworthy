@@ -1,7 +1,7 @@
 ---
 name: using-git-worktrees
 description: Create isolated workspaces via git worktrees for parallel development. Safety verification ensures worktree directories are gitignored before use.
-invoke_when: Need to work on a separate branch without stashing current work, parallel feature development, or when isolation is required for a task.
+invoke_when: Use when working on a separate branch without stashing current work, doing parallel feature development, or when isolation is required for a task.
 ---
 
 # Using Git Worktrees

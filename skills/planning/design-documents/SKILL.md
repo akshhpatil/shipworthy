@@ -1,7 +1,7 @@
 ---
 name: design-documents
 description: Formal RFC/design doc template for significant engineering changes. Covers context, goals, non-goals, proposed solution, alternatives considered, data model changes, API changes with backward compatibility analysis, security considerations, performance implications, rollout plan, rollback plan, second-order effects, open questions, and timeline.
-invoke_when: A change exceeds 500 lines of code, introduces a new service, adds a new database table, adopts a new external dependency, makes a significant architectural decision, or changes API contracts in a breaking way.
+invoke_when: Use when a change exceeds 500 lines of code, introducing a new service, adding a new database table, adopting a new external dependency, making a significant architectural decision, or changing API contracts in a breaking way.
 ---
 
 # Design Documents

@@ -1,7 +1,7 @@
 ---
 name: twelve-factor-app
 description: Evaluate and apply the Twelve-Factor App methodology with modern 2025 interpretations. Covers all 12 factors with actionable checks for cloud-native applications running on containers, Kubernetes, and serverless platforms.
-invoke_when: The user is designing a new service, evaluating an application's cloud readiness, preparing for containerization, or reviewing application architecture for operational maturity. Also invoke when discussing deployment practices, configuration management, or service design principles.
+invoke_when: Use when designing a new service, evaluating cloud readiness, preparing for containerization, reviewing application architecture, or discussing deployment practices, configuration management, or service design principles.
 ---
 
 # Twelve-Factor App (Modern 2025 Interpretation)

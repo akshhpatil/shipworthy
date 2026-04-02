@@ -1,7 +1,7 @@
 ---
 name: compliance-awareness
 description: Practical engineering guidance for SOC 2, GDPR, HIPAA compliance and data classification. Covers access controls, audit logging, change management, right to deletion, data portability, consent, PHI encryption, and data classification levels. Engineering checks, not legal advice.
-invoke_when: The user is handling PII, health data, or financial data. Also when implementing user deletion, data export, consent management, audit logging, access controls, or when the system targets regulated industries (healthcare, finance, EU users).
+invoke_when: Use when handling PII, health data, or financial data, implementing user deletion, data export, consent management, audit logging, access controls, or building for regulated industries (healthcare, finance, GDPR).
 ---
 
 # Compliance Awareness

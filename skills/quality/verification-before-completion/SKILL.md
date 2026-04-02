@@ -1,7 +1,7 @@
 ---
 name: verification-before-completion
 description: Gate function — no completion claims without fresh verification evidence. Prevents shipping broken code by requiring proof that the change works.
-invoke_when: Before claiming any work is complete, before saying "done", before asserting something "should work" or "is ready".
+invoke_when: Use when claiming any work is complete, saying "done", or asserting something "should work" or "is ready" — verification must precede completion claims.
 ---
 
 # Verification Before Completion

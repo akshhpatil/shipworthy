@@ -12,6 +12,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated README.md tables to include all 52 skills across 11 categories
 - Added project-doctor to agents list in README.md
 
+## [1.1.0] - 2026-03-31
+
+### Added
+- **Adaptive Security Framework** — new `adaptive-security` skill that auto-detects application type (web app, API, GraphQL, mobile backend, CLI, data pipeline, IoT, desktop, IaC, containers) and applies the appropriate security profile
+- **Supply Chain Security** skill — dependency pinning, lock file integrity, typosquatting awareness, SBOM generation, license compliance
+- **Secrets Management** skill — comprehensive secrets lifecycle management, rotation strategies, vault integration guidance
+- **Rationalization pressure-testing tables** on 5 core skills (brainstorming, TDD, quality-gates, writing-plans, executing-plans) — prevents AI from generating excuses to skip critical steps
+- **HARD-GATE directives** on brainstorming and writing-plans — AI cannot proceed to implementation without explicit human approval
+- **CSO (Claude Search Optimization)** — all 52+ skills standardized to "Use when..." invoke_when format for reliable AI triggering
+- **Cross-referencing system** — skills reference each other via `shipworthy:skill-name` syntax
+- **GitHub Sponsors** support via FUNDING.yml
+
+### Changed
+- **CONTRIBUTING.md** — comprehensive rewrite with "If You Are an AI Agent" section, human partner language, expanded PR guidelines
+- **PR template** — now requires before/after evidence, adversarial testing confirmation, environment table, duplicate check, human involvement checkbox
+- **writing-skills meta-skill** — expanded to ~3000 words with CSO, adversarial testing, skill anti-patterns, and lifecycle guidance
+- **Issue templates** — blank issues disabled, questions redirected to Discord and Discussions
+
+### Security
+- 11 application-type-specific security profiles (web, API, GraphQL, mobile, CLI, pipeline, IoT, desktop, IaC, container, cross-cutting)
+- Adaptive security detection based on project signals (frameworks, dependencies, file patterns)
+- Supply chain attack prevention checklist
+- Secrets lifecycle management with rotation and vault guidance
 
 ## [1.0.0] - 2026-03-26
 
@@ -35,5 +58,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Starter projects for benchmarking (Express+TS, security bug, N+1 query)
 - First benchmark result: +83% score improvement on REST API CRUD task (22/25 vs 12/25)
 
-[Unreleased]: https://github.com/Vimalk0703/shipworthy/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/Vimalk0703/shipworthy/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/Vimalk0703/shipworthy/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/Vimalk0703/shipworthy/releases/tag/v1.0.0

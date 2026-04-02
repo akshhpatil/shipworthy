@@ -1,7 +1,7 @@
 ---
 name: dependency-management
 description: Vet packages before adoption, audit for vulnerabilities, pin versions, and prevent dependency bloat.
-invoke_when: Adding a new dependency, reviewing package.json/requirements.txt, or when the post-tool-use hook detects a package installation.
+invoke_when: Use when adding a new dependency, reviewing package.json/requirements.txt, auditing for vulnerabilities, or when the post-tool-use hook detects a package installation.
 ---
 
 # Dependency Management

@@ -50,10 +50,10 @@ I wanted something that worked in real-time, invisibly, without asking me to lea
 
 ## Building Shipworthy
 
-Shipworthy is a Claude Code plugin. You install it with one command and never think about it again.
+Shipworthy is an open source engineering layer for AI coding agents. You install it with one command and never think about it again.
 
 ```bash
-claude plugin install shipworthy
+npx shipworthy init
 ```
 
 What happens next is invisible. When you start a Claude Code session, a hook fires in under two seconds. It detects your project type, determines how mature your codebase is, checks for gaps (missing tests? no linter? .env not gitignored?), and injects an engineering routing layer that orchestrates 52 skills.

@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Questions & Discussion
+  - name: Questions & Support
+    url: https://discord.gg/shipworthy
+    about: Ask questions and get help from the community on Discord.
+  - name: Discussions
     url: https://github.com/Vimalk0703/shipworthy/discussions
-    about: Ask questions, share how you use Shipworthy, or discuss ideas before opening a formal request.
+    about: Share ideas, discuss features, or show how you use Shipworthy.

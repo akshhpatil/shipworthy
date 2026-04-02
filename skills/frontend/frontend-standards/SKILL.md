@@ -1,7 +1,7 @@
 ---
 name: frontend-standards
 description: Component patterns, state management, styling conventions, and rendering strategies for modern frontend development.
-invoke_when: Writing React/Next.js components, managing state, or making frontend architecture decisions.
+invoke_when: Use when writing React/Next.js components, managing state, styling UI, or making frontend architecture decisions.
 ---
 
 # Frontend Standards

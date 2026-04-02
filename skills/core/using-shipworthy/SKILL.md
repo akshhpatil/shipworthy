@@ -1,7 +1,7 @@
 ---
 name: using-shipworthy
 description: Master routing skill — loaded at every session start. Defines skill priority hierarchy, mandatory invocation rules, user experience tiers, task size awareness, and routes to appropriate skills based on task type.
-invoke_when: Always. This skill is injected via session-start hook on every session.
+invoke_when: Use when starting any session. This skill is injected via session-start hook on every session and defines routing for all other skills.
 ---
 
 # Using Shipworthy
@@ -115,7 +115,9 @@ Examples: new service, major refactor, multi-component feature, migration.
 | Writing API endpoints | `api-design-standards`, `security-first-development` | All tiers |
 | Database work | `database-design` | All tiers |
 | Debugging a problem | `systematic-debugging` | All tiers — debugging always wins priority |
-| Adding dependencies | `dependency-management` | All tiers |
+| Building any new application | `adaptive-security` | All tiers -- auto-detects app type |
+| Adding dependencies | `dependency-management`, `supply-chain-security` | All tiers |
+| Handling secrets/credentials | `secrets-management` | All tiers |
 | Writing tests | `test-driven-development` | All tiers |
 | Creating UI components | `accessibility`, `frontend-standards` | All tiers |
 | Finishing work | `verification-before-completion`, `quality-gates` | Builder: relaxed gates. Engineer: strict gates |
@@ -143,6 +145,7 @@ Examples: new service, major refactor, multi-component feature, migration.
 | Feature rollout | `feature-flag-discipline` | Maker/Engineer |
 | Environment or setup | `environment-setup` | All tiers |
 | MCP server opportunity | `mcp-integration` | All tiers (advisory) |
+| Before pushing code | Run `/validate` or dispatch `pre-push-validator` agent | All tiers |
 
 ## Conflict Resolution Rules
 

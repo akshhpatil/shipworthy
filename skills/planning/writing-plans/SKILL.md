@@ -1,7 +1,7 @@
 ---
 name: writing-plans
 description: Creates bite-sized (2-5 min) implementation plans with TDD flow, quality gate checkpoints, security considerations, and performance impact notes. Plans reference architecture.md constraints.
-invoke_when: After brainstorming is approved and before implementation begins. Also when breaking down a large task into manageable steps.
+invoke_when: Use when writing an implementation plan after brainstorming is approved, or breaking down a large task into manageable steps before coding begins.
 ---
 
 # Writing Plans
@@ -82,4 +82,27 @@ After writing the plan:
 1. Show the user the task list with file map
 2. Highlight any architecture constraints that influenced the plan
 3. Ask: "Ready to start executing? I'll follow TDD for each task."
+
+<HARD-GATE>
+DO NOT invoke `executing-plans` or begin any implementation until your human partner has explicitly approved the plan.
+Acceptable approval signals: "looks good", "approved", "go ahead", "yes", "proceed", "let's do it", "start", or similar affirmative.
+NOT acceptable: silence, "hmm", "interesting", "okay" (too ambiguous), or no response. If unclear, ASK: "I have the plan ready. Should I start executing it?"
+The plan is a CONTRACT. Once approved, both you and your human partner agree on what will be built.
+</HARD-GATE>
+
 4. On approval, invoke `executing-plans` skill
+
+---
+
+## Rationalization Pressure Test
+
+These are excuses you might generate to skip writing a plan. Each one is wrong.
+
+| Rationalization | Why It's Wrong | What To Do Instead |
+|----------------|---------------|-------------------|
+| "This feature is straightforward enough to just build" | "Straightforward" features still have hidden dependencies, edge cases, and ordering concerns | Write a lightweight plan. Even 5 bullet points prevent wrong-order implementation |
+| "Planning slows us down" | Rework from no plan is 3-10x slower than the plan itself | A 5-minute plan saves a 2-hour rewrite. Math is math |
+| "The brainstorming doc IS the plan" | A brainstorming doc captures WHAT to build. A plan captures HOW and IN WHAT ORDER | Convert the design into sequenced, testable tasks |
+| "I'll keep the plan in my head" | Context windows are finite. You will lose track of what's done vs. what's left | Write it down. `.shipworthy/plans/` exists for this reason |
+| "The user wants to see code, not documents" | The user wants working code. Plans produce working code faster than winging it | Write the plan quickly, show the task list, start executing |
+| "This is only 2-3 files" | File count is not complexity. A 2-file payment integration needs a plan | If it touches money, auth, or data: plan it |
