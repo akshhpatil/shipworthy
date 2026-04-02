@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-04-02
+
 ### Added
 - **Full Transparency System** — two-track observability across every Shipworthy component
   - **Shell track**: Color-coded ANSI stderr logging from all 6 hooks (session-start banner, security scan results, compliance checks, push validation)
