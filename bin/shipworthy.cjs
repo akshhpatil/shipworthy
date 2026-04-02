@@ -66,7 +66,7 @@ function setupClaudeCode(projectDir, pluginRoot) {
   }
 
   // Ensure hook scripts are executable
-  const hookScripts = ['session-start', 'pre-tool-use', 'pre-tool-use-bash', 'post-tool-use', 'post-tool-use-write'];
+  const hookScripts = ['session-start', 'pre-tool-use', 'pre-tool-use-bash', 'pre-push-validate', 'post-tool-use', 'post-tool-use-write'];
   for (const script of hookScripts) {
     const hookPath = path.join(pluginRoot, 'hooks', script);
     if (fs.existsSync(hookPath)) {
@@ -107,6 +107,16 @@ function setupClaudeCode(projectDir, pluginRoot) {
               type: 'command',
               command: `"${path.join(pluginRoot, 'hooks', 'pre-tool-use-bash')}"`,
               timeout: 3000,
+            },
+          ],
+        },
+        {
+          matcher: 'Bash',
+          hooks: [
+            {
+              type: 'command',
+              command: `"${path.join(pluginRoot, 'hooks', 'pre-push-validate')}"`,
+              timeout: 90000,
             },
           ],
         },
