@@ -7,7 +7,7 @@
   <meta name="description" content="Open source Claude Code plugin. 55 transparent engineering skills turn vibe coding into production-ready software. Zero config. Zero dependencies.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -15,257 +15,342 @@
       --bg:          #0a0a0a;
       --bg-subtle:   #111111;
       --bg-elevated: #181818;
-      --border:      #262626;
+      --border:      #222222;
       --border-hover:#3a3a3a;
       --text-1:      #ededed;
       --text-2:      #888888;
       --text-3:      #555555;
       --green:       #22c55e;
-      --green-subtle:rgba(34,197,94,0.08);
+      --green-dim:   #166534;
       --red:         #ef4444;
-      --red-subtle:  rgba(239,68,68,0.08);
       --font:        'Inter', system-ui, -apple-system, sans-serif;
       --mono:        'JetBrains Mono', 'Fira Code', monospace;
     }
 
     html { scroll-behavior: smooth; }
-    body { font-family: var(--font); background: var(--bg); color: var(--text-1); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body {
+      font-family: var(--font); background: var(--bg); color: var(--text-1);
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
     ::selection { background: var(--green); color: #000; }
     a { color: inherit; text-decoration: none; }
 
-    .container { max-width: 960px; margin: 0 auto; padding: 0 1.5rem; }
-
-    /* ---- Reveal ---- */
-    .reveal { opacity: 0; transition: opacity 0.6s ease; }
-    .reveal.visible { opacity: 1; }
+    /* ---- Scroll progress ---- */
+    .scroll-progress {
+      position: fixed; top: 0; left: 0; height: 2px; background: var(--green);
+      width: 0%; z-index: 200; transition: none;
+    }
 
     /* ---- Nav ---- */
     .nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      padding: 0.875rem 0; background: var(--bg);
+      position: fixed; top: 2px; left: 0; right: 0; z-index: 100;
+      padding: 0.875rem 0; background: transparent;
+      transition: background 0.3s, border-color 0.3s;
     }
-    .nav.scrolled { border-bottom: 1px solid var(--border); }
-    .nav .container { display: flex; align-items: center; justify-content: space-between; }
-    .nav-brand { font-weight: 700; font-size: 0.95rem; letter-spacing: -0.01em; color: var(--text-1); }
+    .nav.scrolled { background: rgba(10,10,10,0.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+    .nav .inner { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; }
+    .nav-brand { font-weight: 700; font-size: 0.9rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-2); }
+    .nav-brand:hover { color: var(--text-1); }
     .nav-links { display: flex; align-items: center; gap: 2rem; }
-    .nav-links a {
-      font-size: 0.8rem; color: var(--text-3); font-weight: 500;
-      transition: color 0.15s;
-    }
+    .nav-links a { font-size: 0.75rem; color: var(--text-3); font-weight: 500; letter-spacing: 0.03em; text-transform: uppercase; transition: color 0.2s; }
     .nav-links a:hover { color: var(--text-1); }
 
     /* ---- Hero ---- */
     .hero {
-      min-height: 100vh; display: flex; align-items: center;
-      padding: 8rem 0 6rem;
+      min-height: 100vh; display: flex; flex-direction: column;
+      justify-content: center; padding: 8rem 2rem 4rem;
+      max-width: 1200px; margin: 0 auto;
     }
-    .hero-content { max-width: 640px; }
-
+    .hero-label {
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--green); margin-bottom: 2rem;
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .hero-label::before {
+      content: ''; width: 32px; height: 1px; background: var(--green);
+    }
     .hero h1 {
-      font-size: clamp(2.75rem, 5.5vw, 4rem); font-weight: 700;
-      letter-spacing: -0.03em; line-height: 1.08; margin-bottom: 1.5rem;
-      color: var(--text-1);
+      font-size: clamp(3rem, 7vw, 6rem); font-weight: 800;
+      letter-spacing: -0.02em; line-height: 0.95;
+      text-transform: uppercase; color: var(--text-1);
+      margin-bottom: 2.5rem;
     }
-    .hero-sub {
-      font-size: 1.05rem; line-height: 1.7; color: var(--text-2);
-      margin-bottom: 2.5rem; max-width: 480px;
+    .hero h1 .line-dim { color: var(--text-3); }
+    .hero-bottom {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: 3rem; margin-top: 1rem;
     }
-
+    .hero-desc {
+      font-size: 1rem; line-height: 1.7; color: var(--text-2);
+      max-width: 420px;
+    }
+    .hero-install {
+      display: flex; flex-direction: column; align-items: flex-end; gap: 0.75rem;
+    }
     .install-block {
-      display: inline-flex; align-items: center; gap: 1rem;
+      display: flex; align-items: center; gap: 1rem;
       background: var(--bg-subtle); border: 1px solid var(--border);
-      border-radius: 6px; padding: 0.75rem 1rem;
-      font-family: var(--mono); font-size: 0.875rem;
-      margin-bottom: 1.5rem;
+      border-radius: 4px; padding: 0.75rem 1rem;
+      font-family: var(--mono); font-size: 0.85rem;
     }
     .install-block code { color: var(--text-1); }
-    .install-block .copy-btn {
+    .copy-btn {
       background: none; border: none; color: var(--text-3);
-      font-family: var(--font); font-size: 0.75rem; font-weight: 500;
+      font-family: var(--font); font-size: 0.7rem; font-weight: 600;
       cursor: pointer; transition: color 0.15s; padding: 0;
+      text-transform: uppercase; letter-spacing: 0.05em;
     }
-    .install-block .copy-btn:hover { color: var(--text-1); }
+    .copy-btn:hover { color: var(--text-1); }
+    .hero-gh {
+      font-size: 0.75rem; color: var(--text-3); font-weight: 500;
+      transition: color 0.15s;
+    }
+    .hero-gh:hover { color: var(--text-1); }
 
-    .hero-link {
-      display: block; font-size: 0.875rem; color: var(--text-3);
-      font-weight: 500; transition: color 0.15s;
+    /* ---- Marquee ---- */
+    .marquee-wrap {
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      overflow: hidden; padding: 1rem 0;
     }
-    .hero-link:hover { color: var(--text-1); }
-    .hero-link span { margin-left: 0.25rem; transition: margin-left 0.15s; }
-    .hero-link:hover span { margin-left: 0.5rem; }
+    .marquee {
+      display: flex; gap: 3rem; animation: marquee 20s linear infinite;
+      width: max-content;
+    }
+    .marquee span {
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--text-3); white-space: nowrap;
+    }
+    .marquee .dot { color: var(--border-hover); }
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
 
-    /* ---- Agents ---- */
-    .agents-bar {
-      padding: 3rem 0; border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-    .agents-bar p {
-      font-size: 0.8rem; color: var(--text-3); text-align: center;
-      font-weight: 500; letter-spacing: 0.02em;
-    }
-    .agents-bar p strong { color: var(--text-2); font-weight: 600; }
-
-    /* ---- Section ---- */
-    .section { padding: 7rem 0; }
-    .section-alt { background: var(--bg-subtle); }
+    /* ---- Section core ---- */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+    .section { padding: 8rem 0; }
     .sec-label {
-      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em;
-      font-weight: 600; color: var(--text-3); margin-bottom: 0.75rem;
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em;
+      font-weight: 600; color: var(--text-3); margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 0.75rem;
     }
+    .sec-label::before { content: ''; width: 24px; height: 1px; background: var(--text-3); }
     .sec-title {
-      font-size: clamp(1.5rem, 3vw, 2.25rem); font-weight: 700;
-      letter-spacing: -0.025em; line-height: 1.15; margin-bottom: 1rem;
+      font-size: clamp(1.75rem, 3.5vw, 2.75rem); font-weight: 700;
+      letter-spacing: -0.025em; line-height: 1.1; margin-bottom: 1.25rem;
     }
     .sec-desc {
       color: var(--text-2); font-size: 0.95rem; line-height: 1.7;
-      margin-bottom: 3rem; max-width: 540px;
+      max-width: 520px; margin-bottom: 3.5rem;
     }
 
+    /* ---- Scroll-reveal animations ---- */
+    .sr { opacity: 0; transform: translateY(24px); transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1); }
+    .sr.visible { opacity: 1; transform: translateY(0); }
+    .sr-left { opacity: 0; transform: translateX(-40px); transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1); }
+    .sr-left.visible { opacity: 1; transform: translateX(0); }
+    .sr-right { opacity: 0; transform: translateX(40px); transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1); }
+    .sr-right.visible { opacity: 1; transform: translateX(0); }
+    .sr-scale { opacity: 0; transform: scale(0.95); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .sr-scale.visible { opacity: 1; transform: scale(1); }
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
+    .delay-3 { transition-delay: 0.3s; }
+    .delay-4 { transition-delay: 0.4s; }
+
     /* ---- Benchmark ---- */
-    .bench-header { margin-bottom: 3rem; }
-    .bench-table {
-      width: 100%; border-collapse: collapse;
-      font-size: 0.875rem;
+    .bench-section { background: var(--bg-subtle); }
+    .bench-split {
+      display: grid; grid-template-columns: 1fr; gap: 0;
     }
-    .bench-table th {
-      text-align: left; font-weight: 600; font-size: 0.75rem;
-      text-transform: uppercase; letter-spacing: 0.06em;
-      color: var(--text-3); padding: 0 0 1rem 0;
+    .bench-col {
+      padding: 3rem 0;
       border-bottom: 1px solid var(--border);
     }
-    .bench-table th:not(:first-child) { text-align: right; }
-    .bench-table td {
-      padding: 0.75rem 0; border-bottom: 1px solid var(--border);
-      color: var(--text-2); vertical-align: top;
+    .bench-col:last-child { border-bottom: none; }
+    .bench-col-header {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);
     }
-    .bench-table td:not(:first-child) { text-align: right; }
-    .bench-table td:first-child {
-      font-weight: 500; color: var(--text-1); width: 30%;
+    .bench-col-title { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); }
+    .bench-score {
+      font-family: var(--mono); font-size: 2.5rem; font-weight: 700;
+      letter-spacing: -0.03em;
     }
-    .bench-table .col-without { color: var(--text-3); width: 35%; }
-    .bench-table .col-with { color: var(--text-2); width: 35%; }
-    .bench-table .score-row td { font-weight: 600; font-size: 1rem; padding: 1rem 0; }
-    .bench-table .score-fail { color: var(--red); }
-    .bench-table .score-pass { color: var(--green); }
+    .bench-score-sub { font-size: 0.8rem; color: var(--text-3); font-weight: 500; margin-left: 0.5rem; }
+    .score-fail { color: var(--red); }
+    .score-pass { color: var(--green); }
+    .bench-rows { display: flex; flex-direction: column; gap: 0; }
+    .bench-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.65rem 0; border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+    .bench-row:last-child { border-bottom: none; }
+    .bench-row-label { color: var(--text-2); font-weight: 500; }
+    .bench-row-val { font-family: var(--mono); font-size: 0.8rem; }
+    .bench-col.fail .bench-row-val { color: var(--text-3); }
+    .bench-col.pass .bench-row-val { color: var(--text-1); }
     .bench-note {
-      margin-top: 1.5rem; font-size: 0.8rem; color: var(--text-3); line-height: 1.6;
+      padding-top: 2rem; font-size: 0.8rem; color: var(--text-3); line-height: 1.6;
     }
     .bench-note a { text-decoration: underline; text-underline-offset: 2px; }
     .bench-note a:hover { color: var(--text-2); }
 
-    /* ---- How it works ---- */
-    .how-prose { max-width: 600px; }
-    .how-prose p {
-      font-size: 0.95rem; line-height: 1.8; color: var(--text-2);
-      margin-bottom: 2rem;
+    /* ---- How it works — horizontal scroll ---- */
+    .how-section { overflow: hidden; }
+    .how-track {
+      display: flex; gap: 2px;
     }
-    .how-prose p strong { color: var(--text-1); font-weight: 600; }
+    .how-card {
+      flex: 0 0 100%; padding: 3rem 2rem;
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .how-card:last-child { border-right: none; }
+    .how-num {
+      font-family: var(--mono); font-size: 0.7rem; font-weight: 500;
+      color: var(--text-3); letter-spacing: 0.05em; margin-bottom: 1.5rem;
+    }
+    .how-card h3 {
+      font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem;
+      letter-spacing: -0.01em;
+    }
+    .how-card p {
+      font-size: 0.9rem; color: var(--text-2); line-height: 1.7; max-width: 400px;
+    }
+    .how-nav {
+      display: flex; gap: 0.5rem; margin-top: 2rem;
+      padding-top: 2rem; border-top: 1px solid var(--border);
+    }
+    .how-dot {
+      width: 32px; height: 3px; background: var(--border); border: none;
+      cursor: pointer; transition: background 0.3s;
+    }
+    .how-dot.active { background: var(--text-1); }
 
     /* ---- Terminal ---- */
     .terminal {
-      background: var(--bg-subtle); border: 1px solid var(--border);
-      border-radius: 8px; overflow: hidden; margin-top: 3rem;
-      max-width: 600px;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 6px; overflow: hidden; margin-top: 3rem;
     }
     .term-bar {
       display: flex; align-items: center; gap: 6px;
       padding: 0.6rem 0.875rem; border-bottom: 1px solid var(--border);
     }
-    .term-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); }
-    .term-title {
-      margin-left: auto; font-size: 0.65rem; color: var(--text-3);
-      font-family: var(--mono);
-    }
+    .term-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-hover); }
+    .term-title { margin-left: auto; font-size: 0.65rem; color: var(--text-3); font-family: var(--mono); }
     .term-body {
-      padding: 1rem 1.25rem; font-family: var(--mono);
-      font-size: 0.8rem; line-height: 1.9; color: var(--text-2);
+      padding: 1.25rem; font-family: var(--mono); font-size: 0.78rem;
+      line-height: 1.9; color: var(--text-2);
     }
     .t-green { color: var(--green); }
     .t-dim { color: var(--text-3); }
-    .t-white { color: var(--text-1); font-weight: 500; }
+    .t-w { color: var(--text-1); font-weight: 500; }
 
-    /* ---- Capabilities ---- */
-    .cap-layout {
-      display: grid; grid-template-columns: 1fr; gap: 4rem;
+    /* ---- Capabilities — staggered grid ---- */
+    .cap-grid {
+      display: grid; grid-template-columns: 1fr; gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
     }
-    .cap-intro { max-width: 480px; }
-    .cap-intro p { font-size: 0.95rem; color: var(--text-2); line-height: 1.7; margin-top: 1rem; }
-
-    .cap-list { display: flex; flex-direction: column; gap: 3rem; }
-    .cap-item h3 {
-      font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem;
-      color: var(--text-1);
+    .cap-cell {
+      background: var(--bg); padding: 2.5rem 2rem;
     }
-    .cap-item p { font-size: 0.875rem; color: var(--text-2); line-height: 1.7; max-width: 520px; }
+    .cap-cell h3 {
+      font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; margin-bottom: 0.75rem; color: var(--text-1);
+    }
+    .cap-cell p {
+      font-size: 0.875rem; color: var(--text-2); line-height: 1.7;
+    }
 
-    .cap-numbers {
-      display: flex; gap: 3rem; margin-top: 3rem; padding-top: 2rem;
+    /* ---- Numbers band ---- */
+    .numbers-band {
+      display: grid; grid-template-columns: repeat(5, 1fr);
       border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
     }
-    .cap-num { }
-    .cap-num-val {
-      font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em;
-      color: var(--text-1);
+    .num-cell {
+      padding: 2.5rem 1.5rem; text-align: center;
+      border-right: 1px solid var(--border);
     }
-    .cap-num-label {
-      font-size: 0.75rem; color: var(--text-3); margin-top: 0.2rem;
-      font-weight: 500;
+    .num-cell:last-child { border-right: none; }
+    .num-val {
+      font-size: 2rem; font-weight: 700; letter-spacing: -0.02em;
+      color: var(--text-1); font-family: var(--mono);
+    }
+    .num-val.counting { transition: none; }
+    .num-label {
+      font-size: 0.7rem; color: var(--text-3); margin-top: 0.35rem;
+      font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em;
     }
 
-    /* ---- CTA / Footer ---- */
-    .footer-cta {
-      padding: 6rem 0 3rem; border-top: 1px solid var(--border);
-      text-align: center;
+    /* ---- Footer ---- */
+    .footer {
+      padding: 4rem 0 2rem; border-top: 1px solid var(--border);
     }
-    .footer-install {
-      display: inline-flex; align-items: center; gap: 1rem;
-      background: var(--bg-subtle); border: 1px solid var(--border);
-      border-radius: 6px; padding: 0.875rem 1.25rem;
-      font-family: var(--mono); font-size: 0.95rem;
-      color: var(--text-1); margin-bottom: 1.5rem;
+    .footer-top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 2rem; margin-bottom: 4rem;
     }
-    .footer-sub {
-      font-size: 0.8rem; color: var(--text-3); margin-bottom: 2.5rem;
+    .footer-brand { font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-2); }
+    .footer-cols { display: flex; gap: 4rem; }
+    .footer-col-title {
+      font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--text-3); font-weight: 600; margin-bottom: 0.75rem;
     }
-    .footer-links {
-      display: flex; justify-content: center; gap: 2rem;
-      margin-bottom: 3rem;
-    }
-    .footer-links a {
-      font-size: 0.8rem; color: var(--text-3); font-weight: 500;
+    .footer-col a {
+      display: block; font-size: 0.8rem; color: var(--text-2); padding: 0.25rem 0;
       transition: color 0.15s;
     }
-    .footer-links a:hover { color: var(--text-1); }
-    .footer-credit {
-      font-size: 0.75rem; color: var(--text-3); padding-bottom: 2rem;
+    .footer-col a:hover { color: var(--text-1); }
+    .footer-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 2rem; border-top: 1px solid var(--border);
+      font-size: 0.75rem; color: var(--text-3);
     }
-    .footer-credit a { text-decoration: underline; text-underline-offset: 2px; }
+    .footer-bottom a { text-decoration: underline; text-underline-offset: 2px; }
 
     /* ---- Responsive ---- */
-    @media (min-width: 960px) {
-      .cap-layout {
-        grid-template-columns: 340px 1fr; gap: 5rem;
-      }
+    @media (min-width: 768px) {
+      .bench-split { grid-template-columns: 1fr 1fr; }
+      .bench-col { padding: 3rem; border-bottom: none; }
+      .bench-col:first-child { border-right: 1px solid var(--border); }
+      .cap-grid { grid-template-columns: 1fr 1fr; }
+      .how-card { flex: 0 0 50%; }
     }
-    @media (max-width: 480px) {
-      .hero h1 { font-size: 2.25rem; }
-      .nav-links { gap: 1.25rem; }
-      .bench-table { font-size: 0.8rem; }
-      .cap-numbers { flex-wrap: wrap; gap: 2rem; }
-      .footer-links { flex-wrap: wrap; gap: 1rem 1.5rem; }
+    @media (min-width: 1024px) {
+      .cap-grid { grid-template-columns: repeat(3, 1fr); }
+      .how-card { flex: 0 0 33.333%; }
+    }
+    @media (max-width: 767px) {
+      .hero h1 { font-size: 2.5rem; }
+      .hero-bottom { flex-direction: column; align-items: flex-start; }
+      .hero-install { align-items: flex-start; }
+      .numbers-band { grid-template-columns: repeat(3, 1fr); }
+      .num-cell:nth-child(4), .num-cell:nth-child(5) { border-top: 1px solid var(--border); }
+      .nav-links { gap: 1rem; }
+      .nav-links a { font-size: 0.65rem; }
+      .footer-top { flex-direction: column; }
+      .footer-cols { gap: 2rem; }
+      .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
+      .bench-score { font-size: 2rem; }
     }
   </style>
 </head>
 <body>
 
+<div class="scroll-progress" id="progress"></div>
+
 <!-- Nav -->
 <header class="nav" id="nav">
-  <div class="container">
+  <div class="inner">
     <a href="#" class="nav-brand">&#9875; Shipworthy</a>
     <nav class="nav-links">
       <a href="#benchmark">Benchmark</a>
-      <a href="#how-it-works">How It Works</a>
-      <a href="https://github.com/Vimalk0703/shipworthy/tree/main/docs">Docs</a>
+      <a href="#how">How It Works</a>
+      <a href="#capabilities">Capabilities</a>
       <a href="https://github.com/Vimalk0703/shipworthy">GitHub</a>
     </nav>
   </div>
@@ -273,105 +358,125 @@
 
 <!-- Hero -->
 <section class="hero">
-  <div class="container">
-    <div class="hero-content reveal">
-      <h1>The engineering layer<br>for AI coding agents.</h1>
-      <p class="hero-sub">Open source plugin for Claude Code. 55 engineering skills activate invisibly while you work. Zero config. Zero dependencies.</p>
+  <div class="hero-label sr">Open Source &middot; Zero Config &middot; Zero Dependencies</div>
+  <h1 class="sr delay-1">THE ENGINEERING LAYER<br><span class="line-dim">FOR AI CODING AGENTS.</span></h1>
+  <div class="hero-bottom">
+    <p class="hero-desc sr delay-2">55 engineering skills activate invisibly while you code. TDD, security, architecture, quality gates — enforced automatically. You see everything it does.</p>
+    <div class="hero-install sr delay-3">
       <div class="install-block">
         <code>npx shipworthy init</code>
         <button class="copy-btn" aria-label="Copy install command">Copy</button>
       </div>
-      <a href="https://github.com/Vimalk0703/shipworthy" class="hero-link">View on GitHub<span>&rsaquo;</span></a>
+      <a href="https://github.com/Vimalk0703/shipworthy" class="hero-gh">View on GitHub &rsaquo;</a>
     </div>
   </div>
 </section>
 
-<!-- Agents -->
-<section class="agents-bar reveal">
-  <div class="container">
-    <p>Works with <strong>Claude Code</strong> &middot; <strong>Cursor</strong> &middot; <strong>Copilot</strong> &middot; <strong>Codex</strong> &middot; <strong>Windsurf</strong> &middot; <strong>Gemini CLI</strong></p>
+<!-- Agent marquee -->
+<div class="marquee-wrap">
+  <div class="marquee" aria-hidden="true">
+    <span>Claude Code</span><span class="dot">/</span>
+    <span>Cursor</span><span class="dot">/</span>
+    <span>GitHub Copilot</span><span class="dot">/</span>
+    <span>OpenAI Codex</span><span class="dot">/</span>
+    <span>Windsurf</span><span class="dot">/</span>
+    <span>Gemini CLI</span><span class="dot">/</span>
+    <span>Claude Code</span><span class="dot">/</span>
+    <span>Cursor</span><span class="dot">/</span>
+    <span>GitHub Copilot</span><span class="dot">/</span>
+    <span>OpenAI Codex</span><span class="dot">/</span>
+    <span>Windsurf</span><span class="dot">/</span>
+    <span>Gemini CLI</span><span class="dot">/</span>
+    <span>Claude Code</span><span class="dot">/</span>
+    <span>Cursor</span><span class="dot">/</span>
+    <span>GitHub Copilot</span><span class="dot">/</span>
+    <span>OpenAI Codex</span><span class="dot">/</span>
+    <span>Windsurf</span><span class="dot">/</span>
+    <span>Gemini CLI</span><span class="dot">/</span>
   </div>
-</section>
+</div>
 
 <!-- Benchmark -->
-<section class="section" id="benchmark">
+<section class="section bench-section" id="benchmark">
   <div class="container">
-    <div class="bench-header reveal">
-      <div class="sec-label">Benchmark</div>
-      <div class="sec-title">Same prompts. Same model.<br>One had Shipworthy.</div>
-      <p class="sec-desc">Two agents ran identical 7-turn non-technical founder prompts to build a REST API. 36 automated checks, written before either agent ran, scored the output.</p>
+    <div class="sec-label sr">Benchmark</div>
+    <div class="sec-title sr">Same prompts. Same model.<br>One had Shipworthy.</div>
+    <p class="sec-desc sr">Two agents ran identical 7-turn non-technical founder prompts. 36 automated checks — written before either agent ran — scored the output.</p>
+
+    <div class="bench-split sr-scale">
+      <div class="bench-col fail">
+        <div class="bench-col-header">
+          <span class="bench-col-title">Without Shipworthy</span>
+          <div><span class="bench-score score-fail">41%</span><span class="bench-score-sub">15 / 36</span></div>
+        </div>
+        <div class="bench-rows">
+          <div class="bench-row"><span class="bench-row-label">Database</span><span class="bench-row-val">In-memory arrays</span></div>
+          <div class="bench-row"><span class="bench-row-label">Validation</span><span class="bench-row-val">None</span></div>
+          <div class="bench-row"><span class="bench-row-label">Logging</span><span class="bench-row-val">console.log</span></div>
+          <div class="bench-row"><span class="bench-row-label">Types</span><span class="bench-row-val">5x :any</span></div>
+          <div class="bench-row"><span class="bench-row-label">Tests</span><span class="bench-row-val">0</span></div>
+          <div class="bench-row"><span class="bench-row-label">Secrets</span><span class="bench-row-val">.env exposed</span></div>
+          <div class="bench-row"><span class="bench-row-label">Errors</span><span class="bench-row-val">None</span></div>
+        </div>
+      </div>
+      <div class="bench-col pass">
+        <div class="bench-col-header">
+          <span class="bench-col-title">With Shipworthy</span>
+          <div><span class="bench-score score-pass">97%</span><span class="bench-score-sub">35 / 36</span></div>
+        </div>
+        <div class="bench-rows">
+          <div class="bench-row"><span class="bench-row-label">Database</span><span class="bench-row-val">SQLite + schemas</span></div>
+          <div class="bench-row"><span class="bench-row-label">Validation</span><span class="bench-row-val">Zod on every route</span></div>
+          <div class="bench-row"><span class="bench-row-label">Logging</span><span class="bench-row-val">Pino structured</span></div>
+          <div class="bench-row"><span class="bench-row-label">Types</span><span class="bench-row-val">Strict TypeScript</span></div>
+          <div class="bench-row"><span class="bench-row-label">Tests</span><span class="bench-row-val">39 passing</span></div>
+          <div class="bench-row"><span class="bench-row-label">Secrets</span><span class="bench-row-val">Guarded + .gitignore</span></div>
+          <div class="bench-row"><span class="bench-row-label">Errors</span><span class="bench-row-val">Proper status codes</span></div>
+        </div>
+      </div>
     </div>
-    <table class="bench-table reveal">
-      <thead>
-        <tr>
-          <th>Check</th>
-          <th>Without Shipworthy</th>
-          <th>With Shipworthy</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="score-row">
-          <td>Score</td>
-          <td class="col-without score-fail">15 / 36&ensp;(41%)</td>
-          <td class="col-with score-pass">35 / 36&ensp;(97%)</td>
-        </tr>
-        <tr>
-          <td>Database</td>
-          <td class="col-without">In-memory arrays</td>
-          <td class="col-with">SQLite with schemas</td>
-        </tr>
-        <tr>
-          <td>Input validation</td>
-          <td class="col-without">None</td>
-          <td class="col-with">Zod on every route</td>
-        </tr>
-        <tr>
-          <td>Logging</td>
-          <td class="col-without">console.log</td>
-          <td class="col-with">Pino structured</td>
-        </tr>
-        <tr>
-          <td>Type safety</td>
-          <td class="col-without">5 instances of : any</td>
-          <td class="col-with">Strict TypeScript</td>
-        </tr>
-        <tr>
-          <td>Tests</td>
-          <td class="col-without">0 tests</td>
-          <td class="col-with">39 passing + coverage</td>
-        </tr>
-        <tr>
-          <td>Secrets</td>
-          <td class="col-without">.env exposed, no .gitignore</td>
-          <td class="col-with">.gitignore + secrets guard</td>
-        </tr>
-        <tr>
-          <td>Error handling</td>
-          <td class="col-without">None</td>
-          <td class="col-with">Proper HTTP status codes</td>
-        </tr>
-        <tr>
-          <td>Linting</td>
-          <td class="col-without">Not configured</td>
-          <td class="col-with">ESLint strict, passing</td>
-        </tr>
-      </tbody>
-    </table>
-    <p class="bench-note reveal">Full methodology, all 10 task definitions, and reproduction scripts are on <a href="https://github.com/Vimalk0703/shipworthy/blob/main/BENCHMARKS.md">GitHub</a>.</p>
+    <p class="bench-note sr">Full methodology, all 10 task definitions, and reproduction scripts on <a href="https://github.com/Vimalk0703/shipworthy/blob/main/BENCHMARKS.md">GitHub</a>.</p>
   </div>
 </section>
 
-<!-- How it works -->
-<section class="section section-alt" id="how-it-works">
+<!-- How it works — horizontal scroll -->
+<section class="section how-section" id="how">
   <div class="container">
-    <div class="sec-label reveal">How it works</div>
-    <div class="sec-title reveal">Install once. Everything<br>else is automatic.</div>
-    <div class="how-prose">
-      <p class="reveal"><strong>Run one command.</strong> Shipworthy installs as a Claude Code plugin. Hooks monitor every file write and bash command in real time. Skills activate on demand based on what you're building. No configuration files to edit, no workflows to learn.</p>
-      <p class="reveal"><strong>You code normally.</strong> Say "build me a payment API" and Shipworthy automatically applies TDD, input validation, secrets scanning, and architecture decisions underneath. Every action is logged transparently to your terminal. Nothing is hidden.</p>
-      <p class="reveal"><strong>Quality compounds.</strong> An architecture spec persists across sessions — session 5 remembers what session 1 decided. Run <code style="font-family:var(--mono);background:var(--bg-elevated);padding:0.15em 0.4em;border-radius:3px;font-size:0.85em">/retro</code> to extract learnings. The plugin improves with your project.</p>
+    <div class="sec-label sr">How it works</div>
+    <div class="sec-title sr">Install once. Everything<br>else is automatic.</div>
+  </div>
+  <div class="container">
+    <div class="how-track" id="howTrack">
+      <div class="how-card sr">
+        <div class="how-num">01</div>
+        <h3>One command to start</h3>
+        <p>Run <code style="font-family:var(--mono);background:var(--bg-elevated);padding:0.15em 0.4em;border-radius:3px;font-size:0.85em">npx shipworthy init</code> in any project. Hooks install automatically. Skills load on demand. No config files to edit, no workflows to learn.</p>
+      </div>
+      <div class="how-card sr delay-1">
+        <div class="how-num">02</div>
+        <h3>Hooks guard every action</h3>
+        <p>Six hooks run in real time. Files scanned for secrets before writes. Bash commands checked for destructive patterns. Dependencies monitored. Everything logged transparently to your terminal.</p>
+      </div>
+      <div class="how-card sr delay-2">
+        <div class="how-num">03</div>
+        <h3>Skills activate invisibly</h3>
+        <p>Say "build a payment API" and TDD, input validation, security, and API design skills activate automatically. You code normally. The engineering happens underneath.</p>
+      </div>
+      <div class="how-card sr delay-3">
+        <div class="how-num">04</div>
+        <h3>Architecture persists</h3>
+        <p>A spec captures your conventions, rules, and patterns on first run. Session 5 knows everything session 1 decided. No more "Claude forgot we use Prisma."</p>
+      </div>
+      <div class="how-card sr delay-4">
+        <div class="how-num">05</div>
+        <h3>Quality compounds</h3>
+        <p>Run <code style="font-family:var(--mono);background:var(--bg-elevated);padding:0.15em 0.4em;border-radius:3px;font-size:0.85em">/retro</code> to extract session learnings. Corrections become permanent knowledge. Every session starts smarter than the last.</p>
+      </div>
     </div>
-    <div class="terminal reveal">
+    <div class="how-nav" id="howNav"></div>
+  </div>
+  <div class="container" style="margin-top: 3rem;">
+    <div class="terminal sr-scale">
       <div class="term-bar">
         <span class="term-dot"></span><span class="term-dot"></span><span class="term-dot"></span>
         <span class="term-title">terminal</span>
@@ -379,101 +484,189 @@
       <div class="term-body">
         <div><span class="t-green">&#9875; shipworthy</span> <span class="t-dim">session-start</span></div>
         <div><span class="t-dim">&#9484;&#9472; &#9875; shipworthy &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;</span></div>
-        <div><span class="t-dim">&#9474;</span> Tier: <span class="t-white">ENGINEER</span>  <span class="t-dim">&#9474;</span> Health: <span class="t-green">all passed</span>  <span class="t-dim">&#9474;</span></div>
-        <div><span class="t-dim">&#9474;</span> Skills: <span class="t-white">55</span>       <span class="t-dim">&#9474;</span> Hooks: <span class="t-white">6 active</span>   <span class="t-dim">&#9474;</span></div>
+        <div><span class="t-dim">&#9474;</span> Tier: <span class="t-w">ENGINEER</span>  <span class="t-dim">&#9474;</span> Health: <span class="t-green">all passed</span>  <span class="t-dim">&#9474;</span></div>
+        <div><span class="t-dim">&#9474;</span> Skills: <span class="t-w">55</span>       <span class="t-dim">&#9474;</span> Hooks: <span class="t-w">6 active</span>   <span class="t-dim">&#9474;</span></div>
         <div><span class="t-dim">&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;</span></div>
         <div>&nbsp;</div>
         <div><span class="t-green">&#9875; shipworthy</span> <span class="t-dim">pre-tool-use &rsaquo;</span> Scanning payments.ts</div>
         <div><span class="t-green">&#9875; shipworthy</span> <span class="t-dim">pre-tool-use &rsaquo;</span> <span class="t-green">All checks passed</span></div>
         <div>&nbsp;</div>
-        <div><span class="t-dim">&rsaquo;</span> <span class="t-white">skill: test-driven-development</span></div>
+        <div><span class="t-dim">&rsaquo;</span> <span class="t-w">skill: test-driven-development</span></div>
         <div><span class="t-dim">&rsaquo;</span> Writing failing test for createPayment...</div>
       </div>
     </div>
   </div>
 </section>
 
+<!-- Numbers -->
+<div class="numbers-band">
+  <div class="num-cell sr"><div class="num-val" data-target="55">0</div><div class="num-label">Skills</div></div>
+  <div class="num-cell sr delay-1"><div class="num-val" data-target="6">0</div><div class="num-label">Hooks</div></div>
+  <div class="num-cell sr delay-2"><div class="num-val" data-target="6">0</div><div class="num-label">Agents</div></div>
+  <div class="num-cell sr delay-3"><div class="num-val" data-target="8">0</div><div class="num-label">Templates</div></div>
+  <div class="num-cell sr delay-4"><div class="num-val" data-target="0">0</div><div class="num-label">Dependencies</div></div>
+</div>
+
 <!-- Capabilities -->
 <section class="section" id="capabilities">
   <div class="container">
-    <div class="cap-layout">
-      <div class="cap-intro reveal">
-        <div class="sec-label">What's included</div>
-        <div class="sec-title">55 skills across 11 categories.</div>
-        <p>Each skill is a Markdown file with YAML frontmatter. No code. No runtime. No dependencies. Just instructions that make AI agents better engineers.</p>
-        <p>Security, testing, architecture, operations, planning, debugging, frontend, collaboration, documentation — skills activate when relevant and stay silent when they're not.</p>
+    <div class="sec-label sr">Capabilities</div>
+    <div class="sec-title sr">What 55 skills<br>actually cover.</div>
+    <p class="sec-desc sr">Each skill is a Markdown file. No code, no runtime, no dependencies. Just engineering instructions that make AI agents build production-grade software.</p>
+
+    <div class="cap-grid">
+      <div class="cap-cell sr">
+        <h3>Real-time guardrails</h3>
+        <p>Six hooks guard every action. Secrets caught before files are written. Destructive commands blocked before execution. Security scans logged transparently.</p>
       </div>
-      <div class="cap-list reveal">
-        <div class="cap-item">
-          <h3>Transparent hooks</h3>
-          <p>Every file write is scanned for hardcoded secrets. Every bash command is checked for destructive patterns. Everything is logged to your terminal in real time. Six hooks, always watching.</p>
-        </div>
-        <div class="cap-item">
-          <h3>Test-driven by default</h3>
-          <p>Failing test first, then implementation, then verification. TDD happens automatically — not a workflow you have to remember. You see "it works." Underneath: tests prove it.</p>
-        </div>
-        <div class="cap-item">
-          <h3>Adaptive quality gates</h3>
-          <p>5 files: light touch. 50 files: coverage thresholds and lint enforcement. 500 files: security scans, performance budgets, circular import detection. The rigor scales with your project.</p>
-        </div>
-        <div class="cap-item">
-          <h3>11 security profiles</h3>
-          <p>Auto-detects your application type — web app, API, GraphQL, mobile, CLI, data pipeline, IoT, desktop, infrastructure — and applies the right security checks. PII detection, container hardening, OWASP, supply chain.</p>
-        </div>
-        <div class="cap-item">
-          <h3>Architecture as memory</h3>
-          <p>Generates a persistent architecture spec on first run. Directory conventions, naming patterns, mandatory rules. Session 5 knows everything session 1 decided. No more "Claude forgot we use Prisma."</p>
-        </div>
+      <div class="cap-cell sr delay-1">
+        <h3>Test-driven by default</h3>
+        <p>Failing test first, then implementation, then verification. TDD happens automatically. You see "it works." Underneath: tests prove it.</p>
       </div>
-    </div>
-    <div class="cap-numbers reveal">
-      <div class="cap-num"><div class="cap-num-val">55</div><div class="cap-num-label">Skills</div></div>
-      <div class="cap-num"><div class="cap-num-val">6</div><div class="cap-num-label">Hooks</div></div>
-      <div class="cap-num"><div class="cap-num-val">6</div><div class="cap-num-label">Agents</div></div>
-      <div class="cap-num"><div class="cap-num-val">8</div><div class="cap-num-label">Templates</div></div>
-      <div class="cap-num"><div class="cap-num-val">0</div><div class="cap-num-label">Dependencies</div></div>
+      <div class="cap-cell sr delay-2">
+        <h3>Adaptive quality gates</h3>
+        <p>5 files: light touch. 50 files: coverage thresholds. 500 files: security scans, performance budgets, circular import detection.</p>
+      </div>
+      <div class="cap-cell sr delay-3">
+        <h3>11 security profiles</h3>
+        <p>Auto-detects application type — web, API, GraphQL, mobile, CLI, pipeline, IoT, desktop, infrastructure — and applies the right security checks.</p>
+      </div>
+      <div class="cap-cell sr delay-4">
+        <h3>Architecture as memory</h3>
+        <p>Persistent architecture spec generated on first run. Directory conventions, naming patterns, mandatory rules. Enforced across every session.</p>
+      </div>
+      <div class="cap-cell sr">
+        <h3>Full transparency</h3>
+        <p>Every hook action logged with color-coded output. Skills announce themselves before activating. Toggle off with one environment variable.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- Footer / CTA -->
-<footer class="footer-cta">
+<!-- Footer -->
+<footer class="footer">
   <div class="container">
-    <div class="footer-install reveal">
-      <code>npx shipworthy init</code>
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand">&#9875; Shipworthy</div>
+      </div>
+      <div class="footer-cols">
+        <div>
+          <div class="footer-col-title">Product</div>
+          <a href="https://github.com/Vimalk0703/shipworthy">GitHub</a>
+          <a href="https://github.com/Vimalk0703/shipworthy/tree/main/docs">Docs</a>
+          <a href="https://github.com/Vimalk0703/shipworthy/blob/main/BENCHMARKS.md">Benchmarks</a>
+        </div>
+        <div>
+          <div class="footer-col-title">Community</div>
+          <a href="https://github.com/Vimalk0703/shipworthy/blob/main/CONTRIBUTING.md">Contributing</a>
+          <a href="https://github.com/Vimalk0703/shipworthy/blob/main/docs/blog/from-hackathon-win-to-open-source.md">Blog</a>
+          <a href="https://github.com/Vimalk0703/shipworthy/blob/main/CHANGELOG.md">Changelog</a>
+        </div>
+      </div>
     </div>
-    <p class="footer-sub reveal">MIT Licensed &middot; Markdown + Shell &middot; Zero dependencies</p>
-    <div class="footer-links reveal">
-      <a href="https://github.com/Vimalk0703/shipworthy">GitHub</a>
-      <a href="https://github.com/Vimalk0703/shipworthy/tree/main/docs">Docs</a>
-      <a href="https://github.com/Vimalk0703/shipworthy/blob/main/CONTRIBUTING.md">Contributing</a>
-      <a href="https://github.com/Vimalk0703/shipworthy/blob/main/BENCHMARKS.md">Benchmarks</a>
-      <a href="https://github.com/Vimalk0703/shipworthy/blob/main/docs/blog/from-hackathon-win-to-open-source.md">Blog</a>
+    <div class="footer-bottom">
+      <span>MIT License &middot; v1.2.0</span>
+      <span>Built by <a href="https://www.linkedin.com/in/vimal-kumar-parthasarathy/">Vimal Kumar</a></span>
     </div>
-    <p class="footer-credit">Built by <a href="https://www.linkedin.com/in/vimal-kumar-parthasarathy/">Vimal Kumar</a></p>
   </div>
 </footer>
 
 <script>
-// Scroll reveal
-const obs = new IntersectionObserver(
-  entries => entries.forEach(e => e.isIntersecting && e.target.classList.add('visible')),
-  { threshold: 0.05 }
-);
-document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-
-// Nav border on scroll
-const nav = document.getElementById('nav');
+// Scroll progress bar
+const progress = document.getElementById('progress');
 window.addEventListener('scroll', () => {
-  nav.classList.toggle('scrolled', scrollY > 20);
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  progress.style.width = (window.scrollY / h * 100) + '%';
 });
 
-// Copy install command
+// Nav
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', scrollY > 40);
+});
+
+// Scroll reveal — directional
+const srObs = new IntersectionObserver(
+  entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+  { threshold: 0.08, rootMargin: '0px 0px -60px 0px' }
+);
+document.querySelectorAll('.sr, .sr-left, .sr-right, .sr-scale').forEach(el => srObs.observe(el));
+
+// Copy
 document.querySelector('.copy-btn').addEventListener('click', function() {
   navigator.clipboard.writeText('npx shipworthy init');
   this.textContent = 'Copied';
   setTimeout(() => this.textContent = 'Copy', 2000);
 });
+
+// Counting numbers
+const numObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+    const target = parseInt(el.dataset.target);
+    if (target === 0) { el.textContent = '0'; numObs.unobserve(el); return; }
+    let current = 0;
+    const step = Math.max(1, Math.floor(target / 30));
+    const interval = setInterval(() => {
+      current += step;
+      if (current >= target) { current = target; clearInterval(interval); }
+      el.textContent = current;
+    }, 30);
+    numObs.unobserve(el);
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.num-val').forEach(el => numObs.observe(el));
+
+// Horizontal scroll for How It Works
+const track = document.getElementById('howTrack');
+const howNav = document.getElementById('howNav');
+const cards = track.querySelectorAll('.how-card');
+let currentCard = 0;
+
+// Build nav dots
+cards.forEach((_, i) => {
+  const dot = document.createElement('button');
+  dot.className = 'how-dot' + (i === 0 ? ' active' : '');
+  dot.setAttribute('aria-label', 'Step ' + (i + 1));
+  dot.addEventListener('click', () => scrollToCard(i));
+  howNav.appendChild(dot);
+});
+
+function scrollToCard(index) {
+  currentCard = index;
+  const card = cards[index];
+  track.style.transform = 'translateX(-' + card.offsetLeft + 'px)';
+  track.style.transition = 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
+  howNav.querySelectorAll('.how-dot').forEach((d, i) => d.classList.toggle('active', i === index));
+}
+
+// Auto-advance
+let howInterval = setInterval(() => {
+  currentCard = (currentCard + 1) % cards.length;
+  scrollToCard(currentCard);
+}, 4000);
+
+// Pause on hover
+track.addEventListener('mouseenter', () => clearInterval(howInterval));
+track.addEventListener('mouseleave', () => {
+  howInterval = setInterval(() => {
+    currentCard = (currentCard + 1) % cards.length;
+    scrollToCard(currentCard);
+  }, 4000);
+});
+
+// Touch swipe
+let touchStartX = 0;
+track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; clearInterval(howInterval); }, { passive: true });
+track.addEventListener('touchend', e => {
+  const diff = touchStartX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 50) {
+    if (diff > 0 && currentCard < cards.length - 1) scrollToCard(currentCard + 1);
+    else if (diff < 0 && currentCard > 0) scrollToCard(currentCard - 1);
+  }
+}, { passive: true });
 </script>
 
 </body>
