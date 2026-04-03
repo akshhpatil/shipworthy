@@ -123,6 +123,7 @@ Examples: new service, major refactor, multi-component feature, migration.
 | Finishing work | `verification-before-completion`, `quality-gates` | Builder: relaxed gates. Engineer: strict gates |
 | Preparing a commit | `quality-gates` | All tiers |
 | Code review needed | `requesting-code-review` | Maker/Engineer |
+| Codex cross-review / PR review | `codex-cross-review` (requires codex-plugin-cc; falls back to `requesting-code-review`) | Maker/Engineer |
 | Received review feedback | `receiving-code-review` | Maker/Engineer |
 | Complex multi-part task | `subagent-driven-development` or `dispatching-parallel-agents` | All tiers for Project-size tasks |
 | Working on a branch | `using-git-worktrees`, `finishing-a-development-branch` | All tiers |

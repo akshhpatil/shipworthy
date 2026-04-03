@@ -2,7 +2,7 @@
 
 ## What This Is
 
-Shipworthy is an open-source Claude Code plugin that enforces production engineering practices across AI coding sessions. v1.2.0 with 55 skills, 6 hooks, 6 agents, 8 templates, 5 adapters, 3 presets, 6 commands.
+Shipworthy is an open-source Claude Code plugin that enforces production engineering practices across AI coding sessions. v1.2.0 with 56 skills, 6 hooks, 6 agents, 8 templates, 5 adapters, 3 presets, 6 commands.
 
 ## Repository Structure
 
