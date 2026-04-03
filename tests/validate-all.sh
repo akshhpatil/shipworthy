@@ -6,13 +6,11 @@
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 START_TIME=$(date +%s)
 
 TOTAL_CHECKS=0
 PASSED_CHECKS=0
 FAILED_CHECKS=0
-WARN_CHECKS=0
 SECTION_RESULTS=""
 
 section_pass() {
