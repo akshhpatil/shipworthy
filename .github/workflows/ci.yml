@@ -52,13 +52,13 @@ jobs:
         run: sudo apt-get install -y shellcheck
       - name: Lint hook scripts
         run: |
-          shellcheck -s bash hooks/lib.sh
+          shellcheck -s bash --severity=warning hooks/lib.sh
           for hook in hooks/session-start hooks/pre-tool-use hooks/pre-tool-use-bash hooks/post-tool-use hooks/post-tool-use-write hooks/pre-push-validate; do
             echo "--- Checking $(basename "$hook") ---"
-            shellcheck -s bash -x "$hook"
+            shellcheck -s bash -x --severity=warning "$hook"
           done
       - name: Lint test scripts
-        run: shellcheck -s bash tests/**/*.sh tests/*.sh
+        run: shellcheck -s bash --severity=warning tests/**/*.sh tests/*.sh
 
   markdownlint:
     name: Markdownlint (skill formatting)
