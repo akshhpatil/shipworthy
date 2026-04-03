@@ -6,7 +6,7 @@ Shipworthy works with any AI coding agent, not just Claude Code.
 
 | Agent | Setup | Auto-Hooks | Skills Context | Quality Gates |
 |-------|-------|------------|---------------|---------------|
-| **Claude Code** | `npx shipworthy init` | Full (session-start, pre/post-tool-use) | Full (42 skills) | Automated |
+| **Claude Code** | `npx shipworthy init` | Full (session-start, pre/post-tool-use) | Full (55 skills) | Automated |
 | **Cursor** | Copy `.cursorrules` to project root | Rules only | Condensed | Manual |
 | **GitHub Copilot** | Copy `copilot-instructions.md` to `.github/` | Rules only | Condensed | Manual |
 | **OpenAI Codex** | Copy `AGENTS.md` to project root | Rules only | Condensed | Manual |
@@ -53,4 +53,4 @@ npx shipworthy init --agent codex
 
 - **Claude Code** gets the full experience: auto-activating hooks that detect secrets, monitor commits, and inject skills into every session.
 - **All other agents** get the condensed rules file — the non-negotiable defaults, skill routing, quality gates, and architecture memory. This covers ~80% of the value.
-- **Skills directory** can be referenced by any agent that supports reading project files. Point the agent to `skills/` for the full 42-skill catalog.
+- **Skills directory** can be referenced by any agent that supports reading project files. Point the agent to `skills/` for the full 55-skill catalog.

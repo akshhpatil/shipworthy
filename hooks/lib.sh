@@ -147,3 +147,101 @@ is_ignored_path() {
 
   return 1  # not ignored
 }
+
+# --- Transparency logging ---
+# Writes color-coded status to stderr so users see what Shipworthy is doing.
+# Separate from debug_log (file-based). Controlled by SHIPWORTHY_TRANSPARENCY env var
+# or .shipworthy/config.json "transparency" field. Default: enabled.
+
+# ANSI color constants
+_SW_RESET='\033[0m'
+_SW_BOLD_CYAN='\033[1;36m'
+_SW_BOLD_WHITE='\033[1;37m'
+_SW_CYAN='\033[36m'
+_SW_GREEN='\033[32m'
+_SW_YELLOW='\033[33m'
+_SW_BOLD_RED='\033[1;31m'
+_SW_DIM='\033[2m'
+
+# Check if transparency logging is enabled
+# Returns 0 (enabled) or 1 (disabled)
+sw_transparency_enabled() {
+  local val="${SHIPWORTHY_TRANSPARENCY:-}"
+  if [ -n "$val" ]; then
+    [ "$val" != "0" ] && return 0
+    return 1
+  fi
+  # Fallback to config file (read directly — read_config's // empty swallows false)
+  local config_file="${PROJECT_ROOT:-.}/.shipworthy/config.json"
+  if [ -f "$config_file" ]; then
+    local cfg_val=""
+    if command -v jq &>/dev/null; then
+      cfg_val=$(jq -r '.transparency' "$config_file" 2>/dev/null || true)
+    elif command -v python3 &>/dev/null; then
+      cfg_val=$(python3 -c "import json; print(json.load(open('$config_file')).get('transparency',''))" 2>/dev/null || true)
+    fi
+    [ "$cfg_val" = "false" ] && return 1
+  fi
+  return 0  # default: enabled
+}
+
+# Primary transparency log function
+# Usage: sw_log <level> <source> <message>
+# Levels: info, security, warn, block
+sw_log() {
+  sw_transparency_enabled || return 0
+  local level="$1"
+  local source="$2"
+  local message="$3"
+  local timestamp
+  timestamp=$(date '+%H:%M:%S' 2>/dev/null || echo "??:??:??")
+
+  local msg_color="$_SW_CYAN"
+  case "$level" in
+    security) msg_color="$_SW_GREEN" ;;
+    warn)     msg_color="$_SW_YELLOW" ;;
+    block)    msg_color="$_SW_BOLD_RED" ;;
+  esac
+
+  printf "${_SW_BOLD_CYAN}⚓ shipworthy${_SW_RESET}  ${_SW_DIM}%s${_SW_RESET}  ${_SW_BOLD_WHITE}%s${_SW_RESET}  ${_SW_DIM}›${_SW_RESET}  ${msg_color}%s${_SW_RESET}\n" \
+    "$timestamp" "$source" "$message" >&2
+
+  # Also maintain file log
+  debug_log "$source" "$message" 2>/dev/null || true
+}
+
+# Security check shorthand
+# Usage: sw_check <source> <check_name> <result>
+# result: "pass" or "warn"
+sw_check() {
+  sw_transparency_enabled || return 0
+  local source="$1"
+  local check_name="$2"
+  local result="$3"
+  local timestamp
+  timestamp=$(date '+%H:%M:%S' 2>/dev/null || echo "??:??:??")
+
+  if [ "$result" = "pass" ]; then
+    printf "${_SW_BOLD_CYAN}⚓ shipworthy${_SW_RESET}  ${_SW_DIM}%s${_SW_RESET}  ${_SW_BOLD_WHITE}%s${_SW_RESET}  ${_SW_DIM}›${_SW_RESET}  ${_SW_GREEN}✓ %s: pass${_SW_RESET}\n" \
+      "$timestamp" "$source" "$check_name" >&2
+  else
+    printf "${_SW_BOLD_CYAN}⚓ shipworthy${_SW_RESET}  ${_SW_DIM}%s${_SW_RESET}  ${_SW_BOLD_WHITE}%s${_SW_RESET}  ${_SW_DIM}›${_SW_RESET}  ${_SW_YELLOW}! %s: WARN${_SW_RESET}\n" \
+      "$timestamp" "$source" "$check_name" >&2
+  fi
+}
+
+# Session start banner
+# Usage: sw_banner <tier> <health> <skill_count>
+sw_banner() {
+  sw_transparency_enabled || return 0
+  local tier="$1"
+  local health="$2"
+  local skill_count="${3:-55}"
+  local tier_upper
+  tier_upper=$(echo "$tier" | tr '[:lower:]' '[:upper:]')
+
+  printf >&2 "${_SW_BOLD_CYAN}┌─ ⚓ shipworthy ─────────────────────────────┐${_SW_RESET}\n"
+  printf >&2 "${_SW_BOLD_CYAN}│${_SW_RESET}  Tier: ${_SW_BOLD_WHITE}%-8s${_SW_RESET} ${_SW_BOLD_CYAN}│${_SW_RESET}  Health: ${_SW_GREEN}%-16s${_SW_RESET} ${_SW_BOLD_CYAN}│${_SW_RESET}\n" "$tier_upper" "$health"
+  printf >&2 "${_SW_BOLD_CYAN}│${_SW_RESET}  Skills: ${_SW_BOLD_WHITE}%-6s${_SW_RESET} ${_SW_BOLD_CYAN}│${_SW_RESET}  Hooks: ${_SW_CYAN}%-17s${_SW_RESET} ${_SW_BOLD_CYAN}│${_SW_RESET}\n" "$skill_count" "6 active"
+  printf >&2 "${_SW_BOLD_CYAN}└──────────────────────────────────────────────┘${_SW_RESET}\n"
+}

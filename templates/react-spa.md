@@ -1,5 +1,8 @@
 # Architecture Specification: React SPA
 
+When applying this template, first output:
+> ⚓ **shipworthy** › template: `react-spa` — scaffolding React SPA project structure
+
 ## Project Identity
 - **Type**: React Single-Page Application
 - **Language**: TypeScript (strict mode)

@@ -1,5 +1,8 @@
 # Shipworthy — Production Engineering Guardrails for Codex
 
+When using this adapter, first output:
+> ⚓ **shipworthy** › adapter: `codex` — translating Shipworthy skills for Codex
+
 > Is your code worthy of shipping?
 
 ## Instructions

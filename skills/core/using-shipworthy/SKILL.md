@@ -201,3 +201,65 @@ Before claiming ANY work is complete:
 5. THEN assert completion
 
 Words like "should work", "probably fine", or "I believe" signal unverified claims. Replace them with evidence.
+
+## Transparency Protocol
+
+Shipworthy operates transparently. Whenever you activate, apply, or route to any Shipworthy component, announce it so the user can see what's contributing to the work. This is non-negotiable — the user should always know when Shipworthy is influencing output.
+
+### When Activating a Skill
+
+Before applying any skill's guidance, output:
+
+> ⚓ **shipworthy** › skill: `<skill-name>` — <one-line reason>
+
+Examples:
+
+> ⚓ **shipworthy** › skill: `test-driven-development` — writing tests before implementation
+
+> ⚓ **shipworthy** › skill: `adaptive-security` — detecting app type, applying web security profile
+
+> ⚓ **shipworthy** › skill: `api-design-standards` + `security-first-development` — designing secure endpoint
+
+When multiple skills activate together, combine them in one line.
+
+### When Applying Non-Negotiable Defaults
+
+> ⚓ **shipworthy** › defaults: installing `pino` (structured logging replaces console.log)
+
+> ⚓ **shipworthy** › defaults: adding `zod` for input validation
+
+### When Routing Based on Task Size
+
+> ⚓ **shipworthy** › routing: task classified as **Feature** — using spec → brainstorm → plan → execute flow
+
+### When Resolving Skill Conflicts
+
+> ⚓ **shipworthy** › routing: conflict resolved — `systematic-debugging` wins (bug fix takes priority over TDD)
+
+### When Detecting Red Flag Rationalizations
+
+> ⚓ **shipworthy** › guard: "This is a small change" — applying skill anyway (small changes cause big bugs)
+
+### When Enforcing Architecture Spec
+
+> ⚓ **shipworthy** › architecture: enforcing Mandatory Rule — "All API responses use envelope format"
+
+### When Tier Adapts Behavior
+
+> ⚓ **shipworthy** › tier: MAKER — using streamlined 3-step brainstorming (not full 5-step)
+
+### When Dispatching Agents
+
+> ⚓ **shipworthy** › agent: `code-reviewer` dispatched — reviewing changes for quality and security
+
+### When Applying Templates
+
+> ⚓ **shipworthy** › template: `nextjs` — scaffolding Next.js project structure
+
+### Transparency Rules
+
+1. **Always announce** — even for quick fixes or small changes
+2. **Be specific** — name the exact skill, default, or rule being applied
+3. **Be brief** — one line per announcement, no paragraphs
+4. **Combine when sensible** — multiple skills in one line is fine
+5. **Never suppress** — do not skip announcements to save space or time

@@ -1,5 +1,8 @@
 # Architecture Specification: Monorepo
 
+When applying this template, first output:
+> ⚓ **shipworthy** › template: `monorepo` — scaffolding Monorepo project structure
+
 ## Project Identity
 - **Type**: Monorepo (multi-package)
 - **Language**: [TypeScript/Python/Mixed]

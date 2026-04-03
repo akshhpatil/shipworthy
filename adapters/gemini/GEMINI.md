@@ -1,5 +1,8 @@
 # Shipworthy — Production Engineering Guardrails for Gemini CLI
 
+When using this adapter, first output:
+> ⚓ **shipworthy** › adapter: `gemini` — translating Shipworthy skills for Gemini
+
 > Is your code worthy of shipping?
 
 ## Non-Negotiable Defaults

@@ -1,5 +1,8 @@
 # Shipworthy — Production Engineering Guardrails for Windsurf
 
+When using this adapter, first output:
+> ⚓ **shipworthy** › adapter: `windsurf` — translating Shipworthy skills for Windsurf
+
 > Is your code worthy of shipping?
 
 ## Non-Negotiable Defaults

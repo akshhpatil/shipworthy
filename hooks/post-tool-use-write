@@ -38,6 +38,8 @@ if [ -z "$FILE_PATH" ]; then
   exit 0
 fi
 
+sw_log info post-tool-use-write "Checking: $(basename "$FILE_PATH" 2>/dev/null || echo 'unknown')"
+
 MESSAGE=""
 
 # ============================================================
@@ -54,6 +56,7 @@ if [[ "$BASENAME" == *test* ]] || [[ "$BASENAME" == *spec* ]] || [[ "$BASENAME" 
     if [ -f "$ARCH_SPEC_PATH" ] && grep -qi "colocat" "$ARCH_SPEC_PATH" 2>/dev/null; then
       : # Colocated tests are the convention, no warning
     else
+      sw_check post-tool-use-write "Test file location" warn
       MESSAGE="${MESSAGE}Test file written outside standard test directory. If this is intentional (colocated tests), update architecture spec. "
     fi
   fi
@@ -71,6 +74,7 @@ if [[ "$FILE_PATH" == *.ts ]] || [[ "$FILE_PATH" == *.tsx ]]; then
         # Use word boundary and skip comments (lines starting with // or *)
         ANY_COUNT=$(grep -v '^\s*//' "$FILE_PATH" 2>/dev/null | grep -v '^\s*\*' | grep -cE ':\s*any\b' 2>/dev/null || echo "0")
         if [ "$ANY_COUNT" -gt 0 ]; then
+          sw_check post-tool-use-write "TypeScript :any" warn
           MESSAGE="${MESSAGE}TypeScript file contains ${ANY_COUNT} instance(s) of ': any'. Use 'unknown' with type guards instead. "
         fi
       fi
@@ -84,6 +88,7 @@ fi
 if [ -f "$FILE_PATH" ]; then
   if grep -qE '(app\.(get|post|put|patch|delete)|router\.(get|post|put|patch|delete)|@(Get|Post|Put|Patch|Delete))' "$FILE_PATH" 2>/dev/null; then
     if ! grep -qE '(zod|Zod|z\.|Pydantic|pydantic|validator)' "$FILE_PATH" 2>/dev/null; then
+      sw_check post-tool-use-write "Route validation" warn
       MESSAGE="${MESSAGE}Route handler detected without input validation import. Consider adding Zod (JS/TS) or Pydantic (Python). "
     fi
   fi
@@ -96,5 +101,6 @@ if [ -n "$MESSAGE" ]; then
   ESCAPED_MSG=$(printf '%s' "$MESSAGE" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g' | tr -d '\n\r')
   echo "{\"hookSpecificOutput\":{\"message\":\"[shipworthy] Advisory: ${ESCAPED_MSG}\"}}"
 else
+  sw_log info post-tool-use-write "Compliance OK ✓"
   echo '{}'
 fi

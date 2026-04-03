@@ -22,7 +22,7 @@ You end up building the same feature three times: once to get it working, once t
 
 ## The Solution
 
-**Shipworthy** is a Claude Code plugin that auto-activates every session and silently enforces production engineering practices. It detects your project type, generates an architecture spec, and maintains it across sessions. You vibe code at full speed -- the plugin handles TDD, security, quality gates, and 55 engineering skills invisibly. No configuration, no ceremony, no workflow changes.
+**Shipworthy** is a Claude Code plugin that auto-activates every session and enforces production engineering practices with full transparency. It detects your project type, generates an architecture spec, and maintains it across sessions. You vibe code at full speed -- the plugin handles TDD, security, quality gates, and 55 engineering skills while showing you exactly what it's doing. No configuration, no ceremony, no workflow changes.
 
 ## Install
 
@@ -60,15 +60,31 @@ That is the only setup. Here is what happens next:
 5. **You build features normally.** Say "add a payment endpoint" and Claude automatically applies API design standards, security-first development, TDD, and quality gates. You never asked it to. It just does.
 6. **Before completing, it verifies.** Tests pass, no secrets leaked, no regressions, build is clean. Evidence, not claims.
 
-## Three Pillars
+## Four Pillars
 
 ### 1. Invisible Discipline
 Engineering guardrails activate automatically based on what you are doing. Writing a new feature triggers brainstorming, then planning, then TDD. Creating an API endpoint activates API design standards and security. You never invoke these manually -- they fire when relevant and stay silent when they are not.
 
-### 2. Architecture as Memory
+### 2. Full Transparency
+Every Shipworthy action is visible. Hooks log color-coded activity to your terminal in real time — security scans, compliance checks, push validation. Skills announce themselves before activating. Commands, agents, templates, and adapters all identify when they're contributing. You always know what Shipworthy is doing and why.
+
+```
+┌─ ⚓ shipworthy ─────────────────────────────┐
+│  Tier: ENGINEER  │  Health: all passed       │
+│  Skills: 55      │  Hooks: 6 active          │
+└──────────────────────────────────────────────┘
+⚓ shipworthy  14:32:05  pre-tool-use  ›  Scanning: service.ts
+⚓ shipworthy  14:32:05  pre-tool-use  ›  All checks passed ✓
+```
+
+> ⚓ **shipworthy** › skill: `api-design-standards` + `security-first-development` — designing secure endpoint
+
+Toggle off with `SHIPWORTHY_TRANSPARENCY=0` or `"transparency": false` in `.shipworthy/config.json`.
+
+### 3. Architecture as Memory
 The architecture spec is Claude's long-term memory for your project. Mandatory rules, directory conventions, naming patterns, tech choices -- all persisted and enforced. Session 5 knows everything session 1 decided. No more "Claude forgot we use Prisma" or "it put the route in the wrong directory again."
 
-### 3. Cross-Session Memory
+### 4. Cross-Session Memory
 Inspired by production agent memory architectures, Shipworthy manages a `.shipworthy/` directory as persistent project memory:
 
 - **INDEX.md** -- auto-generated index of all project memory, refreshed every session. Survives context compaction so Claude can rediscover what the project knows mid-conversation.
@@ -78,7 +94,7 @@ Inspired by production agent memory architectures, Shipworthy manages a `.shipwo
 - **Session pruning** -- keeps the 10 most recent session summaries, deletes older ones. Valuable patterns from old sessions should already be captured in learnings via retrospectives.
 - **Absolute dates everywhere** -- all timestamps use `YYYY-MM-DD`, never "yesterday" or "last week". Relative dates become meaningless across sessions.
 
-### 4. Graduated Rigor
+### 5. Graduated Rigor
 A weekend prototype should not face the same ceremony as an enterprise platform. The plugin scales its enforcement: lightweight checks for small projects, full quality gates as your codebase grows. You start fast and the guardrails tighten as complexity demands it.
 
 ## User Experience Tiers

@@ -1,3 +1,8 @@
+Before executing this command, output:
+> ⚓ **shipworthy** › command: `/validate` — running pre-push validation suite
+
+---
+
 # /validate — Pre-Push Validation Gate
 
 Run the comprehensive Shipworthy validation suite before pushing changes.
