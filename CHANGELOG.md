@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **ShellCheck in CI** — bash linting for all 6 hooks and test scripts
+- **Markdownlint in CI** — formatting enforcement for skill and doc Markdown files
+- **Markdownlint config** (`.markdownlint.json`) — relaxed rules for skill file structure
+- **RELEASE.md** — solo-maintainer release checklist with versioning rules
+- **GitHub labels** — `needs-triage`, `accepted` for lightweight issue triage workflow
+- **Branch protection on main** — requires all CI checks to pass, blocks force pushes
+
 ## [1.2.0] - 2026-04-02
 
 ### Added
@@ -64,6 +72,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Starter projects for benchmarking (Express+TS, security bug, N+1 query)
 - First benchmark result: +83% score improvement on REST API CRUD task (22/25 vs 12/25)
 
-[Unreleased]: https://github.com/Vimalk0703/shipworthy/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/Vimalk0703/shipworthy/compare/v1.2.0...HEAD
 [1.1.0]: https://github.com/Vimalk0703/shipworthy/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/Vimalk0703/shipworthy/releases/tag/v1.0.0

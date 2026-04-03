@@ -43,6 +43,38 @@ jobs:
       - name: Validate skill quality
         run: bash tests/skills/test-skill-quality.sh
 
+  shellcheck:
+    name: ShellCheck (bash linting)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ShellCheck
+        run: sudo apt-get install -y shellcheck
+      - name: Lint hook scripts
+        run: |
+          shellcheck -s bash hooks/lib.sh
+          for hook in hooks/session-start hooks/pre-tool-use hooks/pre-tool-use-bash hooks/post-tool-use hooks/post-tool-use-write hooks/pre-push-validate; do
+            echo "--- Checking $(basename "$hook") ---"
+            shellcheck -s bash -x "$hook"
+          done
+      - name: Lint test scripts
+        run: shellcheck -s bash tests/**/*.sh tests/*.sh
+
+  markdownlint:
+    name: Markdownlint (skill formatting)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install markdownlint-cli
+        run: npm install -g markdownlint-cli
+      - name: Lint skill files
+        run: markdownlint 'skills/**/*.md' --config .markdownlint.json
+      - name: Lint docs
+        run: markdownlint 'docs/**/*.md' --config .markdownlint.json || true
+
   structure:
     name: Repository structure
     runs-on: ubuntu-latest
