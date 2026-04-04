@@ -34,6 +34,24 @@ Review the entire conversation and categorize every notable moment:
 | **Skill Hits** | Which Shipworthy skills were invoked and helped | intent-to-spec caught missing requirements |
 | **Skill Misses** | Situations where a skill should have helped but didn't | No skill warned about CORS for frontend+API |
 | **User Preferences** | Patterns in how the user wants to work | Prefers explicit confirmation before database changes |
+| **Anti-Patterns** | Patterns that caused failures or wasted time | Built with SQLite, had to redo with PostgreSQL |
+| **Captured Signals** | Auto-captured events from hooks (`.shipworthy/.session-signals`) | 3 security warnings, 2 dependency additions, 5 commits |
+
+### Phase 1.5: Read Captured Signals
+
+If `.shipworthy/.session-signals` exists, read it. This file contains automatically captured events from hooks during the session — security warnings, dependency additions, git operations, pattern detections, fence violations.
+
+Format: `TIMESTAMP|HOOK|CATEGORY|DETAIL` (one per line)
+
+Group signals by category:
+- **security**: Secrets detected, eval usage, .env writes → candidates for regression fence
+- **pattern**: console.log, `:any`, missing validation → candidates for regression fence
+- **dependency**: New packages added → candidates for architecture spec or learnings
+- **git**: Commits, amends, force pushes → context for session summary
+- **migration**: Database changes → candidates for learnings
+- **fence-violation**: Regression fence rules violated → confirm fence rule is still needed
+
+Use these signals to AUGMENT conversation analysis, not replace it. Signals capture what hooks saw; conversation analysis captures corrections, decisions, and preferences that hooks can't see.
 
 ### Phase 2: Map to Skills
 
@@ -100,6 +118,40 @@ The `description` field is critical — it appears in `.shipworthy/INDEX.md` and
 - Retrospective captures patterns across an entire work session
 - Auto-dream consolidates both overnight
 
+**Regression Fence Updates** → When corrections, anti-patterns, or patterns-that-failed are identified (from conversation OR from captured signals), propose adding them to `.shipworthy/regression-fence.md`:
+
+```
+## Proposed Regression Fence Entries
+
+| # | Rule | Source | Why |
+|---|------|--------|-----|
+| 1 | NEVER use SQLite for production in this project | Correction: user switched to PostgreSQL | Concurrent write failures |
+| 2 | ALWAYS validate webhook payloads in src/routes/ | Signal: route-no-validation detected 3x | Unvalidated inputs cause 500s |
+| 3 | NEVER use console.log in src/api/ — use pino | Signal: console.log detected 5x | Structured logging required |
+
+Add to regression fence? (approve all / select / skip)
+```
+
+**Triage rules for fence vs other destinations:**
+- **Regression fence** → Mistakes that cost time and would repeat. Imperative format: "NEVER X because Y" or "ALWAYS X because Y". Anchor to file paths when possible.
+- **Learnings** → Preferences, patterns that work, decisions. Descriptive format.
+- **Auto-memory** → User-level preferences that span all projects (not project-specific).
+- **Architecture spec** → Stack constraints, mandatory rules (update via `architecture-awareness`).
+
+When adding to the regression fence:
+1. Read existing `.shipworthy/regression-fence.md` (create if it doesn't exist with the header)
+2. Check for duplicates — don't add a rule that already exists in different words
+3. Count existing entries — if at 20, identify the oldest (by date) for removal
+4. Append new entries with today's absolute date (YYYY-MM-DD)
+5. Regenerate `.shipworthy/INDEX.md`
+
+### Phase 4.5: Clear Session Signals
+
+After processing signals into learnings, fence entries, and session summary:
+- Delete `.shipworthy/.session-signals` — it has been fully processed
+- This prevents re-processing the same signals at the next session start
+- If the user skipped all proposed entries, still clear the signals (they've been reviewed)
+
 ### Phase 5: Update Session Summary
 
 After the retrospective, enhance the session summary (`.shipworthy/sessions/[date].md`) with:
@@ -154,11 +206,11 @@ Approve consolidation? (approve all / select items / skip)
 ## The Flywheel
 
 ```
-Session 1: Build feature → Corrections happen → Run /retro → Save learnings
-Session 2: Start work → Learnings loaded → Fewer corrections → Run /retro → Refine
-Session 3: Start work → Learnings + refined skills → Near-zero corrections
+Session 1: Build feature → Hooks capture signals → /retro → Save learnings + fence entries
+Session 2: Start work → Auto-retro processes signals → Fence + learnings loaded → Fewer corrections
+Session 3: Start work → Rich fence + learnings → Near-zero corrections
 ...
-Session N: One-shot execution. System knows your patterns.
+Session N: One-shot execution. System knows your patterns. Hooks confirm patterns hold.
 ```
 
 ## Rules
@@ -172,3 +224,6 @@ Session N: One-shot execution. System knows your patterns.
 7. **Dedup before writing** — before creating a new learning file, list existing files in `.shipworthy/learnings/`. If an existing file covers the same topic, update it instead of creating a new one. Two files about the same topic is worse than one well-maintained file.
 8. **Always use absolute dates** — write `2026-04-01`, never "today" or "last week". Relative dates become meaningless in future sessions. Use the current date at time of writing.
 9. **Regenerate INDEX.md** — after writing, updating, or deleting any file in `.shipworthy/`, regenerate `.shipworthy/INDEX.md` by listing all files with their frontmatter descriptions. This keeps the index fresh for mid-session discovery.
+10. **Regression fence entries are imperative** — write "NEVER use SQLite" not "We discovered that SQLite doesn't work well." The fence is loaded as direct commands that survive context decay.
+11. **Always read .session-signals** — captured signals are free data from hooks. Don't ignore them just because the conversation also has the information. Signals capture what hooks saw; conversation captures what the user said.
+12. **Clear signals after processing** — delete `.shipworthy/.session-signals` after the retrospective completes, even if no entries were approved. The signals have been reviewed.

@@ -7,7 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-04-04
+
 ### Added
+- **Context Intelligence System** — automated context management that captures, organizes, and loads project knowledge across sessions
+  - **`sw_signal()` function** in `hooks/lib.sh` — captures session events (commits, security warnings, pattern detections, dependency changes) to `.shipworthy/.session-signals`
+  - **Signal logging** in all 3 tool-use hooks (`pre-tool-use`, `post-tool-use`, `post-tool-use-write`) — 12 signal capture points across security, pattern, git, dependency, and migration categories
+  - **Regression fence** — new `.shipworthy/regression-fence.md` concept loaded every session as hard constraints. "NEVER/ALWAYS" rules anchored to file paths. Max 20 entries, auto-populated via `/retro`
+  - **Regression fence loading** in `session-start` hook — budget-aware injection (full or summarized), priority between architecture spec and plans
+  - **Fence violation detection** in `post-tool-use-write` — advisory warning when written code matches a `NEVER use X` fence rule
+  - **Auto-retro at session start** — when unprocessed signals exist from last session, Claude auto-processes them into fence entries and learnings before new work begins (user just approves with "yes")
+  - **`context-manager` skill** — teaches the 7 principles of context engineering (prohibitions beat descriptions, anchor to file paths, negative examples anchor harder, constitution vs working memory, only write what Claude can't infer, ordering is load-bearing, zero global bleed)
+  - **`/context` command** — on-demand context health dashboard showing .shipworthy/ completeness, fence health, signal count, and actionable suggestions
+  - **Enhanced retrospective skill** — reads `.session-signals`, proposes regression fence entries with triage logic (fence vs learnings vs auto-memory), clears signals after processing
+  - **Transparency for signals** — every signal capture shows in Claude Code terminal via `sw_log info "signal" "captured: ..."`
+  - **INDEX.md includes regression fence** — `generate_index()` now lists fence rule count
+  - **23 new tests** in `test-context-management.sh` — unit tests for sw_signal, session-start fence/signal loading, integration tests with real hook input, fence violation detection, budget compliance
+  - **Routing table updated** — `context-manager` skill added to using-shipworthy skill selection guide
 - **ShellCheck in CI** — bash linting for all 6 hooks and test scripts
 - **Markdownlint in CI** — formatting enforcement for skill and doc Markdown files
 - **Markdownlint config** (`.markdownlint.json`) — relaxed rules for skill file structure

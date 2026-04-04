@@ -51,6 +51,7 @@ if [ -n "$CONTENT" ]; then
   # AWS Access Key IDs (start with AKIA)
   if echo "$CONTENT" | grep -qE 'AKIA[0-9A-Z]{16}'; then
     sw_check pre-tool-use "AWS key detection" warn
+    sw_signal "pre-tool-use" "security" "secret-detected: AWS key in $(basename "$FILE_PATH" 2>/dev/null || echo 'unknown')"
     WARNINGS="${WARNINGS}AWS Access Key ID detected (AKIA...). Use environment variables or AWS credentials file. "
   fi
 
@@ -91,6 +92,7 @@ fi
 if [ -n "$CONTENT" ]; then
   if echo "$CONTENT" | grep -qE 'eval\s*\('; then
     sw_check pre-tool-use "eval() detection" warn
+    sw_signal "pre-tool-use" "security" "eval-detected in $(basename "$FILE_PATH" 2>/dev/null || echo 'unknown')"
     WARNINGS="${WARNINGS}eval() detected — this is a security risk. Consider safer alternatives. "
   fi
   if echo "$CONTENT" | grep -qE 'new\s+Function\s*\('; then
@@ -111,6 +113,7 @@ if [ -n "$FILE_PATH" ]; then
       : # .env is gitignored, no warning needed
     else
       sw_check pre-tool-use ".env file write" warn
+      sw_signal "pre-tool-use" "security" "env-file-write: $(basename "$FILE_PATH" 2>/dev/null || echo 'unknown') not gitignored"
       WARNINGS="${WARNINGS}Writing to $BASENAME — ensure this file is in .gitignore to prevent committing secrets. "
     fi
   fi
@@ -142,6 +145,7 @@ if [ -n "$FILE_PATH" ] && [ -n "$CONTENT" ]; then
     # Only match actual console.log calls, not strings or comments mentioning it
     if echo "$CONTENT" | grep -qE '[^/]console\.log\s*\(|^console\.log\s*\('; then
       sw_check pre-tool-use "console.log in prod" warn
+      sw_signal "pre-tool-use" "pattern" "console.log in $(basename "$FILE_PATH" 2>/dev/null || echo 'unknown')"
       WARNINGS="${WARNINGS}console.log detected in production code — use structured logging instead. "
     fi
   fi

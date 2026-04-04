@@ -148,6 +148,35 @@ is_ignored_path() {
   return 1  # not ignored
 }
 
+# --- Session signal capture ---
+# Appends session events to .shipworthy/.session-signals for automatic context building.
+# Format: TIMESTAMP|HOOK|CATEGORY|DETAIL
+# Processed by /retro (or auto-retro at next session start), then cleared.
+# Usage: sw_signal "hook-name" "category" "detail message"
+sw_signal() {
+  local hook="$1"
+  local category="$2"
+  local detail="$3"
+  local project_root
+  project_root="$(timeout 2 git rev-parse --show-toplevel 2>/dev/null || pwd)"
+  local signals_dir="$project_root/.shipworthy"
+  local signals_file="$signals_dir/.session-signals"
+
+  # Only capture if .shipworthy/ exists (project has opted into Shipworthy)
+  [ -d "$signals_dir" ] || return 0
+
+  local timestamp
+  timestamp="$(date '+%Y-%m-%dT%H:%M:%S' 2>/dev/null || echo 'unknown')"
+
+  # Append signal (fast: just an echo, no locking needed for advisory data)
+  echo "${timestamp}|${hook}|${category}|${detail}" >> "$signals_file" 2>/dev/null || true
+
+  # Show in terminal so users see context intelligence happening
+  sw_log info "signal" "captured: ${category} — ${detail}"
+
+  debug_log "signal" "${hook}|${category}|${detail}"
+}
+
 # --- Transparency logging ---
 # Writes color-coded status to stderr so users see what Shipworthy is doing.
 # Separate from debug_log (file-based). Controlled by SHIPWORTHY_TRANSPARENCY env var
