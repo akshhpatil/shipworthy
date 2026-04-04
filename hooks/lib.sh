@@ -132,7 +132,7 @@ is_ignored_path() {
 
   [ -f "$config_file" ] || return 1  # not ignored
 
-  local relative_path="${file_path#$project_root/}"
+  local relative_path="${file_path#"$project_root"/}"
 
   if command -v jq &>/dev/null; then
     local ignored
@@ -240,8 +240,8 @@ sw_banner() {
   local tier_upper
   tier_upper=$(echo "$tier" | tr '[:lower:]' '[:upper:]')
 
-  printf >&2 "${_SW_BOLD_CYAN}┌─ ⚓ shipworthy ─────────────────────────────┐${_SW_RESET}\n"
-  printf >&2 "${_SW_BOLD_CYAN}│${_SW_RESET}  Tier: ${_SW_BOLD_WHITE}%-8s${_SW_RESET} ${_SW_BOLD_CYAN}│${_SW_RESET}  Health: ${_SW_GREEN}%-16s${_SW_RESET} ${_SW_BOLD_CYAN}│${_SW_RESET}\n" "$tier_upper" "$health"
-  printf >&2 "${_SW_BOLD_CYAN}│${_SW_RESET}  Skills: ${_SW_BOLD_WHITE}%-6s${_SW_RESET} ${_SW_BOLD_CYAN}│${_SW_RESET}  Hooks: ${_SW_CYAN}%-17s${_SW_RESET} ${_SW_BOLD_CYAN}│${_SW_RESET}\n" "$skill_count" "6 active"
-  printf >&2 "${_SW_BOLD_CYAN}└──────────────────────────────────────────────┘${_SW_RESET}\n"
+  printf >&2 '%s┌─ ⚓ shipworthy ─────────────────────────────┐%s\n' "$_SW_BOLD_CYAN" "$_SW_RESET"
+  printf >&2 '%s│%s  Tier: %s%-8s%s %s│%s  Health: %s%-16s%s %s│%s\n' "$_SW_BOLD_CYAN" "$_SW_RESET" "$_SW_BOLD_WHITE" "$tier_upper" "$_SW_RESET" "$_SW_BOLD_CYAN" "$_SW_RESET" "$_SW_GREEN" "$health" "$_SW_RESET" "$_SW_BOLD_CYAN" "$_SW_RESET"
+  printf >&2 '%s│%s  Skills: %s%-6s%s %s│%s  Hooks: %s%-17s%s %s│%s\n' "$_SW_BOLD_CYAN" "$_SW_RESET" "$_SW_BOLD_WHITE" "$skill_count" "$_SW_RESET" "$_SW_BOLD_CYAN" "$_SW_RESET" "$_SW_CYAN" "6 active" "$_SW_RESET" "$_SW_BOLD_CYAN" "$_SW_RESET"
+  printf >&2 '%s└──────────────────────────────────────────────┘%s\n' "$_SW_BOLD_CYAN" "$_SW_RESET"
 }

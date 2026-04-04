@@ -21,7 +21,6 @@ echo ""
 echo "--- Checking for duplicate skill names ---"
 echo ""
 
-declare -A SKILL_NAMES 2>/dev/null || true
 NAMES_SEEN=""
 DUPES_FOUND=0
 

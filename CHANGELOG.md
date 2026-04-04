@@ -7,10 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-- Updated README.md skill and agent counts to match repo content (52 skills, 5 agents)
-- Updated README.md tables to include all 52 skills across 11 categories
-- Added project-doctor to agents list in README.md
+### Added
+- **ShellCheck in CI** — bash linting for all 6 hooks and test scripts
+- **Markdownlint in CI** — formatting enforcement for skill and doc Markdown files
+- **Markdownlint config** (`.markdownlint.json`) — relaxed rules for skill file structure
+- **RELEASE.md** — solo-maintainer release checklist with versioning rules
+- **GitHub labels** — `needs-triage`, `accepted` for lightweight issue triage workflow
+- **Branch protection on main** — requires all CI checks to pass, blocks force pushes
+
+## [1.2.0] - 2026-04-02
+
+### Added
+- **Full Transparency System** — two-track observability across every Shipworthy component
+  - **Shell track**: Color-coded ANSI stderr logging from all 6 hooks (session-start banner, security scan results, compliance checks, push validation)
+  - **Instruction track**: Transparency Protocol in master routing skill — Claude announces every skill activation, default enforcement, routing decision, conflict resolution, and architecture enforcement
+  - Transparency headers on all 6 commands, 6 agents, 8 templates, and 5 adapters
+  - Branded `⚓ shipworthy ›` prefix with cyan/green/yellow/red color scheme per severity level
+  - Toggleable via `SHIPWORTHY_TRANSPARENCY=0` env var or `"transparency": false` in config
+  - 10 new hook transparency tests + 5 instruction track tests (all passing)
 
 ## [1.1.0] - 2026-03-31
 
@@ -58,6 +72,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Starter projects for benchmarking (Express+TS, security bug, N+1 query)
 - First benchmark result: +83% score improvement on REST API CRUD task (22/25 vs 12/25)
 
-[Unreleased]: https://github.com/Vimalk0703/shipworthy/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/Vimalk0703/shipworthy/compare/v1.2.0...HEAD
 [1.1.0]: https://github.com/Vimalk0703/shipworthy/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/Vimalk0703/shipworthy/releases/tag/v1.0.0
