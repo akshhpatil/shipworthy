@@ -2,19 +2,19 @@
 
 ## What This Is
 
-Shipworthy is an open-source Claude Code plugin that enforces production engineering practices across AI coding sessions. v1.3.0 with 57 skills, 6 hooks, 6 agents, 8 templates, 5 adapters, 3 presets, 7 commands.
+Shipworthy is an open-source Claude Code plugin that enforces production engineering practices across AI coding sessions. v1.4.0 with 64 skills, 6 hooks, 6 agents, 8 templates, 5 adapters, 3 presets, 7 commands.
 
 ## Repository Structure
 
 ```
-skills/              56 engineering skills as SKILL.md files (YAML frontmatter + Markdown)
+skills/              64 engineering skills as SKILL.md files (YAML frontmatter + Markdown)
   core/              Master router, architecture awareness, intent-to-spec
   planning/          Brainstorming, writing-plans, executing-plans, design-documents, decision-frameworks
-  quality/           TDD, quality-gates, verification, error-handling, code-complexity
-  security/          11 skills: adaptive-security, secrets, supply-chain, PII, compliance, etc.
+  quality/           TDD, quality-gates, verification, error-handling, code-complexity, response-schema-validation, feedback-driven-adaptation, confidence-based-strictness
+  security/          14 skills: adaptive-security, secrets, supply-chain, PII, compliance, bias-detection, vendor-risk-assessment, etc.
   architecture/      API design, database, performance, observability, resilience, 12-factor
   collaboration/     Subagent-driven-dev, parallel agents, code review
-  operations/        13 skills: CI/CD, git worktrees, migrations, feature flags, incident response, context-manager
+  operations/        15 skills: CI/CD, git worktrees, migrations, feature flags, incident response, context-manager, guardrail-audit-log, scope-creep-detection
   frontend/          Accessibility, frontend standards
   debugging/         Systematic debugging
   documentation/     Documentation as code
@@ -115,4 +115,4 @@ bash tests/validate-all.sh             # pre-push validation (7 checks)
 
 ## Version
 
-v1.3.0 — Context Intelligence (April 4, 2026)
+v1.4.0 — LLM Guardrails (April 5, 2026)

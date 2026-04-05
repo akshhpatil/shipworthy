@@ -1,5 +1,66 @@
 # Shipworthy Release Notes
 
+## v1.4.0 — LLM Guardrails
+
+**Released:** April 5, 2026
+
+Most teams building with AI focus on features. Few think about guardrails — and that's where things break. This release adds 7 new skills that implement a complete, layered guardrail system based on the 5-layer LLM guardrails framework: Input/Output, Contextual, Security, Adaptive, and Ethical/Compliance. When you install Shipworthy, all 5 layers activate automatically.
+
+### The Problem
+
+Shipworthy already had strong security guardrails (11 skills, 3 hooks). But guardrails are not a single layer — they need to be distributed across the system. We had gaps in response validation, bias detection, adaptive enforcement, vendor risk, scope control, and centralized audit logging.
+
+### 7 New Guardrail Skills
+
+#### Input & Output Layer
+- **response-schema-validation** — Enforces that every API response passes through a declared schema before reaching the client. Prevents accidental data leakage (password hashes, internal notes, admin flags). Includes a sensitive field blocklist and test patterns for Zod, Pydantic, and Go.
+
+#### Contextual Layer
+- **scope-creep-detection** — Detects when a task expands beyond its original boundaries: file count expansion, time-based growth, new requirements mid-task, "while I'm here" syndrome, and dependency chain yak-shaving. Stops, surfaces the expansion, and gets explicit user approval before proceeding.
+
+#### Adaptive Layer
+- **feedback-driven-adaptation** — Moves guardrails from static rules to dynamic control systems. Adapts enforcement based on three signal types: user signals (explicit feedback), project trajectory (file count, test coverage trends, deployment status), and violation patterns (recurring issues, spike detection). Includes tier graduation/downgrade protocols with explicit user communication.
+
+- **confidence-based-strictness** — Scales verification depth based on how uncertain the system is about generated code. Four levels: High Confidence (routine CRUD), Moderate (multiple valid approaches), Low (crypto, financial, concurrency), Minimal (rolling your own security primitives — hard block). Auto-detects trigger patterns like `crypto`, `price`, `mutex`, `migration`.
+
+#### Ethical & Compliance Layer
+- **bias-detection** — Flags discriminatory logic in code that makes decisions about people: pricing, scoring, ranking, filtering, access control. Detects protected attribute usage, proxy variables (zip code = redlining), threshold bias, and training data assumptions. Includes disparate impact testing patterns and EU AI Act / ECOA / GDPR Art. 22 regulatory context.
+
+- **vendor-risk-assessment** — Evaluates third-party services before adoption using a 3-tier framework: Critical (data processors — SOC 2, DPA required), Operational (infrastructure — SLA, fallback required), Development (tooling — access controls). Includes circuit breaker patterns, data minimization rules, webhook signature verification, and vendor failure planning.
+
+#### Cross-Cutting (All Layers)
+- **guardrail-audit-log** — Centralized, immutable audit trail for every guardrail event across all 5 layers. Standardized event schema with layer classification, severity levels, and resolution tracking. Enables compliance evidence export, violation trend analysis, and governance reporting. Integrates with all existing Shipworthy hooks.
+
+### Coverage After This Release
+
+| Guardrail Layer | v1.3.0 | v1.4.0 |
+|----------------|--------|--------|
+| Input & Output | Strong | **Complete** |
+| Contextual | Strong | **Complete** |
+| Security | Comprehensive | Comprehensive |
+| Adaptive | Moderate | **Strong** |
+| Ethical & Compliance | Strong | **Complete** |
+| Cross-Cutting Audit | Missing | **Complete** |
+
+### What's New
+
+- 7 new skills (57 → 64 total)
+- All 5 LLM guardrail layers now covered automatically
+- Router updated with 7 new routing entries
+- 14 security skills (was 11)
+- 15 operations skills (was 13)
+- 8 quality skills (was 5)
+- 12 test suites, all passing
+- 7/7 pre-push validation checks passing
+
+### Upgrading
+
+```bash
+npx shipworthy init
+```
+
+---
+
 ## v1.3.0 — Context Intelligence
 
 **Released:** April 4, 2026
