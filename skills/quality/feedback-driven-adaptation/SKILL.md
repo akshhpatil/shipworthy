@@ -89,7 +89,7 @@ Downgrading is rare and requires explicit justification:
 Adjust *which checks run* and *how they report*, not *whether the principle matters*.
 
 ```
-CORRECT:  "Downgrading console.log check to advisory for this CLI project"
+CORRECT:  "Downgrading structured-logging check to advisory for this CLI project"
            (The principle still applies — structured logging is better — but the enforcement is softer)
 
 WRONG:    "Disabling security checks because the user asked for speed"
@@ -144,6 +144,17 @@ Within a single session, adapt based on the task:
 | Refactoring | Emphasize architectural and test guardrails |
 | Incident response | Reduce non-security guardrails; maximize speed to fix |
 | Code review | All guardrails in advisory mode (inform, don't block) |
+
+## Rationalization Pressure Test
+
+| Excuse | Counter |
+|--------|---------|
+| "The user seems annoyed by the guardrails" | Annoyance is a signal to explain better, not to reduce protection. Improve transparency, not strictness |
+| "This project is small, it doesn't need strict rules" | The graduated levels already handle this — Level 0 has only 2 checks. Trust the tier system, don't bypass it |
+| "The guardrail keeps firing on false positives" | High false-positive rate means the threshold needs calibration, not removal. Adjust the trigger, keep the guardrail |
+| "Nobody has complained about this before" | Absence of complaints is not evidence of safety. Verify guardrails are running, don't assume silence means success |
+| "We should relax rules to move faster" | Relaxing security guardrails to move faster is how breaches happen. Adapt scope, not principle |
+| "The override rate is high, so the guardrail is wrong" | High override rate may mean the guardrail is miscalibrated OR the team needs training. Investigate, don't disable |
 
 ## Code Review Checklist
 

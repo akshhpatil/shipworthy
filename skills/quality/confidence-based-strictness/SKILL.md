@@ -125,6 +125,17 @@ Activating: threat-modeling, edge case enumeration, verification-before-completi
 I'll split this into smaller steps and verify each independently.
 ```
 
+## Rationalization Pressure Test
+
+| Excuse | Counter |
+|--------|---------|
+| "I'm confident this is right" | Confidence is subjective. Check the indicators — unfamiliar domain, no tests, security-critical path. If any apply, escalate regardless of feeling |
+| "It's just a simple function" | Simple functions in complex domains (crypto, finance, concurrency) are where the worst bugs hide. Domain complexity trumps code complexity |
+| "We don't need threat modeling for this" | If the code touches auth, payments, or user data, threat modeling is non-negotiable. The cost of skipping it is measured in breaches |
+| "The tests will catch any issues" | Tests catch what you thought to test for. Low-confidence code has unknown unknowns — that's why it needs more verification, not less |
+| "This is slowing us down" | A bug in crypto or financial code slows you down for months. An extra hour of verification is cheap insurance |
+| "I've written similar code before" | Similar is not identical. Edge cases in unfamiliar domains are what kill you. Verify, don't assume |
+
 ## Code Review Checklist
 
 - [ ] Confidence level assessed and announced for non-trivial code

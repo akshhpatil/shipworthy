@@ -26,6 +26,15 @@ invoke_when: Use when writing API endpoints, response handlers, serializers, or 
 Define response schemas alongside request schemas. Validate before sending:
 
 ```typescript
+// BAD — returning raw database row (leaks internal fields)
+app.get('/users/:id', async (req, res) => {
+  const user = await db.users.findById(req.params.id);
+  res.json(user); // exposes passwordHash, internalNotes, loginAttempts
+});
+```
+
+```typescript
+// GOOD — validate through a declared response schema
 // schemas/user.ts
 import { z } from 'zod';
 
@@ -148,6 +157,17 @@ it('GET /users/:id returns only declared fields', async () => {
   expect(parsed.email).toBeDefined();
 });
 ```
+
+## Rationalization Pressure Test
+
+| Excuse | Counter |
+|--------|---------|
+| "The frontend only uses the fields it needs" | The frontend ignoring extra fields does not prevent them from being sent. An attacker reads the raw response, not the UI |
+| "We control both client and server" | Today. Tomorrow a mobile app, a third-party integration, or an API consumer you did not build will hit this endpoint |
+| "Adding response schemas is boilerplate" | A 5-line Zod schema is less work than a data breach investigation. The boilerplate is the protection |
+| "Our ORM already selects specific fields" | ORM select lists are in a query file far from the route handler. A response schema is the last line of defense at the boundary |
+| "It's just an internal API" | Internal APIs get exposed through SSRF, misconfigured proxies, and lateral movement. Internal does not mean unexploitable |
+| "Performance — parsing responses adds overhead" | Schema validation adds microseconds. Sending entire database rows adds kilobytes of unnecessary data per request |
 
 ## Code Review Checklist
 
