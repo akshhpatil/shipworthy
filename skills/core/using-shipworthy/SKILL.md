@@ -147,6 +147,15 @@ Examples: new service, major refactor, multi-component feature, migration.
 | Environment or setup | `environment-setup` | All tiers |
 | MCP server opportunity | `mcp-integration` | All tiers (advisory) |
 | Before pushing code | Run `/validate` or dispatch `pre-push-validator` agent | All tiers |
+| Context management or organization | `context-manager` | All tiers |
+| Running /context | `context-manager` | All tiers |
+| Writing API response handlers | `response-schema-validation` | All tiers |
+| Code that scores, ranks, or classifies people | `bias-detection` | Maker/Engineer |
+| Setting up guardrail/compliance logging | `guardrail-audit-log` | Maker/Engineer |
+| Guardrail strictness feels wrong | `feedback-driven-adaptation` | All tiers |
+| Unfamiliar domain or high-risk code | `confidence-based-strictness` | All tiers |
+| Adding third-party API/SaaS integration | `vendor-risk-assessment`, `adaptive-security` | All tiers |
+| Task expanding beyond original scope | `scope-creep-detection` | All tiers |
 
 ## Conflict Resolution Rules
 

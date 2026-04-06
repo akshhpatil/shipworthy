@@ -332,6 +332,46 @@ Do NOT block the user's first request — but weave architecture discovery into 
 If the user explicitly says they don't want an architecture spec, respect that and proceed without one."
 fi
 
+# --- Load regression fence if present ---
+FENCE_PATH="$PROJECT_ROOT/.shipworthy/regression-fence.md"
+if [ -f "$FENCE_PATH" ]; then
+  FENCE_COUNT=$(grep -c '^## ' "$FENCE_PATH" 2>/dev/null || echo "0")
+  if [ "$FENCE_COUNT" -gt 0 ]; then
+    sw_log info session-start "Regression fence: $FENCE_COUNT rule(s) loaded"
+    FENCE_CONTENT=$(cat "$FENCE_PATH" 2>/dev/null || true)
+    FENCE_SECTION="
+
+---
+
+## REGRESSION FENCE (AUTO-LOADED)
+
+Known anti-patterns for this project. Identified in previous sessions via /retro.
+Treat each rule as a HARD CONSTRAINT — violating these means repeating a known mistake.
+
+$FENCE_CONTENT
+
+(Edit \`.shipworthy/regression-fence.md\` or run \`/retro\` to manage.)"
+
+    # Budget check
+    COMBINED_LENGTH=$(( ${#CONTEXT} + ${#FENCE_SECTION} ))
+    if [ "$COMBINED_LENGTH" -gt "$CONTEXT_BUDGET" ]; then
+      # Extract just the headings (NEVER/ALWAYS rules) without explanations
+      FENCE_SUMMARY=$(grep '^## ' "$FENCE_PATH" 2>/dev/null | head -20 || true)
+      CONTEXT="$CONTEXT
+
+---
+
+## REGRESSION FENCE (SUMMARIZED — full at .shipworthy/regression-fence.md)
+
+$FENCE_SUMMARY
+
+(${FENCE_COUNT} rules. Read the full file for explanations.)"
+    else
+      CONTEXT="$CONTEXT$FENCE_SECTION"
+    fi
+  fi
+fi
+
 # --- Surface in-progress plans and recent session ---
 PLANS_DIR="$PROJECT_ROOT/.shipworthy/plans"
 SESSIONS_DIR="$PROJECT_ROOT/.shipworthy/sessions"
@@ -418,6 +458,41 @@ if [ -f "$TECH_DEBT_PATH" ]; then
 
 ## TECH DEBT NOTICE
 There are **$DEBT_COUNT tech debt item(s)** tracked in \`.shipworthy/tech-debt.md\`. Review when relevant."
+  fi
+fi
+
+# --- Auto-retro: surface unprocessed session signals ---
+SIGNALS_FILE="$PROJECT_ROOT/.shipworthy/.session-signals"
+if [ -f "$SIGNALS_FILE" ]; then
+  SIGNAL_COUNT=$(wc -l < "$SIGNALS_FILE" 2>/dev/null | tr -d ' ')
+  if [ "$SIGNAL_COUNT" -gt 0 ]; then
+    sw_log info session-start "Unprocessed signals: $SIGNAL_COUNT from last session"
+    # Read last 20 signals for context (keep injection small)
+    SIGNAL_PREVIEW=$(tail -20 "$SIGNALS_FILE" 2>/dev/null || true)
+    CONTEXT="$CONTEXT
+
+---
+
+## AUTO-RETRO: UNPROCESSED SESSION SIGNALS
+
+There are **${SIGNAL_COUNT} captured signal(s)** from the previous session in \`.shipworthy/.session-signals\`.
+These were automatically captured by hooks (commits, security warnings, pattern detections, dependency changes).
+
+**BEFORE starting new work**, process these signals:
+1. Read \`.shipworthy/.session-signals\`
+2. Group by category (security, pattern, dependency, git, migration, fence-violation)
+3. For any repeated patterns or security warnings, propose regression fence entries:
+   - Format: \`## NEVER [verb] [what] — [anchored to file path if possible]\`
+   - Include a 1-line explanation with date
+4. For dependency additions or migration events, propose learnings entries
+5. Present a brief table: \`| # | Proposed Rule | Source | Destination |\`
+6. Ask: \"Approve these context updates? (yes / select items / skip)\"
+7. After processing, delete \`.shipworthy/.session-signals\`
+
+Signal preview (last 20):
+\`\`\`
+${SIGNAL_PREVIEW}
+\`\`\`"
   fi
 fi
 
@@ -513,6 +588,16 @@ generate_index() {
     idx="${idx}
 
 ${hdr}${session_list}"
+  fi
+
+  # Regression Fence
+  if [ -f "$PROJECT_ROOT/.shipworthy/regression-fence.md" ]; then
+    local fc
+    fc=$(grep -c "^## " "$PROJECT_ROOT/.shipworthy/regression-fence.md" 2>/dev/null || echo "0")
+    idx="${idx}
+
+## Regression Fence
+- regression-fence.md — ${fc} rule(s)"
   fi
 
   # Tech Debt

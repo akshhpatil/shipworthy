@@ -35,9 +35,11 @@ MESSAGE=""
 if echo "$COMMAND" | grep -q "git commit" 2>/dev/null; then
   if echo "$COMMAND" | grep -q "\-\-amend" 2>/dev/null; then
     sw_log warn post-tool-use "Commit --amend detected"
+    sw_signal "post-tool-use" "git" "amend-commit: may rewrite history"
     MESSAGE="[shipworthy] Commit amend detected. Verify: Was this intentional? Amending rewrites history — avoid on shared/pushed branches. Did you run tests after the amend?"
   else
     sw_log info post-tool-use "Commit detected — verification reminder issued"
+    sw_signal "post-tool-use" "git" "commit: $(echo "$COMMAND" | head -c 200)"
     MESSAGE="[shipworthy] Commit detected. Verify: Did you run tests? Did you verify the change works? Does it follow the architecture spec?"
   fi
 fi
@@ -74,6 +76,7 @@ elif echo "$COMMAND" | grep -qE "(npm install [a-zA-Z@]|yarn add |pnpm add |pip 
   # Skip flags (things starting with -)
   if [ -n "$DEP_NAME" ] && [[ "$DEP_NAME" != -* ]]; then
     sw_log info post-tool-use "New dependency: $DEP_NAME"
+    sw_signal "post-tool-use" "dependency" "added: ${DEP_NAME}"
     MESSAGE="[shipworthy] New dependency added: ${DEP_NAME}. Consider: Is it well-maintained? Are there known vulnerabilities? Is the license compatible? Is the bundle size impact acceptable? Update architecture spec if this changes the tech stack."
   fi
 fi
@@ -83,6 +86,7 @@ fi
 # ============================================================
 if echo "$COMMAND" | grep -qE "git push.*(--force|-f)" 2>/dev/null; then
   sw_log warn post-tool-use "Force push detected"
+  sw_signal "post-tool-use" "git" "force-push: dangerous history rewrite"
   MESSAGE="[shipworthy] Force push detected. This rewrites remote history. Verify: Is this a shared branch? Have other contributors pulled? Consider --force-with-lease instead."
 fi
 
@@ -91,6 +95,7 @@ fi
 # ============================================================
 if echo "$COMMAND" | grep -qE "(migrate|migration|db:migrate|prisma migrate|alembic|knex migrate|typeorm migration)" 2>/dev/null; then
   sw_log info post-tool-use "Database migration detected"
+  sw_signal "post-tool-use" "migration" "detected: $(echo "$COMMAND" | head -c 200)"
   if [ -z "$MESSAGE" ]; then
     MESSAGE="[shipworthy] Database migration detected. Verify: Is the migration reversible? Have you tested rollback? Is the migration safe for zero-downtime deployment?"
   fi
