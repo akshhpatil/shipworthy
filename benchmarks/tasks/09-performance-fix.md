@@ -2,7 +2,7 @@
 
 ## Prompt
 
-> The API is slow. The GET /orders endpoint takes 5+ seconds. Investigate and fix the performance issue.
+> The orders page is super slow — it takes like 5+ seconds to load. Customers are complaining. Can you figure out why and fix it?
 
 This prompt is given identically for both the **with-plugin** and **without-plugin** runs. No additional guidance or follow-up prompts are allowed.
 

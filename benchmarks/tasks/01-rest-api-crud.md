@@ -2,7 +2,7 @@
 
 ## Prompt
 
-> Build a REST API for a todo app with CRUD operations. Use Express and TypeScript. Include proper error handling and input validation.
+> I need a to-do list feature for my app. People should be able to add tasks, check them off, edit them, and delete them. It needs to work as a backend that a mobile app or website could talk to.
 
 This prompt is given identically for both the **with-plugin** and **without-plugin** runs. No additional guidance or follow-up prompts are allowed.
 

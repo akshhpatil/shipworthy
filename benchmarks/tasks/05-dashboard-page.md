@@ -2,7 +2,7 @@
 
 ## Prompt
 
-> Create a dashboard page that shows user statistics: total orders, revenue, and recent activity. Use React with TypeScript.
+> I need a dashboard that shows me how my business is doing — how many orders came in, how much money we made, and what happened recently. Something clean I can check every morning.
 
 This prompt is given identically for both the **with-plugin** and **without-plugin** runs. No additional guidance or follow-up prompts are allowed.
 

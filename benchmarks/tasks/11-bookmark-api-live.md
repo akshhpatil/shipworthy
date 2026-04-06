@@ -6,7 +6,7 @@ This benchmark was run as a **live session** — not a scripted benchmark runner
 
 ## Prompt
 
-> Build a Bookmark REST API with Express. Include CRUD operations, proper error handling, and tests.
+> I want to save my favorite links — like a bookmarks app. I should be able to add a bookmark with a title and URL, tag them, edit them, and delete ones I don't need anymore.
 
 This prompt was given identically for both runs. No follow-up corrections or guidance were provided.
 

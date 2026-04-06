@@ -2,7 +2,7 @@
 
 ## Prompt
 
-> Add rate limiting to all public endpoints and structured logging throughout the application.
+> People keep hammering our API and it slows everything down. I need something to stop that. Also, when things go wrong I have no idea what happened — we need proper logs so I can actually debug issues.
 
 This prompt is given identically for both the **with-plugin** and **without-plugin** runs. No additional guidance or follow-up prompts are allowed.
 
