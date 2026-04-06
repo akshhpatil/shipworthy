@@ -176,7 +176,6 @@ A weekend prototype should not face the same ceremony as an enterprise platform.
 | **ci-cd-awareness** | Pipeline design, rollback strategies, and feature flags |
 | **using-git-worktrees** | Isolated workspaces for parallel development branches |
 | **finishing-a-development-branch** | 5-step completion workflow: tests, cleanup, docs, PR, verify |
-| **ci-cd-awareness** | Pipeline design, rollback strategies, feature flags |
 | **tech-debt-tracking** | Document shortcuts so they get fixed, not forgotten |
 | **session-memory** | Cross-session persistence via `.shipworthy/` with INDEX.md, pruning, and consolidation |
 | **production-readiness** | Pre-deployment checklist |
