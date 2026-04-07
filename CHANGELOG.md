@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-04-06
+
+### Fixed
+- **CRITICAL:** Python code injection in `hooks/lib.sh` (3 sites) — shell variables no longer interpolated into Python code strings
+- **CRITICAL:** Python code injection in `hooks/session-start` (3 sites) — same fix pattern using `os.environ[]`
+- **HIGH:** TOCTOU race condition in session marker — moved from `/tmp` to `~/.shipworthy/sessions/` with hashed filenames
+- **MEDIUM:** Command injection in `bin/shipworthy.cjs` — replaced `execSync` with `execFileSync` array arguments
+
+### Added
+- `tests/security/test-security-audit.sh` — 12 static analysis security tests
+- Pre-push validation extended to 8 checks (was 7)
+- Security Audited badge in README
+- `benchmarks/results/.gitignore` safety net for generated .env files
+
+### Changed
+- All Python one-liners in hooks use single-quoted strings with `os.environ[]` instead of shell interpolation
+- Session markers use SHA-256 hashed project paths in user-owned directory
+
+## [1.4.0] - 2026-04-05
+
+### Added
+- 7 new LLM guardrail skills: response-schema-validation, scope-creep-detection, feedback-driven-adaptation, confidence-based-strictness, bias-detection, vendor-risk-assessment, guardrail-audit-log
+
 ## [1.3.0] - 2026-04-04
 
 ### Added

@@ -4,7 +4,7 @@ Automated benchmarks that measure code quality produced by Claude Code, comparin
 
 ## How It Works
 
-1. A task prompt (e.g., "build a REST API with CRUD operations") is given to Claude Code
+1. A task prompt written in **non-technical founder language** (e.g., "I need a to-do list feature for my app") is given to Claude Code
 2. The same prompt is run twice: once with the plugin and once without
 3. The generated code is scored by automated checks and an LLM-as-judge
 4. Results are recorded and compared
@@ -127,7 +127,7 @@ Name your file with a zero-padded number prefix: `02-auth-middleware.md`, `03-da
 
 ### Guidelines for Good Tasks
 
-- The prompt should be realistic -- something a developer would actually ask
+- The prompt should be realistic -- something a **non-technical founder** would actually say, not developer jargon
 - The prompt should be identical for both runs (no hints about the plugin)
 - Scoring criteria should be objective and automatable where possible
 - Include at least 3 checks worth 3 points (critical) and 3 checks worth 1 point (good practice)

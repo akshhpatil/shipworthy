@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const readline = require('readline');
 
 const VERSION = '1.0.0';
@@ -279,7 +279,7 @@ function score() {
   console.log(dim('  Running 15 automated checks...\n'));
 
   try {
-    const output = execSync(`bash "${scorerPath}" "${projectDir}" 2>/dev/null`, { encoding: 'utf8' });
+    const output = execFileSync('bash', [scorerPath, projectDir], { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
     const result = JSON.parse(output);
 
     for (const [check, data] of Object.entries(result.checks)) {

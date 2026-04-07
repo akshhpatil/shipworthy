@@ -102,8 +102,8 @@ fi
 # Extract pass count from summary
 PASS_COUNT=$(echo "$VALIDATION_OUTPUT" | grep -oE 'Passed: [0-9]+' | head -1 | grep -oE '[0-9]+' || echo "all")
 
-sw_log info pre-push-validate "Validation passed ($PASS_COUNT/7) — push approved ✓"
-APPROVE_MSG="[shipworthy] Pre-push validation passed ($PASS_COUNT/7 checks). Safe to push."
+sw_log info pre-push-validate "Validation passed ($PASS_COUNT/8) — push approved ✓"
+APPROVE_MSG="[shipworthy] Pre-push validation passed ($PASS_COUNT/8 checks). Safe to push."
 ESCAPED_MSG=$(printf '%s' "$APPROVE_MSG" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g' | tr -d '\n\r')
 
 echo "{\"hookSpecificOutput\":{\"decision\":\"approve\",\"message\":\"${ESCAPED_MSG}\"}}"
