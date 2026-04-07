@@ -1,4 +1,4 @@
-name: CI
+name: CI / CD
 
 on:
   pull_request:
@@ -10,6 +10,8 @@ permissions:
   contents: read
 
 jobs:
+  # ── Test jobs (run in parallel) ──────────────────────────────
+
   hooks:
     name: Hook tests
     runs-on: ubuntu-latest
@@ -27,19 +29,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Validate skill frontmatter
         run: bash tests/skills/test-skill-frontmatter.sh
-
       - name: Validate CSO compliance
         run: bash tests/skills/test-cso-format.sh
-
       - name: Validate skill routing
         run: bash tests/skills/test-skill-routing.sh
-
       - name: Validate cross-references
         run: bash tests/skills/test-cross-references.sh
-
       - name: Validate skill quality
         run: bash tests/skills/test-skill-quality.sh
 
@@ -80,6 +77,49 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Validate repo structure
         run: bash tests/structure/test-repo-structure.sh
+
+  # ── Deploy (only after ALL tests pass) ──────────────────────
+
+  deploy:
+    name: Deploy landing page
+    needs: [hooks, skills, shellcheck, markdownlint, structure]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check for site changes
+        id: changes
+        run: |
+          if git diff --name-only HEAD~1 HEAD | grep -q '^site/'; then
+            echo "site=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "site=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/configure-pages@v5
+        if: steps.changes.outputs.site == 'true'
+
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.changes.outputs.site == 'true'
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        if: steps.changes.outputs.site == 'true'
+        uses: actions/deploy-pages@v4

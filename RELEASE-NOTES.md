@@ -1,5 +1,45 @@
 # Shipworthy Release Notes
 
+## v1.4.1 — Security Hardening
+
+**Released:** April 6, 2026
+
+Internal security audit of all 64 skills, 6 hooks, 8 templates, 6 agents, 5 adapters, and CLI entry point. Found and fixed code injection vulnerabilities in hook scripts. Added a 12-test static analysis security suite that runs on every push.
+
+### Fixed
+
+- **CRITICAL:** Fixed Python code injection in `hooks/lib.sh` (3 sites) and `hooks/session-start` (3 sites). Shell variables were interpolated directly into double-quoted Python code strings. All Python one-liners now use `os.environ[]` with single-quoted strings — values pass through the kernel, not through shell interpolation.
+- **HIGH:** Fixed TOCTOU race condition in session marker file. Markers moved from world-writable `/tmp` to user-owned `~/.shipworthy/sessions/` with hashed filenames. Eliminates symlink attack vector on shared systems.
+- **MEDIUM:** Fixed command injection in `bin/shipworthy.cjs` score command. Replaced `execSync` template literal with `execFileSync` array arguments — directory names with shell metacharacters are no longer interpreted.
+
+### Added
+
+- New security test suite: `tests/security/test-security-audit.sh` with 12 static analysis checks:
+  1. No Python string interpolation in hooks
+  2. No eval/exec in hooks (except `source lib.sh`)
+  3. No hardcoded URLs (except allowlist)
+  4. No network requests in hooks (offline-only)
+  5. No unsafe /tmp operations
+  6. No obfuscated code (base64 encode/decode)
+  7. Skills don't instruct download-and-execute
+  8. Templates have no insecure defaults
+  9. Hooks produce valid JSON on error
+  10. No secrets patterns in tracked code
+  11. Hook scripts have safe permissions
+  12. Zero external dependencies
+- Pre-push validation now runs 8 checks (was 7)
+- Test suites: 14 (was 13)
+
+### Audit Results
+
+- **Skills (64):** Clean — no dangerous instructions, no hardcoded secrets, no prompt injection
+- **Templates (8):** Clean — secure defaults, input validation, no hardcoded credentials
+- **Agents (6), Commands (7), Adapters (5), Presets (3):** Clean
+- **Hooks (6):** 6 injection sites fixed, TOCTOU fixed
+- **CLI (1):** Command injection fixed
+- **Supply chain:** Zero dependencies, no lifecycle scripts
+- **Site:** No XSS vectors, safe DOM manipulation
+
 ## v1.4.0 — LLM Guardrails
 
 **Released:** April 5, 2026

@@ -21,14 +21,15 @@ parse_json_field() {
 
   # Try python3 (handles escaped quotes)
   if command -v python3 &>/dev/null; then
-    result=$(printf '%s' "$input" | python3 -c "
-import json, sys
+    result=$(printf '%s' "$input" | _SW_FIELD="$field" python3 -c '
+import json, sys, os
 try:
     d = json.loads(sys.stdin.read())
-    v = d.get('tool_input', d).get('$field', '')
-    print(v, end='')
+    f = os.environ["_SW_FIELD"]
+    v = d.get("tool_input", d).get(f, "")
+    print(v, end="")
 except: pass
-" 2>/dev/null || true)
+' 2>/dev/null || true)
     if [ -n "$result" ]; then
       printf '%s' "$result"
       return
@@ -111,15 +112,15 @@ read_config() {
   if command -v jq &>/dev/null; then
     jq -r ".$key_path // empty" "$config_file" 2>/dev/null || true
   elif command -v python3 &>/dev/null; then
-    python3 -c "
-import json, functools
+    _SW_CF="$config_file" _SW_KP="$key_path" python3 -c '
+import json, functools, os
 try:
-    d = json.load(open('$config_file'))
-    keys = '$key_path'.split('.')
+    d = json.load(open(os.environ["_SW_CF"]))
+    keys = os.environ["_SW_KP"].split(".")
     v = functools.reduce(lambda a,k: a[k], keys, d)
-    print(v if v is not None else '', end='')
+    print(v if v is not None else "", end="")
 except: pass
-" 2>/dev/null || true
+' 2>/dev/null || true
   fi
 }
 
@@ -207,7 +208,11 @@ sw_transparency_enabled() {
     if command -v jq &>/dev/null; then
       cfg_val=$(jq -r '.transparency' "$config_file" 2>/dev/null || true)
     elif command -v python3 &>/dev/null; then
-      cfg_val=$(python3 -c "import json; print(json.load(open('$config_file')).get('transparency',''))" 2>/dev/null || true)
+      cfg_val=$(_SW_CF="$config_file" python3 -c '
+import json, os
+try: print(json.load(open(os.environ["_SW_CF"])).get("transparency",""))
+except: pass
+' 2>/dev/null || true)
     fi
     [ "$cfg_val" = "false" ] && return 1
   fi

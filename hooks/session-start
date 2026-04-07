@@ -22,7 +22,11 @@ PROJECT_ROOT="$(timeout 3 git rev-parse --show-toplevel 2>/dev/null || pwd)"
 debug_log "session-start" "Starting. PROJECT_ROOT=$PROJECT_ROOT"
 
 # --- Idempotency: use PPID (Claude Code process) not $$ (hook process) ---
-MARKER_FILE="/tmp/shipworthy-session-$(echo "$PROJECT_ROOT" | tr '/' '_')-${PPID:-$$}"
+# Use user-owned directory (not world-writable /tmp) to prevent symlink attacks
+MARKER_DIR="${HOME}/.shipworthy/sessions"
+mkdir -p "$MARKER_DIR" 2>/dev/null || true
+MARKER_NAME="session-$(printf '%s' "$PROJECT_ROOT" | shasum -a 256 | cut -c1-16)-${PPID:-$$}"
+MARKER_FILE="$MARKER_DIR/$MARKER_NAME"
 # Allow force reload via env var
 if [ -f "$MARKER_FILE" ] && [ "${SHIPWORTHY_FORCE_RELOAD:-0}" != "1" ]; then
   sw_log info session-start "Context already loaded (session reuse)"
@@ -113,7 +117,11 @@ sw_log info session-start "Tier: $(echo "$TIER" | tr '[:lower:]' '[:upper:]')"
 if [ -n "$PRESET_NAME" ]; then
   PRESET_FILE="$PLUGIN_ROOT/presets/${PRESET_NAME}.json"
   if [ -f "$PRESET_FILE" ]; then
-    PRESET_TIER=$(python3 -c "import json; d=json.load(open('$PRESET_FILE')); print(d.get('tier',''))" 2>/dev/null || true)
+    PRESET_TIER=$(_SW_PF="$PRESET_FILE" python3 -c '
+import json, os
+try: print(json.load(open(os.environ["_SW_PF"])).get("tier",""), end="")
+except: pass
+' 2>/dev/null || true)
     if [ -n "$PRESET_TIER" ]; then
       TIER="$PRESET_TIER"
     fi
@@ -244,8 +252,16 @@ if [ -n "$PRESET_NAME" ]; then
   sw_log info session-start "Preset: $PRESET_NAME"
   PRESET_FILE="$PLUGIN_ROOT/presets/${PRESET_NAME}.json"
   if [ -f "$PRESET_FILE" ]; then
-    SKIP_SKILLS=$(python3 -c "import json; d=json.load(open('$PRESET_FILE')); print(', '.join(d.get('skip_skills',[])))" 2>/dev/null || true)
-    ACTIVE_CATS=$(python3 -c "import json; d=json.load(open('$PRESET_FILE')); print(', '.join(d.get('active_categories',[])))" 2>/dev/null || true)
+    SKIP_SKILLS=$(_SW_PF="$PRESET_FILE" python3 -c '
+import json, os
+try: print(", ".join(json.load(open(os.environ["_SW_PF"])).get("skip_skills",[])), end="")
+except: pass
+' 2>/dev/null || true)
+    ACTIVE_CATS=$(_SW_PF="$PRESET_FILE" python3 -c '
+import json, os
+try: print(", ".join(json.load(open(os.environ["_SW_PF"])).get("active_categories",[])), end="")
+except: pass
+' 2>/dev/null || true)
     CONTEXT="$CONTEXT
 
 ---
@@ -633,9 +649,9 @@ sw_banner "$TIER" "$PROJECT_HEALTH"
 ESCAPED_CONTEXT=$(escape_json "$CONTEXT")
 
 # --- Mark session as initialized ---
-touch "$MARKER_FILE"
-# Clean up marker file after 24 hours (background, non-blocking)
-(sleep 86400 && rm -f "$MARKER_FILE" 2>/dev/null) &>/dev/null &
+printf '%s\n' "$(date +%s)" > "$MARKER_FILE" 2>/dev/null || true
+# Clean up stale markers older than 24 hours (non-blocking)
+find "$MARKER_DIR" -maxdepth 1 -name "session-*" -mtime +1 -delete 2>/dev/null &
 
 # --- Output for Claude Code ---
 cat <<HOOKEOF

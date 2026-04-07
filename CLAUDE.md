@@ -1,8 +1,12 @@
-# CLAUDE.md — Shipworthy
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+# Shipworthy
 
 ## What This Is
 
-Shipworthy is an open-source Claude Code plugin that enforces production engineering practices across AI coding sessions. v1.4.0 with 64 skills, 6 hooks, 6 agents, 8 templates, 5 adapters, 3 presets, 7 commands.
+Shipworthy is an open-source Claude Code plugin that enforces production engineering practices across AI coding sessions. v1.4.1 with 64 skills, 6 hooks, 6 agents, 8 templates, 5 adapters, 3 presets, 7 commands.
 
 ## Repository Structure
 
@@ -34,11 +38,12 @@ adapters/            5 multi-agent adapters: cursor, copilot, codex, windsurf, g
 presets/             3 config presets: startup.json, agency.json, enterprise.json
 extensions/          Domain-specific extensions: e-commerce, fintech, healthcare
 bin/shipworthy.cjs   CLI entry point (npx shipworthy init)
-tests/               Test suites (11 suites, all passing)
+tests/               Test suites (14 suites, all passing)
   hooks/             Hook tests: test-session-start, test-pre-tool-use, test-post-tool-use, test-transparency
   skills/            Skill tests: test-skill-frontmatter, test-cso-format, test-cross-references, test-skill-routing, test-skill-quality, test-transparency-instructions
+  security/          Security audit: test-security-audit (12 static analysis checks)
   run-all-tests.sh   Master test runner (auto-discovers test-*.sh files)
-  validate-all.sh    Pre-push validation (7 checks, called by pre-push-validate hook)
+  validate-all.sh    Pre-push validation (8 checks, called by pre-push-validate hook)
 site/                Landing page (GitHub Pages): index.html, og-image.html
 docs/                Documentation site: getting-started/, guides/, reference/, blog/
 benchmarks/          Reproducible benchmark suite with scoring scripts
@@ -77,11 +82,21 @@ benchmarks/          Reproducible benchmark suite with scoring scripts
 ## Running Tests
 
 ```bash
-bash tests/run-all-tests.sh           # all 11 suites
-bash tests/hooks/test-transparency.sh  # transparency shell tests only
-bash tests/skills/test-transparency-instructions.sh  # instruction track tests
-bash tests/validate-all.sh             # pre-push validation (7 checks)
+bash tests/run-all-tests.sh           # all 14 suites
+bash tests/hooks/test-transparency.sh  # single suite (any test-*.sh file works)
+bash tests/validate-all.sh             # pre-push validation (8 checks)
 ```
+
+## Running Benchmarks
+
+```bash
+bash benchmarks/run-benchmark.sh --task 1              # single task, both modes
+bash benchmarks/run-benchmark.sh --task 1 --with-plugin # single task, with plugin only
+bash benchmarks/run-benchmark.sh --all                  # all tasks, both modes
+bash benchmarks/score.sh /path/to/project               # score any project directory
+```
+
+Benchmark prompts are written in **non-technical founder language** (e.g., "I need a to-do list feature") — not developer jargon. The scorer (`score.sh`) checks 25 automated criteria across build, testing, code quality, validation, architecture, and security.
 
 ## Common Workflows
 
@@ -115,4 +130,4 @@ bash tests/validate-all.sh             # pre-push validation (7 checks)
 
 ## Version
 
-v1.4.0 — LLM Guardrails (April 5, 2026)
+v1.4.1 — Security Hardening (April 6, 2026)

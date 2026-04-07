@@ -1,6 +1,6 @@
 {
   "project": "/Users/vimalkumar/engineering-with-vibes/benchmarks/results/01-rest-api-crud-with",
-  "timestamp": "2026-03-26T04:36:18Z",
+  "timestamp": "2026-04-06T04:36:55Z",
   "language": "node",
   "checks": {
     "tests_exist": { "pass": true, "points": 3, "max_points": 3, "details": "Found 1 test file(s)" },
@@ -12,14 +12,14 @@
     "error_handling": { "pass": true, "points": 2, "max_points": 2, "details": "Error middleware pattern found" },
     "typescript_strict": { "pass": true, "points": 2, "max_points": 2, "details": "tsconfig.json has strict: true" },
     "no_any_types": { "pass": true, "points": 1, "max_points": 1, "details": "No : any types found in .ts files" },
-    "http_status_codes": { "pass": true, "points": 2, "max_points": 2, "details": "Found status codes: 201=1 400=2 404=1 occurrences" },
-    "env_variables": { "pass": true, "points": 1, "max_points": 1, "details": "Found 1 process.env reference(s)" },
+    "http_status_codes": { "pass": true, "points": 2, "max_points": 2, "details": "Found status codes: 201=1 400=1 404=1 occurrences" },
+    "env_variables": { "pass": true, "points": 1, "max_points": 1, "details": "Found 4 process.env reference(s)" },
     "test_coverage": { "pass": false, "points": 0, "max_points": 1, "details": "Coverage tooling not configured or not available" },
-    "lint_passes": { "pass": false, "points": 0, "max_points": 1, "details": "No linter configured" },
+    "lint_passes": { "pass": true, "points": 1, "max_points": 1, "details": "ESLint configured and passes" },
     "no_circular_imports": { "pass": true, "points": 1, "max_points": 1, "details": "No obvious circular imports detected" },
     "lock_file_present": { "pass": true, "points": 1, "max_points": 1, "details": "package-lock.json present" }
   },
-  "total_points": 22,
+  "total_points": 23,
   "max_points": 25,
   "grade": "A"
 }
