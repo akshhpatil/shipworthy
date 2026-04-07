@@ -2,7 +2,7 @@
 
 ## Prompt
 
-> Add Stripe payment processing. Users should be able to create a checkout session and we need a webhook endpoint to handle payment events.
+> I want customers to be able to pay for my product. They should see a checkout page, enter their card info, and get a confirmation once it goes through. I need to know when a payment works so I can give them access. Use Stripe.
 
 This prompt is given identically for both the **with-plugin** and **without-plugin** runs. No additional guidance or follow-up prompts are allowed.
 

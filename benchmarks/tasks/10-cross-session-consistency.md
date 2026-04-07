@@ -8,13 +8,13 @@ The key question: **Does the second session produce code that looks like it was 
 
 ## Prompt (Session 1)
 
-> Build a user profile API with GET/PUT endpoints following REST conventions.
+> I need a user profile page where people can see their info and update things like their name and email.
 
 This prompt is given first, in a fresh Claude Code session. The agent builds the user profile API from scratch on top of the starter project.
 
 ## Prompt (Session 2)
 
-> Add an orders API with GET/POST/DELETE endpoints.
+> Now I need to add orders — people should be able to place an order, see their past orders, and cancel one if they need to.
 
 This prompt is given in a **new** Claude Code session, starting from the state left by Session 1. The agent must build the orders API on top of whatever Session 1 produced.
 

@@ -50,6 +50,7 @@ run_test_dir() {
 run_test_dir "hooks"
 run_test_dir "skills"
 run_test_dir "structure"
+run_test_dir "security"
 
 # Overall summary
 echo "============================================"

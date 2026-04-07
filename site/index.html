@@ -3,657 +3,671 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shipworthy — Production Engineering Guardrails for AI Coding</title>
-  <meta name="description" content="Open source Claude Code plugin. 52 invisible engineering skills turn vibe coding into production-ready software.">
+  <title>Shipworthy — Engineering Guardrails for AI Coding Agents</title>
+  <meta name="description" content="Open source Claude Code plugin. 64 security-audited engineering skills with automated context intelligence turn vibe coding into production-ready software. Zero config. Zero dependencies.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg-0: #020209;
-      --bg-1: #07070f;
-      --bg-2: #0d0d18;
-      --bg-3: #131320;
-      --bg-card: rgba(15, 15, 28, 0.7);
-      --bg-card-solid: #0f0f1c;
-      --border: rgba(255, 255, 255, 0.06);
-      --border-hover: rgba(255, 255, 255, 0.12);
-      --text-1: #f0f0f8;
-      --text-2: #a0a0bc;
-      --text-3: #5c5c78;
-      --purple: #8b5cf6;
-      --purple-light: #a78bfa;
-      --purple-glow: rgba(139, 92, 246, 0.15);
-      --blue: #3b82f6;
-      --cyan: #06b6d4;
-      --green: #10b981;
-      --green-glow: rgba(16, 185, 129, 0.12);
-      --red: #ef4444;
-      --red-glow: rgba(239, 68, 68, 0.1);
-      --orange: #f59e0b;
-      --font: 'Inter', system-ui, sans-serif;
-      --mono: 'JetBrains Mono', 'Fira Code', monospace;
+      --bg:          #0a0a0a;
+      --bg-subtle:   #111111;
+      --bg-elevated: #181818;
+      --border:      #222222;
+      --border-hover:#3a3a3a;
+      --text-1:      #ededed;
+      --text-2:      #888888;
+      --text-3:      #555555;
+      --green:       #22c55e;
+      --green-dim:   #166534;
+      --red:         #ef4444;
+      --font:        'Inter', system-ui, -apple-system, sans-serif;
+      --mono:        'JetBrains Mono', 'Fira Code', monospace;
     }
 
     html { scroll-behavior: smooth; }
-    body { font-family: var(--font); background: var(--bg-0); color: var(--text-1); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
-
-    ::selection { background: var(--purple); color: #fff; }
-
+    body {
+      font-family: var(--font); background: var(--bg); color: var(--text-1);
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    ::selection { background: var(--green); color: #000; }
     a { color: inherit; text-decoration: none; }
-    .container { max-width: 1180px; margin: 0 auto; padding: 0 1.5rem; }
 
-    /* ============ ANIMATED GRID BACKGROUND ============ */
-    .grid-bg {
-      position: fixed; inset: 0; z-index: 0; pointer-events: none;
-      background-image:
-        linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
-      background-size: 60px 60px;
-      mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 20%, transparent 70%);
+    /* ---- Scroll progress ---- */
+    .scroll-progress {
+      position: fixed; top: 0; left: 0; height: 2px; background: var(--green);
+      width: 0%; z-index: 200; transition: none;
     }
 
-    /* ============ SCROLL REVEAL ============ */
-    .reveal {
-      opacity: 0; transform: translateY(40px);
-      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-    .reveal-delay-1 { transition-delay: 0.1s; }
-    .reveal-delay-2 { transition-delay: 0.2s; }
-    .reveal-delay-3 { transition-delay: 0.3s; }
-
-    /* ============ NAV ============ */
+    /* ---- Nav ---- */
     .nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-      padding: 0.75rem 0; transition: all 0.3s;
+      position: fixed; top: 2px; left: 0; right: 0; z-index: 100;
+      padding: 0.875rem 0; background: transparent;
+      transition: background 0.3s, border-color 0.3s;
     }
-    .nav.scrolled { background: rgba(2, 2, 9, 0.85); backdrop-filter: blur(24px) saturate(1.2); border-bottom: 1px solid var(--border); }
-    .nav .container { display: flex; align-items: center; justify-content: space-between; }
-    .nav-brand { display: flex; align-items: center; gap: 0.6rem; font-weight: 800; font-size: 1.15rem; letter-spacing: -0.02em; }
-    .nav-brand svg { width: 28px; height: 28px; }
-    .nav-links { display: flex; align-items: center; gap: 1.75rem; }
-    .nav-links a { font-size: 0.82rem; color: var(--text-3); font-weight: 500; transition: color 0.2s; letter-spacing: 0.01em; }
+    .nav.scrolled { background: rgba(10,10,10,0.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+    .nav .inner { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; }
+    .nav-brand { font-weight: 700; font-size: 0.9rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-2); }
+    .nav-brand:hover { color: var(--text-1); }
+    .nav-links { display: flex; align-items: center; gap: 2rem; }
+    .nav-links a { font-size: 0.75rem; color: var(--text-3); font-weight: 500; letter-spacing: 0.03em; text-transform: uppercase; transition: color 0.2s; }
     .nav-links a:hover { color: var(--text-1); }
-    .btn-gh {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      background: rgba(255,255,255,0.06); border: 1px solid var(--border);
-      padding: 0.45rem 1rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600;
-      color: var(--text-2); transition: all 0.2s;
-    }
-    .btn-gh:hover { background: rgba(255,255,255,0.1); color: var(--text-1); border-color: var(--border-hover); }
-    .btn-gh svg { width: 16px; height: 16px; }
 
-    /* ============ HERO ============ */
-    .hero { min-height: 100vh; display: flex; align-items: center; position: relative; padding: 6rem 0; overflow: hidden; }
-
-    /* Gradient orbs */
-    .orb {
-      position: absolute; border-radius: 50%; filter: blur(100px); pointer-events: none;
-      animation: float 20s ease-in-out infinite;
+    /* ---- Hero ---- */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      justify-content: center; padding: 8rem 2rem 4rem;
+      max-width: 1200px; margin: 0 auto;
     }
-    .orb-1 { width: 600px; height: 600px; top: -15%; left: -10%; background: rgba(139, 92, 246, 0.08); animation-delay: 0s; }
-    .orb-2 { width: 500px; height: 500px; top: 10%; right: -15%; background: rgba(6, 182, 212, 0.06); animation-delay: -7s; }
-    .orb-3 { width: 400px; height: 400px; bottom: -10%; left: 30%; background: rgba(16, 185, 129, 0.05); animation-delay: -14s; }
-    @keyframes float {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(30px, -20px) scale(1.05); }
-      66% { transform: translate(-20px, 15px) scale(0.95); }
+    .hero-label {
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--green); margin-bottom: 2rem;
+      display: flex; align-items: center; gap: 0.75rem;
     }
-
-    .hero-inner { position: relative; z-index: 2; max-width: 760px; }
-
-    .hero-pill {
-      display: inline-flex; align-items: center; gap: 0.6rem;
-      padding: 0.35rem 0.9rem 0.35rem 0.5rem; border-radius: 100px;
-      background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.18);
-      font-size: 0.75rem; font-weight: 500; color: var(--purple-light);
-      margin-bottom: 2rem;
+    .hero-label::before {
+      content: ''; width: 32px; height: 1px; background: var(--green);
     }
-    .hero-pill .pulse-dot {
-      width: 8px; height: 8px; border-radius: 50%; background: var(--green);
-      position: relative;
-    }
-    .hero-pill .pulse-dot::after {
-      content: ''; position: absolute; inset: -3px; border-radius: 50%;
-      border: 1px solid var(--green); animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; opacity: 0;
-    }
-    @keyframes ping { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(2.2); opacity: 0; } }
-
     .hero h1 {
-      font-size: clamp(2.8rem, 6.5vw, 5rem); font-weight: 900; letter-spacing: -0.045em;
-      line-height: 1.05; margin-bottom: 1.5rem;
+      font-size: clamp(3rem, 7vw, 6rem); font-weight: 800;
+      letter-spacing: -0.02em; line-height: 0.95;
+      text-transform: uppercase; color: var(--text-1);
+      margin-bottom: 2.5rem;
     }
-    .hero h1 .glow-text {
-      background: linear-gradient(135deg, var(--purple-light) 0%, var(--cyan) 50%, var(--green) 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-size: 200% auto;
-      animation: shimmer 8s linear infinite;
+    .hero h1 .line-dim { color: var(--text-3); }
+    .hero-bottom {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: 3rem; margin-top: 1rem;
     }
-    @keyframes shimmer { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+    .hero-desc {
+      font-size: 1rem; line-height: 1.7; color: var(--text-2);
+      max-width: 420px;
+    }
+    .hero-install {
+      display: flex; flex-direction: column; align-items: flex-end; gap: 0.75rem;
+    }
+    .install-block {
+      display: flex; align-items: center; gap: 1rem;
+      background: var(--bg-subtle); border: 1px solid var(--border);
+      border-radius: 4px; padding: 0.75rem 1rem;
+      font-family: var(--mono); font-size: 0.85rem;
+    }
+    .install-block code { color: var(--text-1); }
+    .copy-btn {
+      background: none; border: none; color: var(--text-3);
+      font-family: var(--font); font-size: 0.7rem; font-weight: 600;
+      cursor: pointer; transition: color 0.15s; padding: 0;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .copy-btn:hover { color: var(--text-1); }
+    .hero-gh {
+      font-size: 0.75rem; color: var(--text-3); font-weight: 500;
+      transition: color 0.15s;
+    }
+    .hero-gh:hover { color: var(--text-1); }
 
-    .hero-sub {
-      font-size: 1.15rem; line-height: 1.65; color: var(--text-2); margin-bottom: 2.5rem;
-      max-width: 560px; font-weight: 400;
+    /* ---- Marquee ---- */
+    .marquee-wrap {
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      overflow: hidden; padding: 1rem 0;
     }
-    .hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 3.5rem; }
-
-    .btn-main {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      padding: 0.8rem 1.75rem; border-radius: 10px; font-weight: 700;
-      font-size: 0.9rem; border: none; cursor: pointer; transition: all 0.25s;
-      background: var(--purple); color: #fff;
-      box-shadow: 0 0 0 1px rgba(139,92,246,0.3), 0 4px 24px rgba(139,92,246,0.25), inset 0 1px 0 rgba(255,255,255,0.1);
+    .marquee {
+      display: flex; gap: 3rem; animation: marquee 20s linear infinite;
+      width: max-content;
     }
-    .btn-main:hover { transform: translateY(-2px); box-shadow: 0 0 0 1px rgba(139,92,246,0.5), 0 8px 40px rgba(139,92,246,0.35), inset 0 1px 0 rgba(255,255,255,0.15); }
-    .btn-main svg { width: 18px; height: 18px; }
-
-    .btn-outline {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      padding: 0.8rem 1.75rem; border-radius: 10px; font-weight: 600;
-      font-size: 0.9rem; border: 1px solid var(--border-hover); cursor: pointer;
-      color: var(--text-2); background: transparent; transition: all 0.25s;
+    .marquee span {
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--text-3); white-space: nowrap;
     }
-    .btn-outline:hover { border-color: var(--purple); color: var(--text-1); background: var(--purple-glow); }
+    .marquee .dot { color: var(--border-hover); }
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
 
-    .hero-terminal {
-      background: var(--bg-card-solid); border: 1px solid var(--border);
-      border-radius: 14px; overflow: hidden; max-width: 520px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03);
+    /* ---- Section core ---- */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+    .section { padding: 8rem 0; }
+    .sec-label {
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em;
+      font-weight: 600; color: var(--text-3); margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .sec-label::before { content: ''; width: 24px; height: 1px; background: var(--text-3); }
+    .sec-title {
+      font-size: clamp(1.75rem, 3.5vw, 2.75rem); font-weight: 700;
+      letter-spacing: -0.025em; line-height: 1.1; margin-bottom: 1.25rem;
+    }
+    .sec-desc {
+      color: var(--text-2); font-size: 0.95rem; line-height: 1.7;
+      max-width: 520px; margin-bottom: 3.5rem;
+    }
+
+    /* ---- Scroll-reveal animations ---- */
+    .sr { opacity: 0; transform: translateY(24px); transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1); }
+    .sr.visible { opacity: 1; transform: translateY(0); }
+    .sr-left { opacity: 0; transform: translateX(-40px); transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1); }
+    .sr-left.visible { opacity: 1; transform: translateX(0); }
+    .sr-right { opacity: 0; transform: translateX(40px); transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1); }
+    .sr-right.visible { opacity: 1; transform: translateX(0); }
+    .sr-scale { opacity: 0; transform: scale(0.95); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .sr-scale.visible { opacity: 1; transform: scale(1); }
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
+    .delay-3 { transition-delay: 0.3s; }
+    .delay-4 { transition-delay: 0.4s; }
+
+    /* ---- Benchmark ---- */
+    .bench-section { background: var(--bg-subtle); }
+    .bench-split {
+      display: grid; grid-template-columns: 1fr; gap: 0;
+    }
+    .bench-col {
+      padding: 3rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .bench-col:last-child { border-bottom: none; }
+    .bench-col-header {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);
+    }
+    .bench-col-title { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); }
+    .bench-score {
+      font-family: var(--mono); font-size: 2.5rem; font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+    .bench-score-sub { font-size: 0.8rem; color: var(--text-3); font-weight: 500; margin-left: 0.5rem; }
+    .score-fail { color: var(--red); }
+    .score-pass { color: var(--green); }
+    .bench-rows { display: flex; flex-direction: column; gap: 0; }
+    .bench-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.65rem 0; border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+    .bench-row:last-child { border-bottom: none; }
+    .bench-row-label { color: var(--text-2); font-weight: 500; }
+    .bench-row-val { font-family: var(--mono); font-size: 0.8rem; }
+    .bench-col.fail .bench-row-val { color: var(--text-3); }
+    .bench-col.pass .bench-row-val { color: var(--text-1); }
+    .bench-note {
+      padding-top: 2rem; font-size: 0.8rem; color: var(--text-3); line-height: 1.6;
+    }
+    .bench-note a { text-decoration: underline; text-underline-offset: 2px; }
+    .bench-note a:hover { color: var(--text-2); }
+
+    /* ---- How it works — horizontal scroll ---- */
+    .how-section { overflow: hidden; }
+    .how-track {
+      display: flex; gap: 2px;
+    }
+    .how-card {
+      flex: 0 0 100%; padding: 3rem 2rem;
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .how-card:last-child { border-right: none; }
+    .how-num {
+      font-family: var(--mono); font-size: 0.7rem; font-weight: 500;
+      color: var(--text-3); letter-spacing: 0.05em; margin-bottom: 1.5rem;
+    }
+    .how-card h3 {
+      font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem;
+      letter-spacing: -0.01em;
+    }
+    .how-card p {
+      font-size: 0.9rem; color: var(--text-2); line-height: 1.7; max-width: 400px;
+    }
+    .how-nav {
+      display: flex; gap: 0.5rem; margin-top: 2rem;
+      padding-top: 2rem; border-top: 1px solid var(--border);
+    }
+    .how-dot {
+      width: 32px; height: 3px; background: var(--border); border: none;
+      cursor: pointer; transition: background 0.3s;
+    }
+    .how-dot.active { background: var(--text-1); }
+
+    /* ---- Terminal ---- */
+    .terminal {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 6px; overflow: hidden; margin-top: 3rem;
     }
     .term-bar {
-      display: flex; align-items: center; padding: 0.65rem 1rem; gap: 6px;
-      background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 6px;
+      padding: 0.6rem 0.875rem; border-bottom: 1px solid var(--border);
     }
-    .term-dot { width: 10px; height: 10px; border-radius: 50%; }
-    .term-dot.r { background: #ff5f56; } .term-dot.y { background: #ffbd2e; } .term-dot.g { background: #27c93f; }
-    .term-title { margin-left: auto; font-size: 0.7rem; color: var(--text-3); font-family: var(--mono); }
-    .term-body { padding: 1.25rem; font-family: var(--mono); font-size: 0.82rem; line-height: 2; }
-    .term-line { display: flex; gap: 0.5rem; }
-    .t-prompt { color: var(--green); user-select: none; }
-    .t-cmd { color: var(--text-1); }
-    .t-comment { color: var(--text-3); }
-    .t-output { color: var(--purple-light); }
-    .t-cursor { display: inline-block; width: 8px; height: 16px; background: var(--purple); animation: blink 1.2s step-end infinite; vertical-align: text-bottom; margin-left: 2px; }
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    .term-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-hover); }
+    .term-title { margin-left: auto; font-size: 0.65rem; color: var(--text-3); font-family: var(--mono); }
+    .term-body {
+      padding: 1.25rem; font-family: var(--mono); font-size: 0.78rem;
+      line-height: 1.9; color: var(--text-2);
+    }
+    .t-green { color: var(--green); }
+    .t-dim { color: var(--text-3); }
+    .t-w { color: var(--text-1); font-weight: 500; }
 
-    /* ============ LOGOS / STATS ============ */
-    .metrics {
-      padding: 4rem 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-      background: linear-gradient(to bottom, var(--bg-1), var(--bg-0));
-    }
-    .metrics-grid {
-      display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.5rem; text-align: center;
-    }
-    @media (max-width: 768px) { .metrics-grid { grid-template-columns: repeat(3, 1fr); } }
-
-    .metric { padding: 1rem 0; }
-    .metric-val {
-      font-size: 2.5rem; font-weight: 900; letter-spacing: -0.03em;
-      background: linear-gradient(135deg, var(--text-1), var(--purple-light));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .metric-label { font-size: 0.7rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 0.3rem; font-weight: 500; }
-
-    /* ============ SECTION STYLES ============ */
-    .section { padding: 7rem 0; position: relative; }
-    .section-alt { background: var(--bg-1); }
-    .sec-label {
-      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.18em; font-weight: 600;
-      color: var(--purple-light); margin-bottom: 0.75rem;
-    }
-    .sec-title {
-      font-size: clamp(1.8rem, 3.5vw, 2.75rem); font-weight: 800; letter-spacing: -0.035em;
-      line-height: 1.15; margin-bottom: 1rem; max-width: 650px;
-    }
-    .sec-desc { color: var(--text-2); font-size: 1.05rem; max-width: 540px; line-height: 1.7; margin-bottom: 3.5rem; }
-    .sec-center { text-align: center; }
-    .sec-center .sec-title, .sec-center .sec-desc { margin-left: auto; margin-right: auto; }
-
-    /* ============ BENCHMARK ============ */
-    .bench-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-    @media (max-width: 768px) { .bench-grid { grid-template-columns: 1fr; } }
-
-    .bench-card {
-      position: relative; border-radius: 20px; padding: 2.5rem; overflow: hidden;
-      background: var(--bg-card); backdrop-filter: blur(12px);
+    /* ---- Capabilities — staggered grid ---- */
+    .cap-grid {
+      display: grid; grid-template-columns: 1fr; gap: 1px;
+      background: var(--border);
       border: 1px solid var(--border);
-      transition: transform 0.3s, box-shadow 0.3s;
     }
-    .bench-card:hover { transform: translateY(-4px); }
-
-    /* Glow border */
-    .bench-card::before {
-      content: ''; position: absolute; inset: 0; border-radius: 20px; padding: 1px;
-      background: linear-gradient(135deg, transparent 40%, var(--border-hover));
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
+    .cap-cell {
+      background: var(--bg); padding: 2.5rem 2rem;
     }
-
-    .bench-card.fail::before { background: linear-gradient(135deg, transparent 30%, rgba(239,68,68,0.3)); }
-    .bench-card.fail:hover { box-shadow: 0 20px 60px rgba(239,68,68,0.08); }
-    .bench-card.pass::before { background: linear-gradient(135deg, transparent 30%, rgba(16,185,129,0.3)); }
-    .bench-card.pass:hover { box-shadow: 0 20px 60px rgba(16,185,129,0.08); }
-
-    .bench-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
-    .bench-label { font-size: 0.8rem; font-weight: 600; color: var(--text-2); }
-    .bench-badge {
-      font-family: var(--mono); font-size: 0.7rem; font-weight: 700;
-      padding: 0.2rem 0.6rem; border-radius: 6px;
+    .cap-cell h3 {
+      font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; margin-bottom: 0.75rem; color: var(--text-1);
     }
-    .bench-card.fail .bench-badge { background: var(--red-glow); color: var(--red); }
-    .bench-card.pass .bench-badge { background: var(--green-glow); color: var(--green); }
-
-    .bench-score { font-size: 4rem; font-weight: 900; letter-spacing: -0.04em; line-height: 1; margin-bottom: 0.3rem; }
-    .bench-card.fail .bench-score { color: var(--red); }
-    .bench-card.pass .bench-score { color: var(--green); }
-    .bench-sub { font-size: 0.8rem; color: var(--text-3); margin-bottom: 2rem; font-family: var(--mono); }
-
-    .bench-checks { display: flex; flex-direction: column; gap: 0.55rem; }
-    .bench-check { display: flex; align-items: center; gap: 0.6rem; font-size: 0.82rem; color: var(--text-2); }
-    .chk-icon { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.65rem; font-weight: 700; }
-    .chk-pass { background: var(--green-glow); color: var(--green); }
-    .chk-fail { background: var(--red-glow); color: var(--red); }
-
-    /* ============ FEATURES ============ */
-    .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
-    @media (max-width: 900px) { .feat-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 600px) { .feat-grid { grid-template-columns: 1fr; } }
-
-    .feat-card {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
-      padding: 2rem; transition: all 0.35s; position: relative; overflow: hidden;
-    }
-    .feat-card::after {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--border-hover), transparent);
-      opacity: 0; transition: opacity 0.35s;
-    }
-    .feat-card:hover { border-color: var(--border-hover); transform: translateY(-3px); box-shadow: 0 16px 48px rgba(0,0,0,0.3); }
-    .feat-card:hover::after { opacity: 1; }
-
-    .feat-icon {
-      width: 48px; height: 48px; border-radius: 14px; display: flex;
-      align-items: center; justify-content: center; margin-bottom: 1.25rem;
-      font-size: 1.35rem; position: relative;
-    }
-    .feat-icon::after {
-      content: ''; position: absolute; inset: -1px; border-radius: 14px;
-      background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.08));
-      pointer-events: none;
-    }
-    .fi-purple { background: rgba(139,92,246,0.1); }
-    .fi-green { background: rgba(16,185,129,0.1); }
-    .fi-red { background: rgba(239,68,68,0.08); }
-    .fi-orange { background: rgba(245,158,11,0.1); }
-    .fi-cyan { background: rgba(6,182,212,0.1); }
-    .fi-blue { background: rgba(59,130,246,0.1); }
-
-    .feat-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.01em; }
-    .feat-card p { font-size: 0.85rem; color: var(--text-2); line-height: 1.6; }
-
-    /* ============ FLOW STEPS ============ */
-    .flow { position: relative; margin-top: 3rem; }
-    .flow-line {
-      position: absolute; left: 31px; top: 50px; bottom: 50px; width: 2px;
-      background: linear-gradient(to bottom, var(--purple), var(--cyan), var(--green));
-      opacity: 0.4;
-    }
-    @media (max-width: 600px) { .flow-line { left: 23px; } }
-
-    .flow-step { display: flex; gap: 1.75rem; padding: 1.75rem 0; position: relative; z-index: 1; }
-    .flow-num {
-      width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0;
-      background: var(--bg-card-solid); border: 2px solid rgba(139,92,246,0.3);
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 1.1rem; color: var(--purple-light);
-      box-shadow: 0 0 20px rgba(139,92,246,0.1);
-    }
-    .flow-step:hover .flow-num { border-color: var(--purple); box-shadow: 0 0 30px rgba(139,92,246,0.2); }
-    .flow-text h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.35rem; }
-    .flow-text p { color: var(--text-2); font-size: 0.9rem; line-height: 1.6; max-width: 500px; }
-
-    /* ============ SKILLS SECTION ============ */
-    .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; }
-
-    .skill-pill {
-      display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1.15rem;
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
-      transition: all 0.2s;
-    }
-    .skill-pill:hover { border-color: var(--border-hover); background: rgba(20,20,35,0.8); }
-    .skill-num { font-family: var(--mono); font-weight: 700; font-size: 1.3rem; color: var(--purple-light); min-width: 28px; }
-    .skill-info .skill-name { font-weight: 600; font-size: 0.82rem; }
-    .skill-info .skill-sub { font-size: 0.7rem; color: var(--text-3); margin-top: 0.1rem; }
-
-    /* ============ FLYWHEEL ============ */
-    .wheel { display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap; margin: 3rem auto; }
-    .wheel-node {
-      padding: 1rem 1.5rem; background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 14px; text-align: center; min-width: 140px;
-      transition: all 0.3s;
-    }
-    .wheel-node:hover { border-color: var(--purple); background: var(--purple-glow); transform: scale(1.05); }
-    .wheel-node h4 { font-size: 0.85rem; font-weight: 700; }
-    .wheel-node p { font-size: 0.72rem; color: var(--text-3); margin-top: 0.2rem; }
-    .wheel-arrow { color: var(--purple); font-size: 1.2rem; opacity: 0.5; }
-    @media (max-width: 768px) {
-      .wheel { flex-direction: column; }
-      .wheel-arrow { transform: rotate(90deg); }
+    .cap-cell p {
+      font-size: 0.875rem; color: var(--text-2); line-height: 1.7;
     }
 
-    /* ============ CONTEXT BARS ============ */
-    .ctx-card {
-      max-width: 580px; margin: 2.5rem auto 0; background: var(--bg-card);
-      border: 1px solid var(--border); border-radius: 16px; padding: 2rem;
+    /* ---- Numbers band ---- */
+    .numbers-band {
+      display: grid; grid-template-columns: repeat(5, 1fr);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
     }
-    .ctx-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }
-    .ctx-row:last-child { margin-bottom: 0; }
-    .ctx-label { font-size: 0.78rem; color: var(--text-2); min-width: 100px; font-weight: 500; }
-    .ctx-track { flex: 1; height: 6px; background: rgba(255,255,255,0.04); border-radius: 3px; overflow: hidden; }
-    .ctx-fill { height: 100%; border-radius: 3px; }
-    .ctx-fill.f1 { width: 1%; background: var(--green); box-shadow: 0 0 8px var(--green); }
-    .ctx-fill.f2 { width: 1.7%; background: var(--purple-light); box-shadow: 0 0 8px var(--purple); }
-    .ctx-fill.f3 { width: 3%; background: var(--orange); box-shadow: 0 0 8px var(--orange); }
-    .ctx-pct { font-family: var(--mono); font-size: 0.75rem; color: var(--text-3); min-width: 45px; text-align: right; font-weight: 500; }
+    .num-cell {
+      padding: 2.5rem 1.5rem; text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .num-cell:last-child { border-right: none; }
+    .num-val {
+      font-size: 2rem; font-weight: 700; letter-spacing: -0.02em;
+      color: var(--text-1); font-family: var(--mono);
+    }
+    .num-val.counting { transition: none; }
+    .num-label {
+      font-size: 0.7rem; color: var(--text-3); margin-top: 0.35rem;
+      font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em;
+    }
 
-    /* ============ CTA ============ */
-    .cta { padding: 8rem 0; text-align: center; position: relative; }
-    .cta .orb { position: absolute; width: 500px; height: 500px; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(139,92,246,0.06); border-radius: 50%; filter: blur(120px); }
-    .cta h2 { font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 900; letter-spacing: -0.04em; margin-bottom: 1rem; position: relative; z-index: 1; }
-    .cta .sec-desc { margin-bottom: 2.5rem; position: relative; z-index: 1; }
-    .cta-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
-    .cta-note { margin-top: 2rem; font-size: 0.8rem; color: var(--text-3); position: relative; z-index: 1; }
+    /* ---- Footer ---- */
+    .footer {
+      padding: 4rem 0 2rem; border-top: 1px solid var(--border);
+    }
+    .footer-top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 2rem; margin-bottom: 4rem;
+    }
+    .footer-brand { font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-2); }
+    .footer-cols { display: flex; gap: 4rem; }
+    .footer-col-title {
+      font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--text-3); font-weight: 600; margin-bottom: 0.75rem;
+    }
+    .footer-col a {
+      display: block; font-size: 0.8rem; color: var(--text-2); padding: 0.25rem 0;
+      transition: color 0.15s;
+    }
+    .footer-col a:hover { color: var(--text-1); }
+    .footer-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 2rem; border-top: 1px solid var(--border);
+      font-size: 0.75rem; color: var(--text-3);
+    }
+    .footer-bottom a { text-decoration: underline; text-underline-offset: 2px; }
 
-    /* ============ FOOTER ============ */
-    footer { padding: 2.5rem 0; border-top: 1px solid var(--border); text-align: center; font-size: 0.8rem; color: var(--text-3); }
-    footer a { color: var(--text-2); transition: color 0.2s; }
-    footer a:hover { color: var(--purple-light); }
-    footer .footer-links { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 0.75rem; }
-
-    /* ============ RESPONSIVE ============ */
-    @media (max-width: 768px) {
-      .nav-links { display: none; }
-      .hero { padding: 5rem 0 3rem; }
-      .section { padding: 5rem 0; }
-      .bench-score { font-size: 3rem; }
-      .flow-num { width: 48px; height: 48px; font-size: 0.9rem; }
+    /* ---- Responsive ---- */
+    @media (min-width: 768px) {
+      .bench-split { grid-template-columns: 1fr 1fr; }
+      .bench-col { padding: 3rem; border-bottom: none; }
+      .bench-col:first-child { border-right: 1px solid var(--border); }
+      .cap-grid { grid-template-columns: 1fr 1fr; }
+      .how-card { flex: 0 0 50%; }
+    }
+    @media (min-width: 1024px) {
+      .cap-grid { grid-template-columns: repeat(3, 1fr); }
+      .how-card { flex: 0 0 33.333%; }
+    }
+    @media (max-width: 767px) {
+      .hero h1 { font-size: 2.5rem; }
+      .hero-bottom { flex-direction: column; align-items: flex-start; }
+      .hero-install { align-items: flex-start; }
+      .numbers-band { grid-template-columns: repeat(3, 1fr); }
+      .num-cell:nth-child(4), .num-cell:nth-child(5) { border-top: 1px solid var(--border); }
+      .nav-links { gap: 1rem; }
+      .nav-links a { font-size: 0.65rem; }
+      .footer-top { flex-direction: column; }
+      .footer-cols { gap: 2rem; }
+      .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
+      .bench-score { font-size: 2rem; }
     }
   </style>
 </head>
 <body>
 
-<div class="grid-bg"></div>
+<div class="scroll-progress" id="progress"></div>
 
-<!-- NAV -->
+<!-- Nav -->
 <header class="nav" id="nav">
-  <div class="container">
-    <a href="#" class="nav-brand">
-      <svg viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="url(#g1)" stroke-width="2"/><path d="M9 14.5l3.5 3.5 7-7" stroke="url(#g1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="g1" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#8b5cf6"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs></svg>
-      Shipworthy
-    </a>
-    <div class="nav-links">
-      <a href="#features">Features</a>
-      <a href="#how-it-works">How It Works</a>
+  <div class="inner">
+    <a href="#" class="nav-brand">&#9875; Shipworthy</a>
+    <nav class="nav-links">
       <a href="#benchmark">Benchmark</a>
-      <a href="#skills">Skills</a>
-      <a href="https://github.com/Vimalk0703/shipworthy" class="btn-gh">
-        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-        GitHub
-      </a>
-    </div>
+      <a href="#how">How It Works</a>
+      <a href="#capabilities">Capabilities</a>
+      <a href="https://github.com/Vimalk0703/shipworthy">GitHub</a>
+    </nav>
   </div>
 </header>
 
-<!-- HERO -->
+<!-- Hero -->
 <section class="hero">
-  <div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
-  <div class="container">
-    <div class="hero-inner reveal">
-      <div class="hero-pill"><span class="pulse-dot"></span> Open Source &middot; 52 Skills &middot; Zero Config</div>
-      <h1>Vibe Code.<br><span class="glow-text">Ship Production.</span></h1>
-      <p class="hero-sub">An invisible engineering layer for Claude Code. You describe what you want in plain English. Shipworthy makes sure what gets built is production-ready software.</p>
-      <div class="hero-actions">
-        <a href="https://github.com/Vimalk0703/shipworthy" class="btn-main">
-          <svg viewBox="0 0 16 16" fill="currentColor" width="18" height="18"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-          View on GitHub
-        </a>
-        <a href="#how-it-works" class="btn-outline">See How It Works</a>
+  <div class="hero-label sr">Open Source &middot; Security Audited &middot; Zero Config &middot; Zero Dependencies</div>
+  <h1 class="sr delay-1">THE ENGINEERING LAYER<br><span class="line-dim">FOR AI CODING AGENTS.</span></h1>
+  <div class="hero-bottom">
+    <p class="hero-desc sr delay-2">64 security-audited engineering skills activate invisibly while you code. TDD, security, architecture, quality gates — enforced automatically. Context persists across every session. You see everything it does.</p>
+    <div class="hero-install sr delay-3">
+      <div class="install-block">
+        <code>npx shipworthy init</code>
+        <button class="copy-btn" aria-label="Copy install command">Copy</button>
       </div>
-      <div class="hero-terminal">
-        <div class="term-bar"><span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span><span class="term-title">zsh</span></div>
-        <div class="term-body">
-          <div class="term-line"><span class="t-prompt">$</span><span class="t-cmd">npx shipworthy init</span></div>
-          <div class="term-line"><span class="t-output">Shipworthy is ready. 52 skills active. Zero config needed.</span></div>
-          <div>&nbsp;</div>
-          <div class="term-line"><span class="t-prompt">$</span><span class="t-cmd">claude</span></div>
-          <div class="term-line"><span class="t-comment"># Just start talking. Guardrails are invisible.</span></div>
-          <div class="term-line"><span class="t-cmd">You:</span> <span class="t-output">Build me an invoice app with payments</span><span class="t-cursor"></span></div>
+      <a href="https://github.com/Vimalk0703/shipworthy" class="hero-gh">View on GitHub &rsaquo;</a>
+    </div>
+  </div>
+</section>
+
+<!-- Agent marquee -->
+<div class="marquee-wrap">
+  <div class="marquee" aria-hidden="true">
+    <span>Claude Code</span><span class="dot">/</span>
+    <span>Cursor</span><span class="dot">/</span>
+    <span>GitHub Copilot</span><span class="dot">/</span>
+    <span>OpenAI Codex</span><span class="dot">/</span>
+    <span>Windsurf</span><span class="dot">/</span>
+    <span>Gemini CLI</span><span class="dot">/</span>
+    <span>Claude Code</span><span class="dot">/</span>
+    <span>Cursor</span><span class="dot">/</span>
+    <span>GitHub Copilot</span><span class="dot">/</span>
+    <span>OpenAI Codex</span><span class="dot">/</span>
+    <span>Windsurf</span><span class="dot">/</span>
+    <span>Gemini CLI</span><span class="dot">/</span>
+    <span>Claude Code</span><span class="dot">/</span>
+    <span>Cursor</span><span class="dot">/</span>
+    <span>GitHub Copilot</span><span class="dot">/</span>
+    <span>OpenAI Codex</span><span class="dot">/</span>
+    <span>Windsurf</span><span class="dot">/</span>
+    <span>Gemini CLI</span><span class="dot">/</span>
+  </div>
+</div>
+
+<!-- Benchmark -->
+<section class="section bench-section" id="benchmark">
+  <div class="container">
+    <div class="sec-label sr">Benchmark</div>
+    <div class="sec-title sr">Same prompts. Same model.<br>One had Shipworthy.</div>
+    <p class="sec-desc sr">Two agents ran identical 7-turn non-technical founder prompts. 36 automated checks — written before either agent ran — scored the output.</p>
+
+    <div class="bench-split sr-scale">
+      <div class="bench-col fail">
+        <div class="bench-col-header">
+          <span class="bench-col-title">Without Shipworthy</span>
+          <div><span class="bench-score score-fail">41%</span><span class="bench-score-sub">15 / 36</span></div>
+        </div>
+        <div class="bench-rows">
+          <div class="bench-row"><span class="bench-row-label">Database</span><span class="bench-row-val">In-memory arrays</span></div>
+          <div class="bench-row"><span class="bench-row-label">Validation</span><span class="bench-row-val">None</span></div>
+          <div class="bench-row"><span class="bench-row-label">Logging</span><span class="bench-row-val">console.log</span></div>
+          <div class="bench-row"><span class="bench-row-label">Types</span><span class="bench-row-val">5x :any</span></div>
+          <div class="bench-row"><span class="bench-row-label">Tests</span><span class="bench-row-val">0</span></div>
+          <div class="bench-row"><span class="bench-row-label">Secrets</span><span class="bench-row-val">.env exposed</span></div>
+          <div class="bench-row"><span class="bench-row-label">Errors</span><span class="bench-row-val">None</span></div>
+        </div>
+      </div>
+      <div class="bench-col pass">
+        <div class="bench-col-header">
+          <span class="bench-col-title">With Shipworthy</span>
+          <div><span class="bench-score score-pass">97%</span><span class="bench-score-sub">35 / 36</span></div>
+        </div>
+        <div class="bench-rows">
+          <div class="bench-row"><span class="bench-row-label">Database</span><span class="bench-row-val">SQLite + schemas</span></div>
+          <div class="bench-row"><span class="bench-row-label">Validation</span><span class="bench-row-val">Zod on every route</span></div>
+          <div class="bench-row"><span class="bench-row-label">Logging</span><span class="bench-row-val">Pino structured</span></div>
+          <div class="bench-row"><span class="bench-row-label">Types</span><span class="bench-row-val">Strict TypeScript</span></div>
+          <div class="bench-row"><span class="bench-row-label">Tests</span><span class="bench-row-val">39 passing</span></div>
+          <div class="bench-row"><span class="bench-row-label">Secrets</span><span class="bench-row-val">Guarded + .gitignore</span></div>
+          <div class="bench-row"><span class="bench-row-label">Errors</span><span class="bench-row-val">Proper status codes</span></div>
         </div>
       </div>
     </div>
+    <p class="bench-note sr">Full methodology, all 10 task definitions, and reproduction scripts on <a href="https://github.com/Vimalk0703/shipworthy/blob/main/BENCHMARKS.md">GitHub</a>.</p>
   </div>
 </section>
 
-<!-- METRICS -->
-<section class="metrics">
+<!-- How it works — horizontal scroll -->
+<section class="section how-section" id="how">
   <div class="container">
-    <div class="metrics-grid reveal">
-      <div class="metric"><div class="metric-val">52</div><div class="metric-label">Engineering Skills</div></div>
-      <div class="metric"><div class="metric-val">5</div><div class="metric-label">Automated Hooks</div></div>
-      <div class="metric"><div class="metric-val">5</div><div class="metric-label">Agent Personas</div></div>
-      <div class="metric"><div class="metric-val">190</div><div class="metric-label">Tests Passing</div></div>
-      <div class="metric"><div class="metric-val">0</div><div class="metric-label">Dependencies</div></div>
+    <div class="sec-label sr">How it works</div>
+    <div class="sec-title sr">Install once. Everything<br>else is automatic.</div>
+  </div>
+  <div class="container">
+    <div class="how-track" id="howTrack">
+      <div class="how-card sr">
+        <div class="how-num">01</div>
+        <h3>One command to start</h3>
+        <p>Run <code style="font-family:var(--mono);background:var(--bg-elevated);padding:0.15em 0.4em;border-radius:3px;font-size:0.85em">npx shipworthy init</code> in any project. Hooks install automatically. Skills load on demand. No config files to edit, no workflows to learn.</p>
+      </div>
+      <div class="how-card sr delay-1">
+        <div class="how-num">02</div>
+        <h3>Hooks guard every action</h3>
+        <p>Six hooks run in real time. Files scanned for secrets before writes. Bash commands checked for destructive patterns. Dependencies monitored. Everything logged transparently to your terminal.</p>
+      </div>
+      <div class="how-card sr delay-2">
+        <div class="how-num">03</div>
+        <h3>Skills activate invisibly</h3>
+        <p>Say "build a payment API" and TDD, input validation, security, and API design skills activate automatically. You code normally. The engineering happens underneath.</p>
+      </div>
+      <div class="how-card sr delay-3">
+        <div class="how-num">04</div>
+        <h3>Context persists automatically</h3>
+        <p>Hooks capture every session event — commits, security warnings, pattern detections. A regression fence of "NEVER do X" rules loads every session. No more repeating the same mistakes.</p>
+      </div>
+      <div class="how-card sr delay-4">
+        <div class="how-num">05</div>
+        <h3>Quality compounds</h3>
+        <p>Session signals auto-process into learnings and fence rules at next session start. Corrections become permanent knowledge. Every session starts smarter than the last — 95% automatic.</p>
+      </div>
+    </div>
+    <div class="how-nav" id="howNav"></div>
+  </div>
+  <div class="container" style="margin-top: 3rem;">
+    <div class="terminal sr-scale">
+      <div class="term-bar">
+        <span class="term-dot"></span><span class="term-dot"></span><span class="term-dot"></span>
+        <span class="term-title">terminal</span>
+      </div>
+      <div class="term-body">
+        <div><span class="t-green">&#9875; shipworthy</span> <span class="t-dim">session-start</span></div>
+        <div><span class="t-dim">&#9484;&#9472; &#9875; shipworthy &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;</span></div>
+        <div><span class="t-dim">&#9474;</span> Tier: <span class="t-w">ENGINEER</span>  <span class="t-dim">&#9474;</span> Health: <span class="t-green">all passed</span>  <span class="t-dim">&#9474;</span></div>
+        <div><span class="t-dim">&#9474;</span> Skills: <span class="t-w">64</span>       <span class="t-dim">&#9474;</span> Hooks: <span class="t-w">6 active</span>   <span class="t-dim">&#9474;</span></div>
+        <div><span class="t-dim">&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;</span></div>
+        <div><span class="t-green">&#9875; shipworthy</span> <span class="t-dim">session-start &rsaquo;</span> Regression fence: <span class="t-w">5 rule(s) loaded</span></div>
+        <div><span class="t-green">&#9875; shipworthy</span> <span class="t-dim">session-start &rsaquo;</span> Unprocessed signals: <span class="t-w">8 from last session</span></div>
+        <div>&nbsp;</div>
+        <div><span class="t-green">&#9875; shipworthy</span> <span class="t-dim">pre-tool-use &rsaquo;</span> Scanning payments.ts</div>
+        <div><span class="t-green">&#9875; shipworthy</span> <span class="t-dim">signal &rsaquo;</span> captured: <span class="t-w">pattern</span> &mdash; console.log in payments.ts</div>
+        <div><span class="t-green">&#9875; shipworthy</span> <span class="t-dim">pre-tool-use &rsaquo;</span> <span style="color:#eab308">! console.log in prod: WARN</span></div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- BENCHMARK -->
-<section class="section" id="benchmark">
+<!-- Numbers -->
+<div class="numbers-band">
+  <div class="num-cell sr"><div class="num-val" data-target="64">0</div><div class="num-label">Skills</div></div>
+  <div class="num-cell sr delay-1"><div class="num-val" data-target="6">0</div><div class="num-label">Hooks</div></div>
+  <div class="num-cell sr delay-2"><div class="num-val" data-target="7">0</div><div class="num-label">Commands</div></div>
+  <div class="num-cell sr delay-3"><div class="num-val" data-target="6">0</div><div class="num-label">Agents</div></div>
+  <div class="num-cell sr delay-4"><div class="num-val" data-target="0">0</div><div class="num-label">Dependencies</div></div>
+</div>
+
+<!-- Capabilities -->
+<section class="section" id="capabilities">
   <div class="container">
-    <div class="sec-label reveal">Benchmark</div>
-    <div class="sec-title reveal">Same Prompts. Same Model.<br>Different Universe of Quality.</div>
-    <div class="sec-desc reveal">Two agents. Identical 7-turn founder prompts. One had Shipworthy. Scoring was automated with 25 objective checks written before either agent ran.</div>
-    <div class="bench-grid">
-      <div class="bench-card fail reveal">
-        <div class="bench-header"><span class="bench-label">Without Shipworthy</span><span class="bench-badge">GRADE F</span></div>
-        <div class="bench-score">41%</div>
-        <div class="bench-sub">15 / 36 checks passed</div>
-        <div class="bench-checks">
-          <div class="bench-check"><span class="chk-icon chk-fail">&#x2717;</span> In-memory arrays — data lost on restart</div>
-          <div class="bench-check"><span class="chk-icon chk-fail">&#x2717;</span> No input validation on any route</div>
-          <div class="bench-check"><span class="chk-icon chk-fail">&#x2717;</span> No linter, no coverage config</div>
-          <div class="bench-check"><span class="chk-icon chk-fail">&#x2717;</span> console.log in production code</div>
-          <div class="bench-check"><span class="chk-icon chk-fail">&#x2717;</span> 5 instances of TypeScript : any</div>
-          <div class="bench-check"><span class="chk-icon chk-fail">&#x2717;</span> No .gitignore — secrets exposed</div>
-          <div class="bench-check"><span class="chk-icon chk-fail">&#x2717;</span> No error handling on routes</div>
-          <div class="bench-check"><span class="chk-icon chk-pass">&#x2713;</span> Build succeeds</div>
+    <div class="sec-label sr">Capabilities</div>
+    <div class="sec-title sr">What 64 skills<br>actually cover.</div>
+    <p class="sec-desc sr">Each skill is a Markdown file. No code, no runtime, no dependencies. Just security-audited engineering instructions that make AI agents build production-grade software.</p>
+
+    <div class="cap-grid">
+      <div class="cap-cell sr">
+        <h3>Real-time guardrails</h3>
+        <p>Six hooks guard every action. Secrets caught before files are written. Destructive commands blocked before execution. Security scans logged transparently.</p>
+      </div>
+      <div class="cap-cell sr delay-1">
+        <h3>Test-driven by default</h3>
+        <p>Failing test first, then implementation, then verification. TDD happens automatically. You see "it works." Underneath: tests prove it.</p>
+      </div>
+      <div class="cap-cell sr delay-2">
+        <h3>Adaptive quality gates</h3>
+        <p>5 files: light touch. 50 files: coverage thresholds. 500 files: security scans, performance budgets, circular import detection.</p>
+      </div>
+      <div class="cap-cell sr delay-3">
+        <h3>14 security skills, audited</h3>
+        <p>Auto-detects application type — web, API, GraphQL, mobile, CLI, pipeline, IoT, desktop, infrastructure — and applies the right security checks. Every file in the repo passes a 12-test static security audit on every push.</p>
+      </div>
+      <div class="cap-cell sr delay-4">
+        <h3>Context intelligence</h3>
+        <p>Hooks capture session signals automatically. Regression fence loads anti-patterns every session. Auto-retro processes corrections into permanent knowledge. 95% automatic.</p>
+      </div>
+      <div class="cap-cell sr">
+        <h3>Full transparency</h3>
+        <p>Every hook, signal capture, and fence check logged with color-coded output. Skills announce themselves before activating. Toggle off with one environment variable.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand">&#9875; Shipworthy</div>
+      </div>
+      <div class="footer-cols">
+        <div>
+          <div class="footer-col-title">Product</div>
+          <a href="https://github.com/Vimalk0703/shipworthy">GitHub</a>
+          <a href="https://github.com/Vimalk0703/shipworthy/tree/main/docs">Docs</a>
+          <a href="https://github.com/Vimalk0703/shipworthy/blob/main/BENCHMARKS.md">Benchmarks</a>
+        </div>
+        <div>
+          <div class="footer-col-title">Community</div>
+          <a href="https://github.com/Vimalk0703/shipworthy/blob/main/CONTRIBUTING.md">Contributing</a>
+          <a href="https://github.com/Vimalk0703/shipworthy/blob/main/docs/blog/from-hackathon-win-to-open-source.md">Blog</a>
+          <a href="https://github.com/Vimalk0703/shipworthy/blob/main/CHANGELOG.md">Changelog</a>
         </div>
       </div>
-      <div class="bench-card pass reveal reveal-delay-1">
-        <div class="bench-header"><span class="bench-label">With Shipworthy</span><span class="bench-badge">GRADE A</span></div>
-        <div class="bench-score">97%</div>
-        <div class="bench-sub">35 / 36 checks passed</div>
-        <div class="bench-checks">
-          <div class="bench-check"><span class="chk-icon chk-pass">&#x2713;</span> SQLite database with proper schemas</div>
-          <div class="bench-check"><span class="chk-icon chk-pass">&#x2713;</span> Zod validation on every route</div>
-          <div class="bench-check"><span class="chk-icon chk-pass">&#x2713;</span> ESLint strict config — passing</div>
-          <div class="bench-check"><span class="chk-icon chk-pass">&#x2713;</span> Pino structured logging — 0 console.log</div>
-          <div class="bench-check"><span class="chk-icon chk-pass">&#x2713;</span> Zero : any types — strict TypeScript</div>
-          <div class="bench-check"><span class="chk-icon chk-pass">&#x2713;</span> .gitignore + .env protected</div>
-          <div class="bench-check"><span class="chk-icon chk-pass">&#x2713;</span> Error handling + proper status codes</div>
-          <div class="bench-check"><span class="chk-icon chk-pass">&#x2713;</span> 39 tests passing + coverage</div>
-        </div>
-      </div>
     </div>
-  </div>
-</section>
-
-<!-- FEATURES -->
-<section class="section section-alt" id="features">
-  <div class="container">
-    <div class="sec-label reveal">Capabilities</div>
-    <div class="sec-title reveal">Everything Happens Invisibly</div>
-    <div class="sec-desc reveal">You keep vibe coding at full speed. Shipworthy handles the engineering you don't know to ask for.</div>
-    <div class="feat-grid">
-      <div class="feat-card reveal">
-        <div class="feat-icon fi-purple">&#x1f4cb;</div>
-        <h3>Invisible Specifications</h3>
-        <p>Before code starts, a lightweight spec is generated silently. Deliverables, acceptance criteria, constraints. You never see it. Claude builds against it.</p>
-      </div>
-      <div class="feat-card reveal reveal-delay-1">
-        <div class="feat-icon fi-green">&#x2705;</div>
-        <h3>Tests Before Code</h3>
-        <p>TDD happens automatically. Failing test first, then implementation, then verification. You see "it works." Underneath: 12 tests prove it.</p>
-      </div>
-      <div class="feat-card reveal reveal-delay-2">
-        <div class="feat-icon fi-red">&#x1f6e1;</div>
-        <h3>Real-Time Guardrails</h3>
-        <p>5 hooks guard every action. Secrets caught before files are written. Destructive commands blocked before execution. All advisory, never blocking.</p>
-      </div>
-      <div class="feat-card reveal">
-        <div class="feat-icon fi-orange">&#x1f4c8;</div>
-        <h3>Scaling Quality Gates</h3>
-        <p>5 files: light touch. 50 files: coverage thresholds. 500 files: security scans, performance budgets, circular import detection. Automatic.</p>
-      </div>
-      <div class="feat-card reveal reveal-delay-1">
-        <div class="feat-icon fi-cyan">&#x1f504;</div>
-        <h3>Self-Improving Loop</h3>
-        <p>Run /retro after a session. Sub-agents analyze corrections, patterns, and gaps. Learnings persist. Next session starts smarter. Eventually: one-shot.</p>
-      </div>
-      <div class="feat-card reveal reveal-delay-2">
-        <div class="feat-icon fi-blue">&#x1f3e2;</div>
-        <h3>Enterprise Ready</h3>
-        <p>PII detection, container security, API versioning, zero-downtime migrations, code complexity limits. Per-project configuration and preset bundles.</p>
-      </div>
+    <div class="footer-bottom">
+      <span>MIT License &middot; v1.4.1</span>
+      <span>Built by <a href="https://www.linkedin.com/in/vimal-kumar-parthasarathy/">Vimal Kumar</a></span>
     </div>
-  </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<section class="section" id="how-it-works">
-  <div class="container">
-    <div class="sec-label reveal">Under The Hood</div>
-    <div class="sec-title reveal">What Happens When You Say<br>"Build Me an Invoice App"</div>
-    <div class="flow">
-      <div class="flow-line"></div>
-      <div class="flow-step reveal"><div class="flow-num">1</div><div class="flow-text"><h3>Session Starts</h3><p>Hook fires in &lt;2s. Detects project type, maturity tier, diagnoses gaps, loads architecture spec and learnings from previous retrospectives.</p></div></div>
-      <div class="flow-step reveal"><div class="flow-num">2</div><div class="flow-text"><h3>Intent to Spec</h3><p>Generates a lightweight specification silently. What you want, deliverables, acceptance criteria. For non-technical users: completely invisible.</p></div></div>
-      <div class="flow-step reveal"><div class="flow-num">3</div><div class="flow-text"><h3>Architecture Awareness</h3><p>Detects tech stack, generates architecture spec with mandatory rules. Persists across sessions. Claude remembers your project structure tomorrow.</p></div></div>
-      <div class="flow-step reveal"><div class="flow-num">4</div><div class="flow-text"><h3>Test-Driven Development</h3><p>Writes failing test. Implements minimal code to pass. Verifies. Installs validation libraries, structured logging, real database. All automatic.</p></div></div>
-      <div class="flow-step reveal"><div class="flow-num">5</div><div class="flow-text"><h3>Verification</h3><p>Runs proof commands: tests pass, linter clean, build succeeds. Not "should work" — proven with evidence from actual command output.</p></div></div>
-      <div class="flow-step reveal"><div class="flow-num">6</div><div class="flow-text"><h3>Retrospective</h3><p>Run /retro to extract session learnings. Corrections, patterns, and gaps are analyzed by sub-agents. Approved learnings persist for next session.</p></div></div>
-    </div>
-  </div>
-</section>
-
-<!-- SKILLS -->
-<section class="section section-alt" id="skills">
-  <div class="container sec-center">
-    <div class="sec-label reveal">52 Skills</div>
-    <div class="sec-title reveal">Engineering Expertise,<br>Encoded as Markdown</div>
-    <div class="sec-desc reveal">Each skill is a Markdown file with YAML frontmatter. No code. No dependencies. No runtime. Just instructions that make Claude a better engineer.</div>
-    <div class="skills-grid reveal">
-      <div class="skill-pill"><span class="skill-num">3</span><div class="skill-info"><div class="skill-name">Core</div><div class="skill-sub">Routing, architecture, specs</div></div></div>
-      <div class="skill-pill"><span class="skill-num">5</span><div class="skill-info"><div class="skill-name">Planning</div><div class="skill-sub">Brainstorming, plans, decisions</div></div></div>
-      <div class="skill-pill"><span class="skill-num">5</span><div class="skill-info"><div class="skill-name">Quality</div><div class="skill-sub">TDD, gates, verification</div></div></div>
-      <div class="skill-pill"><span class="skill-num">5</span><div class="skill-info"><div class="skill-name">Security</div><div class="skill-sub">OWASP, PII, containers</div></div></div>
-      <div class="skill-pill"><span class="skill-num">8</span><div class="skill-info"><div class="skill-name">Architecture</div><div class="skill-sub">APIs, DB, observability</div></div></div>
-      <div class="skill-pill"><span class="skill-num">4</span><div class="skill-info"><div class="skill-name">Collaboration</div><div class="skill-sub">Agents, code review</div></div></div>
-      <div class="skill-pill"><span class="skill-num">12</span><div class="skill-info"><div class="skill-name">Operations</div><div class="skill-sub">CI/CD, git, migrations</div></div></div>
-      <div class="skill-pill"><span class="skill-num">2</span><div class="skill-info"><div class="skill-name">Frontend</div><div class="skill-sub">Accessibility, standards</div></div></div>
-      <div class="skill-pill"><span class="skill-num">2</span><div class="skill-info"><div class="skill-name">Meta</div><div class="skill-sub">Writing skills, retro</div></div></div>
-      <div class="skill-pill"><span class="skill-num">2</span><div class="skill-info"><div class="skill-name">Extensions</div><div class="skill-sub">E-commerce patterns</div></div></div>
-    </div>
-  </div>
-</section>
-
-<!-- FLYWHEEL -->
-<section class="section sec-center">
-  <div class="container">
-    <div class="sec-label reveal">The Loop</div>
-    <div class="sec-title reveal">Every Session Makes<br>the Next One Better</div>
-    <div class="sec-desc reveal">Static tools stay the same forever. Shipworthy compounds with every piece of work you do.</div>
-    <div class="wheel reveal">
-      <div class="wheel-node"><h4>Build</h4><p>Vibe code normally</p></div>
-      <span class="wheel-arrow">&rarr;</span>
-      <div class="wheel-node"><h4>Correct</h4><p>Fix what's off</p></div>
-      <span class="wheel-arrow">&rarr;</span>
-      <div class="wheel-node"><h4>/retro</h4><p>Extract patterns</p></div>
-      <span class="wheel-arrow">&rarr;</span>
-      <div class="wheel-node"><h4>Learn</h4><p>Save to project</p></div>
-      <span class="wheel-arrow">&rarr;</span>
-      <div class="wheel-node"><h4>Improve</h4><p>Next session: smarter</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- CONTEXT -->
-<section class="section section-alt sec-center">
-  <div class="container">
-    <div class="sec-label reveal">Lightweight</div>
-    <div class="sec-title reveal">Uses Less Than 1%<br>of Your Context Window</div>
-    <div class="sec-desc reveal">Master skill in context. Everything else loads on demand. Skills do their job and scroll out naturally.</div>
-    <div class="ctx-card reveal">
-      <div class="ctx-row"><span class="ctx-label">Session start</span><div class="ctx-track"><div class="ctx-fill f1"></div></div><span class="ctx-pct">1.0%</span></div>
-      <div class="ctx-row"><span class="ctx-label">Active work</span><div class="ctx-track"><div class="ctx-fill f2"></div></div><span class="ctx-pct">1.7%</span></div>
-      <div class="ctx-row"><span class="ctx-label">Heavy work</span><div class="ctx-track"><div class="ctx-fill f3"></div></div><span class="ctx-pct">3.0%</span></div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA -->
-<section class="cta">
-  <div class="orb"></div>
-  <div class="container">
-    <h2 class="reveal">Ready to Ship<br><span class="glow-text">Production-Grade Software?</span></h2>
-    <p class="sec-desc reveal" style="margin-left:auto;margin-right:auto;">One command. Zero configuration. Your code stays yours.<br>The guardrails are invisible.</p>
-    <div class="cta-actions reveal">
-      <a href="https://github.com/Vimalk0703/shipworthy" class="btn-main">
-        <svg viewBox="0 0 16 16" fill="currentColor" width="18" height="18"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-        View on GitHub
-      </a>
-      <a href="https://github.com/Vimalk0703/shipworthy/blob/main/CONTRIBUTING.md" class="btn-outline">Contribute</a>
-    </div>
-    <p class="cta-note reveal">MIT Licensed &middot; Markdown + Shell Scripts &middot; Works Everywhere Bash Runs</p>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <div class="container">
-    <div class="footer-links">
-      <a href="https://github.com/Vimalk0703/shipworthy">GitHub</a>
-      <a href="https://github.com/Vimalk0703/shipworthy/blob/main/docs/blog/from-hackathon-win-to-open-source.md">Blog</a>
-      <a href="https://www.linkedin.com/in/vimal-kumar-parthasarathy/">LinkedIn</a>
-      <a href="https://github.com/Vimalk0703/shipworthy/blob/main/CONTRIBUTING.md">Contributing</a>
-    </div>
-    <p>Built by <a href="https://www.linkedin.com/in/vimal-kumar-parthasarathy/">Vimal Kumar</a> &middot; Vibe coding is how you start. Engineering is what keeps it alive.</p>
   </div>
 </footer>
 
 <script>
-// Scroll reveal
-const obs = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
-}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+// Scroll progress bar
+const progress = document.getElementById('progress');
+window.addEventListener('scroll', () => {
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  progress.style.width = (window.scrollY / h * 100) + '%';
+});
 
-// Nav scroll effect
+// Nav
 const nav = document.getElementById('nav');
 window.addEventListener('scroll', () => {
-  nav.classList.toggle('scrolled', window.scrollY > 40);
+  nav.classList.toggle('scrolled', scrollY > 40);
 });
 
-// Smooth anchor links
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
-    const target = document.querySelector(a.getAttribute('href'));
-    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-  });
+// Scroll reveal — directional
+const srObs = new IntersectionObserver(
+  entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+  { threshold: 0.08, rootMargin: '0px 0px -60px 0px' }
+);
+document.querySelectorAll('.sr, .sr-left, .sr-right, .sr-scale').forEach(el => srObs.observe(el));
+
+// Copy
+document.querySelector('.copy-btn').addEventListener('click', function() {
+  navigator.clipboard.writeText('npx shipworthy init');
+  this.textContent = 'Copied';
+  setTimeout(() => this.textContent = 'Copy', 2000);
 });
+
+// Counting numbers
+const numObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+    const target = parseInt(el.dataset.target);
+    if (target === 0) { el.textContent = '0'; numObs.unobserve(el); return; }
+    let current = 0;
+    const step = Math.max(1, Math.floor(target / 30));
+    const interval = setInterval(() => {
+      current += step;
+      if (current >= target) { current = target; clearInterval(interval); }
+      el.textContent = current;
+    }, 30);
+    numObs.unobserve(el);
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.num-val').forEach(el => numObs.observe(el));
+
+// Horizontal scroll for How It Works
+const track = document.getElementById('howTrack');
+const howNav = document.getElementById('howNav');
+const cards = track.querySelectorAll('.how-card');
+let currentCard = 0;
+
+// Build nav dots
+cards.forEach((_, i) => {
+  const dot = document.createElement('button');
+  dot.className = 'how-dot' + (i === 0 ? ' active' : '');
+  dot.setAttribute('aria-label', 'Step ' + (i + 1));
+  dot.addEventListener('click', () => scrollToCard(i));
+  howNav.appendChild(dot);
+});
+
+function scrollToCard(index) {
+  currentCard = index;
+  const card = cards[index];
+  track.style.transform = 'translateX(-' + card.offsetLeft + 'px)';
+  track.style.transition = 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
+  howNav.querySelectorAll('.how-dot').forEach((d, i) => d.classList.toggle('active', i === index));
+}
+
+// Auto-advance
+let howInterval = setInterval(() => {
+  currentCard = (currentCard + 1) % cards.length;
+  scrollToCard(currentCard);
+}, 4000);
+
+// Pause on hover
+track.addEventListener('mouseenter', () => clearInterval(howInterval));
+track.addEventListener('mouseleave', () => {
+  howInterval = setInterval(() => {
+    currentCard = (currentCard + 1) % cards.length;
+    scrollToCard(currentCard);
+  }, 4000);
+});
+
+// Touch swipe
+let touchStartX = 0;
+track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; clearInterval(howInterval); }, { passive: true });
+track.addEventListener('touchend', e => {
+  const diff = touchStartX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 50) {
+    if (diff > 0 && currentCard < cards.length - 1) scrollToCard(currentCard + 1);
+    else if (diff < 0 && currentCard > 0) scrollToCard(currentCard - 1);
+  }
+}, { passive: true });
 </script>
+
 </body>
 </html>

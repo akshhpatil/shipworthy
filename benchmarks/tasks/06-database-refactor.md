@@ -2,7 +2,7 @@
 
 ## Prompt
 
-> Refactor the raw SQL queries to use Prisma ORM. Create proper migrations. Don't break existing functionality.
+> The database code is a mess — there are raw SQL strings scattered everywhere and it's hard to change anything without breaking something else. Can you clean it up so it's easier to maintain? Don't break anything that's already working.
 
 This prompt is given identically for both the **with-plugin** and **without-plugin** runs. No additional guidance or follow-up prompts are allowed.
 

@@ -5,6 +5,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-blue)]()
 [![Benchmark: +83%](https://img.shields.io/badge/Benchmark-+83%25%20Quality-brightgreen)](BENCHMARKS.md)
+[![Security Audited](https://img.shields.io/badge/Security-Audited-green)]()
+[![Zero Dependencies](https://img.shields.io/badge/Dependencies-0-brightgreen)]()
 
 ---
 
@@ -22,7 +24,7 @@ You end up building the same feature three times: once to get it working, once t
 
 ## The Solution
 
-**Shipworthy** is a Claude Code plugin that auto-activates every session and silently enforces production engineering practices. It detects your project type, generates an architecture spec, and maintains it across sessions. You vibe code at full speed -- the plugin handles TDD, security, quality gates, and 55 engineering skills invisibly. No configuration, no ceremony, no workflow changes.
+**Shipworthy** is a Claude Code plugin that auto-activates every session and enforces production engineering practices with full transparency. It detects your project type, generates an architecture spec, and maintains it across sessions. You vibe code at full speed -- the plugin handles TDD, security, quality gates, and 64 engineering skills while showing you exactly what it's doing. No configuration, no ceremony, no workflow changes.
 
 ## Install
 
@@ -42,7 +44,7 @@ npx shipworthy init --agent gemini
 
 | Agent | Setup | Hooks | Skills | Quality Gates |
 |-------|-------|-------|--------|--------------|
-| **Claude Code** | `npx shipworthy init` | Full | Full (55) | Automated |
+| **Claude Code** | `npx shipworthy init` | Full | Full (64) | Automated |
 | **Cursor** | `npx shipworthy init --agent cursor` | Rules | Full | Manual |
 | **GitHub Copilot** | `npx shipworthy init --agent copilot` | Rules | Full | Manual |
 | **OpenAI Codex** | `npx shipworthy init --agent codex` | Rules | Full | Manual |
@@ -60,15 +62,31 @@ That is the only setup. Here is what happens next:
 5. **You build features normally.** Say "add a payment endpoint" and Claude automatically applies API design standards, security-first development, TDD, and quality gates. You never asked it to. It just does.
 6. **Before completing, it verifies.** Tests pass, no secrets leaked, no regressions, build is clean. Evidence, not claims.
 
-## Three Pillars
+## Four Pillars
 
 ### 1. Invisible Discipline
 Engineering guardrails activate automatically based on what you are doing. Writing a new feature triggers brainstorming, then planning, then TDD. Creating an API endpoint activates API design standards and security. You never invoke these manually -- they fire when relevant and stay silent when they are not.
 
-### 2. Architecture as Memory
+### 2. Full Transparency
+Every Shipworthy action is visible. Hooks log color-coded activity to your terminal in real time — security scans, compliance checks, push validation. Skills announce themselves before activating. Commands, agents, templates, and adapters all identify when they're contributing. You always know what Shipworthy is doing and why.
+
+```
+┌─ ⚓ shipworthy ─────────────────────────────┐
+│  Tier: ENGINEER  │  Health: all passed       │
+│  Skills: 55      │  Hooks: 6 active          │
+└──────────────────────────────────────────────┘
+⚓ shipworthy  14:32:05  pre-tool-use  ›  Scanning: service.ts
+⚓ shipworthy  14:32:05  pre-tool-use  ›  All checks passed ✓
+```
+
+> ⚓ **shipworthy** › skill: `api-design-standards` + `security-first-development` — designing secure endpoint
+
+Toggle off with `SHIPWORTHY_TRANSPARENCY=0` or `"transparency": false` in `.shipworthy/config.json`.
+
+### 3. Architecture as Memory
 The architecture spec is Claude's long-term memory for your project. Mandatory rules, directory conventions, naming patterns, tech choices -- all persisted and enforced. Session 5 knows everything session 1 decided. No more "Claude forgot we use Prisma" or "it put the route in the wrong directory again."
 
-### 3. Cross-Session Memory
+### 4. Cross-Session Memory
 Inspired by production agent memory architectures, Shipworthy manages a `.shipworthy/` directory as persistent project memory:
 
 - **INDEX.md** -- auto-generated index of all project memory, refreshed every session. Survives context compaction so Claude can rediscover what the project knows mid-conversation.
@@ -78,7 +96,7 @@ Inspired by production agent memory architectures, Shipworthy manages a `.shipwo
 - **Session pruning** -- keeps the 10 most recent session summaries, deletes older ones. Valuable patterns from old sessions should already be captured in learnings via retrospectives.
 - **Absolute dates everywhere** -- all timestamps use `YYYY-MM-DD`, never "yesterday" or "last week". Relative dates become meaningless across sessions.
 
-### 4. Graduated Rigor
+### 5. Graduated Rigor
 A weekend prototype should not face the same ceremony as an enterprise platform. The plugin scales its enforcement: lightweight checks for small projects, full quality gates as your codebase grows. You start fast and the guardrails tighten as complexity demands it.
 
 ## User Experience Tiers
@@ -89,12 +107,25 @@ A weekend prototype should not face the same ceremony as an enterprise platform.
 | **Maker** | Some experience, growing project | Moderate ceremony. Explains why tests matter. Offers choices on architecture decisions. |
 | **Engineer** | Production codebase, CI/CD | Full TDD, quality gates, architecture enforcement. Every PR is verified before completion. |
 
-## Skills (55)
+## Security
+
+v1.4.1 includes a comprehensive security audit of every file in the repository. All 64 skills, 6 hooks, 8 templates, 6 agents, 5 adapters, and the CLI entry point were audited for code injection, data exfiltration, unsafe operations, and supply chain risks.
+
+**Audit results:**
+- 6 Python code injection sites in hooks -- **fixed** (shell variables no longer interpolated into code strings)
+- 1 TOCTOU race condition in session markers -- **fixed** (moved to user-owned directory with hashed names)
+- 1 command injection in CLI -- **fixed** (replaced shell template literal with array arguments)
+- 12 automated security tests run on every push (no network requests, no obfuscated code, no secrets, no unsafe /tmp, safe permissions, zero dependencies)
+- All skills, templates, agents, commands, adapters, and presets: **clean**
+
+See [RELEASE-NOTES.md](RELEASE-NOTES.md) for full details.
+
+## Skills (64)
 
 ### Core (3)
 | Skill | What It Does |
 |-------|-------------|
-| **using-shipworthy** | Master router -- loaded every session, dispatches to relevant skills |
+| **using-shipworthy** | Master routing skill -- loaded at every session start. Defines skill priority and routing. |
 | **architecture-awareness** | Auto-detects project type, generates and enforces architecture spec |
 | **intent-to-spec** | Converts vague requests into detailed specs (invisible for Builder, shown for Engineer) |
 
@@ -107,7 +138,7 @@ A weekend prototype should not face the same ceremony as an enterprise platform.
 | **design-documents** | Creates Architecture Decision Records (ADRs) |
 | **decision-frameworks** | Structured decision-making for trade-offs |
 
-### Quality (5)
+### Quality (8)
 | Skill | What It Does |
 |-------|-------------|
 | **test-driven-development** | RED-GREEN-REFACTOR discipline for every feature |
@@ -115,8 +146,11 @@ A weekend prototype should not face the same ceremony as an enterprise platform.
 | **verification-before-completion** | Requires evidence (passing tests, clean build) before marking work done |
 | **error-handling-patterns** | Structured errors, recovery strategies, and user-facing messages |
 | **code-complexity** | Identifies and refactors complex code |
+| **response-schema-validation** | Enforces schema validation on every API response before reaching clients |
+| **feedback-driven-adaptation** | Adapts guardrail enforcement dynamically based on user signals and project trajectory |
+| **confidence-based-strictness** | Scales verification depth based on uncertainty — routine CRUD vs crypto/financial code |
 
-### Security (11)
+### Security (14)
 | Skill | What It Does |
 |-------|-------------|
 | **security-first-development** | OWASP-aware coding -- input validation, auth, secrets management |
@@ -128,6 +162,8 @@ A weekend prototype should not face the same ceremony as an enterprise platform.
 | **threat-modeling** | Structured threat analysis |
 | **compliance-awareness** | HIPAA, PCI-DSS, SOC2, GDPR guidance |
 | **container-security** | Docker/container-specific hardening |
+| **bias-detection** | Flags discriminatory logic in scoring, pricing, ranking, and access control code |
+| **vendor-risk-assessment** | Evaluates third-party services with 3-tier framework before adoption |
 
 ### Architecture (9)
 | Skill | What It Does |
@@ -150,12 +186,16 @@ A weekend prototype should not face the same ceremony as an enterprise platform.
 | **requesting-code-review** | Structured review via the code-reviewer agent |
 | **receiving-code-review** | Technical verification over performative agreement |
 
-### Operations (12)
+### Operations (15)
 | Skill | What It Does |
 |-------|-------------|
+| **environment-setup** | Auto-generates .env.example and validates environment configuration |
+| **session-memory** | Cross-session memory system for specs, decisions, and plans |
+| **tech-debt-tracking** | Document shortcuts so they get fixed, not forgotten |
+| **feature-flag-discipline** | Manage feature flags with expiration dates and kill switches |
+| **ci-cd-awareness** | Pipeline design, rollback strategies, and feature flags |
 | **using-git-worktrees** | Isolated workspaces for parallel development branches |
 | **finishing-a-development-branch** | 5-step completion workflow: tests, cleanup, docs, PR, verify |
-| **ci-cd-awareness** | Pipeline design, rollback strategies, feature flags |
 | **tech-debt-tracking** | Document shortcuts so they get fixed, not forgotten |
 | **session-memory** | Cross-session persistence via `.shipworthy/` with INDEX.md, pruning, and consolidation |
 | **production-readiness** | Pre-deployment checklist |
@@ -165,17 +205,20 @@ A weekend prototype should not face the same ceremony as an enterprise platform.
 | **feature-flag-discipline** | Gradual rollout, kill switches |
 | **incident-response** | Outage response procedures |
 | **slo-sli-definition** | Service level objectives and indicators |
+| **context-manager** | Manages context budget across skills, prevents context window overflow |
+| **scope-creep-detection** | Detects when tasks expand beyond original boundaries, gets explicit approval |
+| **guardrail-audit-log** | Immutable, append-only audit trail for all guardrail events |
 
 ### Frontend (2)
 | Skill | What It Does |
 |-------|-------------|
 | **accessibility** | WCAG 2.1 AA baseline for every UI component |
-| **frontend-standards** | Component patterns, state management, rendering best practices |
+| **frontend-standards** | Component patterns, state management, and rendering best practices |
 
 ### Documentation (1)
 | Skill | What It Does |
 |-------|-------------|
-| **documentation-as-code** | JSDoc, README sync, ADRs, changelog -- documentation that stays current |
+| **documentation-as-code** | JSDoc, README sync, ADRs, and changelog maintenance |
 
 ### Debugging (1)
 | Skill | What It Does |
@@ -224,7 +267,7 @@ Specialized AI personas dispatched by skills for focused review:
 | **security-auditor** | Scans for vulnerabilities, secrets, auth gaps, injection risks |
 | **test-strategist** | Evaluates test coverage, suggests missing test cases, reviews test quality |
 | **project-doctor** | Infrastructure gap analysis with auto-fix recommendations |
-| **pre-push-validator** | Runs 7-check validation suite (hooks, frontmatter, CSO, routing, cross-refs, quality, structure) |
+| **pre-push-validator** | Runs 8-check validation suite (hooks, frontmatter, CSO, routing, cross-refs, quality, structure, security) |
 
 ## Commands
 
@@ -235,7 +278,7 @@ Specialized AI personas dispatched by skills for focused review:
 | `/health` | Quick project health dashboard -- see where you stand at a glance |
 | `/diagnose` | Infrastructure gap analysis with auto-fix options via project-doctor agent |
 | `/retro` | Run a retrospective -- extract signals, save learnings, consolidate memory |
-| `/validate` | Pre-push validation gate -- runs the full 7-check suite before pushing |
+| `/validate` | Pre-push validation gate -- runs the full 8-check suite before pushing |
 
 ## Before and After
 

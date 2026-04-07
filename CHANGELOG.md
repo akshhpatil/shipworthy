@@ -7,6 +7,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-04-06
+
+### Fixed
+- **CRITICAL:** Python code injection in `hooks/lib.sh` (3 sites) — shell variables no longer interpolated into Python code strings
+- **CRITICAL:** Python code injection in `hooks/session-start` (3 sites) — same fix pattern using `os.environ[]`
+- **HIGH:** TOCTOU race condition in session marker — moved from `/tmp` to `~/.shipworthy/sessions/` with hashed filenames
+- **MEDIUM:** Command injection in `bin/shipworthy.cjs` — replaced `execSync` with `execFileSync` array arguments
+
+### Added
+- `tests/security/test-security-audit.sh` — 12 static analysis security tests
+- Pre-push validation extended to 8 checks (was 7)
+- Security Audited badge in README
+- `benchmarks/results/.gitignore` safety net for generated .env files
+
+### Changed
+- All Python one-liners in hooks use single-quoted strings with `os.environ[]` instead of shell interpolation
+- Session markers use SHA-256 hashed project paths in user-owned directory
+
+## [1.4.0] - 2026-04-05
+
+### Added
+- 7 new LLM guardrail skills: response-schema-validation, scope-creep-detection, feedback-driven-adaptation, confidence-based-strictness, bias-detection, vendor-risk-assessment, guardrail-audit-log
+
+## [1.3.0] - 2026-04-04
+
+### Added
+- **Context Intelligence System** — automated context management that captures, organizes, and loads project knowledge across sessions
+  - **`sw_signal()` function** in `hooks/lib.sh` — captures session events (commits, security warnings, pattern detections, dependency changes) to `.shipworthy/.session-signals`
+  - **Signal logging** in all 3 tool-use hooks (`pre-tool-use`, `post-tool-use`, `post-tool-use-write`) — 12 signal capture points across security, pattern, git, dependency, and migration categories
+  - **Regression fence** — new `.shipworthy/regression-fence.md` concept loaded every session as hard constraints. "NEVER/ALWAYS" rules anchored to file paths. Max 20 entries, auto-populated via `/retro`
+  - **Regression fence loading** in `session-start` hook — budget-aware injection (full or summarized), priority between architecture spec and plans
+  - **Fence violation detection** in `post-tool-use-write` — advisory warning when written code matches a `NEVER use X` fence rule
+  - **Auto-retro at session start** — when unprocessed signals exist from last session, Claude auto-processes them into fence entries and learnings before new work begins (user just approves with "yes")
+  - **`context-manager` skill** — teaches the 7 principles of context engineering (prohibitions beat descriptions, anchor to file paths, negative examples anchor harder, constitution vs working memory, only write what Claude can't infer, ordering is load-bearing, zero global bleed)
+  - **`/context` command** — on-demand context health dashboard showing .shipworthy/ completeness, fence health, signal count, and actionable suggestions
+  - **Enhanced retrospective skill** — reads `.session-signals`, proposes regression fence entries with triage logic (fence vs learnings vs auto-memory), clears signals after processing
+  - **Transparency for signals** — every signal capture shows in Claude Code terminal via `sw_log info "signal" "captured: ..."`
+  - **INDEX.md includes regression fence** — `generate_index()` now lists fence rule count
+  - **23 new tests** in `test-context-management.sh` — unit tests for sw_signal, session-start fence/signal loading, integration tests with real hook input, fence violation detection, budget compliance
+  - **Routing table updated** — `context-manager` skill added to using-shipworthy skill selection guide
+- **ShellCheck in CI** — bash linting for all 6 hooks and test scripts
+- **Markdownlint in CI** — formatting enforcement for skill and doc Markdown files
+- **Markdownlint config** (`.markdownlint.json`) — relaxed rules for skill file structure
+- **RELEASE.md** — solo-maintainer release checklist with versioning rules
+- **GitHub labels** — `needs-triage`, `accepted` for lightweight issue triage workflow
+- **Branch protection on main** — requires all CI checks to pass, blocks force pushes
+
+## [1.2.0] - 2026-04-02
+
+### Added
+- **Full Transparency System** — two-track observability across every Shipworthy component
+  - **Shell track**: Color-coded ANSI stderr logging from all 6 hooks (session-start banner, security scan results, compliance checks, push validation)
+  - **Instruction track**: Transparency Protocol in master routing skill — Claude announces every skill activation, default enforcement, routing decision, conflict resolution, and architecture enforcement
+  - Transparency headers on all 6 commands, 6 agents, 8 templates, and 5 adapters
+  - Branded `⚓ shipworthy ›` prefix with cyan/green/yellow/red color scheme per severity level
+  - Toggleable via `SHIPWORTHY_TRANSPARENCY=0` env var or `"transparency": false` in config
+  - 10 new hook transparency tests + 5 instruction track tests (all passing)
+
 ## [1.1.0] - 2026-03-31
 
 ### Added
@@ -53,6 +111,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Starter projects for benchmarking (Express+TS, security bug, N+1 query)
 - First benchmark result: +83% score improvement on REST API CRUD task (22/25 vs 12/25)
 
-[Unreleased]: https://github.com/Vimalk0703/shipworthy/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/Vimalk0703/shipworthy/compare/v1.2.0...HEAD
 [1.1.0]: https://github.com/Vimalk0703/shipworthy/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/Vimalk0703/shipworthy/releases/tag/v1.0.0

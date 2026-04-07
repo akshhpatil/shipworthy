@@ -56,7 +56,7 @@ Shipworthy is an open source engineering layer for AI coding agents. You install
 npx shipworthy init
 ```
 
-What happens next is invisible. When you start a Claude Code session, a hook fires in under two seconds. It detects your project type, determines how mature your codebase is, checks for gaps (missing tests? no linter? .env not gitignored?), and injects an engineering routing layer that orchestrates 52 skills.
+What happens next is invisible. When you start a Claude Code session, a hook fires in under two seconds. It detects your project type, determines how mature your codebase is, checks for gaps (missing tests? no linter? .env not gitignored?), and injects an engineering routing layer that orchestrates 55 skills.
 
 You see nothing. You just start talking normally.
 
@@ -158,7 +158,7 @@ But right now, most of what gets built this way has a shelf life of about one de
 
 The solution isn't to stop vibe coding. It's to make vibe coding safe for production. To add an engineering layer so invisible that the founder never knows it's there, but the software is fundamentally more robust because of it.
 
-That's what Shipworthy is. 52 engineering skills that fire automatically. 5 hooks that guard every action. A self-improving loop that gets better with every session. And an architecture that scales from "just me in a weekend" to "enterprise team with compliance requirements."
+That's what Shipworthy is. 55 engineering skills that fire automatically. 6 hooks that guard every action. A self-improving loop that gets better with every session. And an architecture that scales from "just me in a weekend" to "enterprise team with compliance requirements."
 
 One install command. Zero configuration. The rest is invisible.
 

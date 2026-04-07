@@ -1,5 +1,8 @@
 # Shipworthy — Production Engineering Guardrails
 
+When using this adapter, first output:
+> ⚓ **shipworthy** › adapter: `copilot` — translating Shipworthy skills for Copilot
+
 > Is your code worthy of shipping?
 
 ## Non-Negotiable Defaults

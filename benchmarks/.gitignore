@@ -6,3 +6,5 @@ results/*/
 !results/*-scores.json
 !results/*-log*.txt
 !results/expense-tracker-v2/
+!results/11-bookmark-api-with/
+!results/11-bookmark-api-without/

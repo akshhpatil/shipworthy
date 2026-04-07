@@ -1,5 +1,8 @@
 # Architecture Specification: Go Service
 
+When applying this template, first output:
+> ⚓ **shipworthy** › template: `go-service` — scaffolding Go project structure
+
 ## Project Identity
 - **Type**: Go HTTP service
 - **Language**: Go 1.22+

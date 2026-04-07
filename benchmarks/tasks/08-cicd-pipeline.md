@@ -2,7 +2,7 @@
 
 ## Prompt
 
-> Set up a GitHub Actions CI/CD pipeline. It should lint, test, build, and deploy to staging on push to main.
+> Every time I push code I'm scared I'll break something. I want it set up so the code gets checked automatically before it goes live — run the tests, make sure nothing is broken, and deploy it if everything looks good.
 
 This prompt is given identically for both the **with-plugin** and **without-plugin** runs. No additional guidance or follow-up prompts are allowed.
 

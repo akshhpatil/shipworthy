@@ -38,6 +38,8 @@ if [ -z "$FILE_PATH" ]; then
   exit 0
 fi
 
+sw_log info post-tool-use-write "Checking: $(basename "$FILE_PATH" 2>/dev/null || echo 'unknown')"
+
 MESSAGE=""
 
 # ============================================================
@@ -54,6 +56,8 @@ if [[ "$BASENAME" == *test* ]] || [[ "$BASENAME" == *spec* ]] || [[ "$BASENAME" 
     if [ -f "$ARCH_SPEC_PATH" ] && grep -qi "colocat" "$ARCH_SPEC_PATH" 2>/dev/null; then
       : # Colocated tests are the convention, no warning
     else
+      sw_check post-tool-use-write "Test file location" warn
+      sw_signal "post-tool-use-write" "pattern" "test-misplaced: $(basename "$FILE_PATH" 2>/dev/null || echo 'unknown')"
       MESSAGE="${MESSAGE}Test file written outside standard test directory. If this is intentional (colocated tests), update architecture spec. "
     fi
   fi
@@ -71,6 +75,8 @@ if [[ "$FILE_PATH" == *.ts ]] || [[ "$FILE_PATH" == *.tsx ]]; then
         # Use word boundary and skip comments (lines starting with // or *)
         ANY_COUNT=$(grep -v '^\s*//' "$FILE_PATH" 2>/dev/null | grep -v '^\s*\*' | grep -cE ':\s*any\b' 2>/dev/null || echo "0")
         if [ "$ANY_COUNT" -gt 0 ]; then
+          sw_check post-tool-use-write "TypeScript :any" warn
+          sw_signal "post-tool-use-write" "pattern" "typescript-any: ${ANY_COUNT} instance(s) in $(basename "$FILE_PATH" 2>/dev/null || echo 'unknown')"
           MESSAGE="${MESSAGE}TypeScript file contains ${ANY_COUNT} instance(s) of ': any'. Use 'unknown' with type guards instead. "
         fi
       fi
@@ -84,9 +90,33 @@ fi
 if [ -f "$FILE_PATH" ]; then
   if grep -qE '(app\.(get|post|put|patch|delete)|router\.(get|post|put|patch|delete)|@(Get|Post|Put|Patch|Delete))' "$FILE_PATH" 2>/dev/null; then
     if ! grep -qE '(zod|Zod|z\.|Pydantic|pydantic|validator)' "$FILE_PATH" 2>/dev/null; then
+      sw_check post-tool-use-write "Route validation" warn
+      sw_signal "post-tool-use-write" "pattern" "route-no-validation: $(basename "$FILE_PATH" 2>/dev/null || echo 'unknown')"
       MESSAGE="${MESSAGE}Route handler detected without input validation import. Consider adding Zod (JS/TS) or Pydantic (Python). "
     fi
   fi
+fi
+
+# ============================================================
+# Check 4: Regression fence violation detection
+# ============================================================
+FENCE_PATH="$PROJECT_ROOT/.shipworthy/regression-fence.md"
+if [ -f "$FENCE_PATH" ] && [ -f "$FILE_PATH" ]; then
+  WRITTEN_CONTENT=$(cat "$FILE_PATH" 2>/dev/null || true)
+  while IFS= read -r rule_heading; do
+    [ -z "$rule_heading" ] && continue
+    rule_text="${rule_heading#\#\# }"
+    # Match "NEVER use X" patterns — check if X appears in the written file
+    if echo "$rule_text" | grep -qiE '^NEVER use ' 2>/dev/null; then
+      forbidden=$(echo "$rule_text" | sed 's/^NEVER use //i' | awk '{print $1}')
+      if [ -n "$forbidden" ] && echo "$WRITTEN_CONTENT" | grep -qi "$forbidden" 2>/dev/null; then
+        sw_check post-tool-use-write "Regression fence" warn
+        sw_signal "post-tool-use-write" "fence-violation" "${rule_text} in $(basename "$FILE_PATH" 2>/dev/null || echo 'unknown')"
+        MESSAGE="${MESSAGE}Regression fence violation: ${rule_text}. Check .shipworthy/regression-fence.md. "
+        break  # One warning is enough, don't spam
+      fi
+    fi
+  done < <(grep '^## ' "$FENCE_PATH" 2>/dev/null || true)
 fi
 
 # ============================================================
@@ -96,5 +126,6 @@ if [ -n "$MESSAGE" ]; then
   ESCAPED_MSG=$(printf '%s' "$MESSAGE" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g' | tr -d '\n\r')
   echo "{\"hookSpecificOutput\":{\"message\":\"[shipworthy] Advisory: ${ESCAPED_MSG}\"}}"
 else
+  sw_log info post-tool-use-write "Compliance OK ✓"
   echo '{}'
 fi

@@ -2,7 +2,7 @@
 
 ## Prompt
 
-> Add JWT authentication to this Express API. Users should be able to register, login, and access protected routes. Store passwords securely.
+> I need people to be able to create an account and log in. Once they're logged in, they should stay logged in. Pages that need a logged-in user should bounce people to the login screen if they're not signed in.
 
 This prompt is given identically for both the **with-plugin** and **without-plugin** runs. No additional guidance or follow-up prompts are allowed.
 

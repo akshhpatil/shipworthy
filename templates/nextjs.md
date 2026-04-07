@@ -1,5 +1,8 @@
 # Architecture Specification: Next.js Application
 
+When applying this template, first output:
+> ⚓ **shipworthy** › template: `nextjs` — scaffolding Next.js project structure
+
 ## Project Identity
 - **Type**: Next.js App Router application
 - **Language**: TypeScript (strict mode)

@@ -6,13 +6,11 @@
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 START_TIME=$(date +%s)
 
 TOTAL_CHECKS=0
 PASSED_CHECKS=0
 FAILED_CHECKS=0
-WARN_CHECKS=0
 SECTION_RESULTS=""
 
 section_pass() {
@@ -35,7 +33,7 @@ echo "╚═══════════════════════�
 echo ""
 
 # ---- 1. Hook Tests ----
-echo "━━━ 1/7: Hook Tests ━━━"
+echo "━━━ 1/8: Hook Tests ━━━"
 if bash "$SCRIPT_DIR/run-all-tests.sh" > /tmp/shipworthy-hooks.log 2>&1; then
   section_pass "Hook tests (37 tests)"
   echo "  All hook tests passed."
@@ -46,7 +44,7 @@ fi
 echo ""
 
 # ---- 2. Skill Frontmatter ----
-echo "━━━ 2/7: Skill Frontmatter ━━━"
+echo "━━━ 2/8: Skill Frontmatter ━━━"
 if bash "$SCRIPT_DIR/skills/test-skill-frontmatter.sh" > /tmp/shipworthy-frontmatter.log 2>&1; then
   section_pass "Skill frontmatter validation"
   SKILL_COUNT=$(grep "Skills checked:" /tmp/shipworthy-frontmatter.log | grep -oE '[0-9]+' || echo "?")
@@ -58,7 +56,7 @@ fi
 echo ""
 
 # ---- 3. CSO Compliance ----
-echo "━━━ 3/7: CSO Compliance ━━━"
+echo "━━━ 3/8: CSO Compliance ━━━"
 if [ -f "$SCRIPT_DIR/skills/test-cso-format.sh" ]; then
   if bash "$SCRIPT_DIR/skills/test-cso-format.sh" > /tmp/shipworthy-cso.log 2>&1; then
     section_pass "CSO (Claude Search Optimization)"
@@ -73,7 +71,7 @@ fi
 echo ""
 
 # ---- 4. Skill Routing ----
-echo "━━━ 4/7: Skill Routing ━━━"
+echo "━━━ 4/8: Skill Routing ━━━"
 if bash "$SCRIPT_DIR/skills/test-skill-routing.sh" > /tmp/shipworthy-routing.log 2>&1; then
   section_pass "Skill routing table"
   echo "  All skills reachable from routing table."
@@ -84,7 +82,7 @@ fi
 echo ""
 
 # ---- 5. Cross-References ----
-echo "━━━ 5/7: Cross-References ━━━"
+echo "━━━ 5/8: Cross-References ━━━"
 if [ -f "$SCRIPT_DIR/skills/test-cross-references.sh" ]; then
   if bash "$SCRIPT_DIR/skills/test-cross-references.sh" > /tmp/shipworthy-xref.log 2>&1; then
     section_pass "Cross-reference validation"
@@ -99,7 +97,7 @@ fi
 echo ""
 
 # ---- 6. Skill Quality ----
-echo "━━━ 6/7: Skill Quality ━━━"
+echo "━━━ 6/8: Skill Quality ━━━"
 if [ -f "$SCRIPT_DIR/skills/test-skill-quality.sh" ]; then
   if bash "$SCRIPT_DIR/skills/test-skill-quality.sh" > /tmp/shipworthy-quality.log 2>&1; then
     section_pass "Skill quality checks"
@@ -114,7 +112,7 @@ fi
 echo ""
 
 # ---- 7. Repo Structure ----
-echo "━━━ 7/7: Repository Structure ━━━"
+echo "━━━ 7/8: Repository Structure ━━━"
 if [ -f "$SCRIPT_DIR/structure/test-repo-structure.sh" ]; then
   if bash "$SCRIPT_DIR/structure/test-repo-structure.sh" > /tmp/shipworthy-structure.log 2>&1; then
     section_pass "Repository structure"
@@ -125,6 +123,21 @@ if [ -f "$SCRIPT_DIR/structure/test-repo-structure.sh" ]; then
   fi
 else
   section_fail "Repo structure test script missing"
+fi
+echo ""
+
+# ---- 8. Security Audit ----
+echo "━━━ 8/8: Security Audit ━━━"
+if [ -f "$SCRIPT_DIR/security/test-security-audit.sh" ]; then
+  if bash "$SCRIPT_DIR/security/test-security-audit.sh" > /tmp/shipworthy-security.log 2>&1; then
+    section_pass "Security audit"
+    echo "  All security checks passed."
+  else
+    section_fail "Security audit"
+    grep "FAIL:" /tmp/shipworthy-security.log | head -10 || true
+  fi
+else
+  section_fail "Security audit test script missing"
 fi
 echo ""
 

@@ -1,3 +1,8 @@
+Before executing this command, output:
+> ⚓ **shipworthy** › command: `/diagnose` — analyzing project infrastructure gaps
+
+---
+
 Run a full project infrastructure diagnosis.
 
 Unlike `/audit` (which reviews code quality), this command checks what's **missing entirely** from the project.
